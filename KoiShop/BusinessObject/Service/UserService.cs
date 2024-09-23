@@ -20,25 +20,44 @@ namespace BusinessObject.Service
             _userRepo = repo;
             _mapper = mapper;
         }
-        public async Task<CreateUserDTO> CreateUser(CreateUserDTO userDTO)
+        public async Task<ServiceResponseFormat<CreateUserDTO>> CreateUser(CreateUserDTO userDTO)
         {
+            var res=new ServiceResponseFormat<CreateUserDTO>();
             try
             {
                 var mapp=_mapper.Map<User>(userDTO);
                 await _userRepo.CreateUser(mapp);
-                return userDTO;
+                res.Success = true;
+                res.Message = "User created successfully";
+                res.Data = userDTO;
+                return res;
             }
             catch (Exception ex) 
             {
-                throw new Exception(ex.Message);
+                res.Success = false;
+                res.Message = $"Fail to create User:{ex.Message}";
             }
+            return res;
         }
 
-        public async Task<IEnumerable<CreateUserDTO>> GetAllUser()
+        public async Task<ServiceResponseFormat<IEnumerable<CreateUserDTO>>> GetAllUser()
         {
-            var users= await _userRepo.GetAllUser();
-            var mapp = _mapper.Map<IEnumerable<CreateUserDTO>>(users);
-            return mapp;
+            var res = new ServiceResponseFormat<IEnumerable<CreateUserDTO>>();
+            try
+            {
+                var users = await _userRepo.GetAllUser();
+                var mapp = _mapper.Map<IEnumerable<CreateUserDTO>>(users);
+                res.Success = true;
+                res.Message = "User created successfully";
+                res.Data = mapp;
+                return res;
+            }
+            catch (Exception ex) 
+            {
+                res.Success = false;
+                res.Message = $"Fail to get User:{ex.Message}";
+            }
+            return res;
         }
     }
 }

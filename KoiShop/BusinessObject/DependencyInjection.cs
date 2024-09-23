@@ -15,8 +15,13 @@ namespace BusinessObject
     {
         public static IServiceCollection AddService(this IServiceCollection services, string? DatabaseConnection)
         {
+            //User
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepo, UserRepo>();
+            //Role
+            services.AddScoped<IRoleRepo, RoleRepo>();
+            services.AddScoped<IRoleService, RoleService>();
+            
             return services;
         }
     }
