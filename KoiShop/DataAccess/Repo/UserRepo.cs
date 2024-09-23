@@ -9,31 +9,47 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Repo
 {
-    public class UserRepo(DbContext context) : BaseRepo<User>(context), IUserRepo
+    public class UserRepo : BaseRepo<User>, IUserRepo
     {
-        private readonly DbContext _context = context;
+        private readonly DbContext _context;
+        public UserRepo(KoiShopContext context) : base(context)
+        {
+            _context = context;
+        }
 
-        public Task<User> CreateAsync(User user)
+        public async Task<User> CreateUser(User user)
+        {
+            await _context.Set<User>().AddAsync(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+
+        public Task<User> DeleteUser(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<User> DeleteAsync(int id)
+        public async Task<IEnumerable<User>> GetAllUser()
+        {
+            return await _context.Set<User>().ToListAsync();
+        }
+
+        public async Task<User> GetByEmail(string email)
+        {
+            return await _context.Set<User>().FirstOrDefaultAsync(e=>e.Email.Equals(email));
+        }
+
+        public Task<User> GetById(int id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<User> GetByEmailAsync(string email)
+        public Task<User> GetByName(string name)
         {
             throw new NotImplementedException();
         }
 
-        public Task<User> GetByNameAsync(string name)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<User> UpdateAsync(User user)
+        public Task<User> UpdateUser(User user)
         {
             throw new NotImplementedException();
         }

@@ -1,3 +1,4 @@
+using BusinessObject;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,8 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<KoiShopContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")));
 
+builder.Services.AddService(builder.Configuration.GetConnectionString("DatabaseConnection"));
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
