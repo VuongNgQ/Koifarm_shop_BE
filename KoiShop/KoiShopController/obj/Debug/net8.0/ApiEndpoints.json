@@ -1,5 +1,31 @@
 [
   {
+    "ContainingType": "KoiShopController.Controllers.RoleController",
+    "Method": "CreateRole",
+    "RelativePath": "api/Role/role",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "role",
+        "Type": "BusinessObject.Model.RequestDTO.CreateRoleDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.RoleController",
+    "Method": "GetRoles",
+    "RelativePath": "api/Role/role",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "KoiShopController.Controllers.UserController",
     "Method": "CreateUser",
     "RelativePath": "api/User/user",

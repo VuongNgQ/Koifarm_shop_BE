@@ -3,40 +3,68 @@
   "WorkspaceRootPath": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{46037D77-8DD2-4728-A508-0F8273E8AC85}|KoiShopController\\KoiShopController.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\koishopcontroller\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{46037D77-8DD2-4728-A508-0F8273E8AC85}|KoiShopController\\KoiShopController.csproj|solutionrelative:koishopcontroller\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{46037D77-8DD2-4728-A508-0F8273E8AC85}|KoiShopController\\KoiShopController.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\koishopcontroller\\controllers\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{46037D77-8DD2-4728-A508-0F8273E8AC85}|KoiShopController\\KoiShopController.csproj|solutionrelative:koishopcontroller\\controllers\\rolecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\service\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\service\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\service\\roleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\service\\roleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\iservice\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\iservice\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\dataaccess\\irepo\\iuserrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|solutionrelative:dataaccess\\irepo\\iuserrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\dataaccess\\repo\\userrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|solutionrelative:dataaccess\\repo\\userrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\model\\requestdto\\createroledto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\model\\requestdto\\createroledto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\mapper\\mapperconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\mapper\\mapperconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{46037D77-8DD2-4728-A508-0F8273E8AC85}|KoiShopController\\KoiShopController.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\koishopcontroller\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{46037D77-8DD2-4728-A508-0F8273E8AC85}|KoiShopController\\KoiShopController.csproj|solutionrelative:koishopcontroller\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\iservice\\iroleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\iservice\\iroleservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\dependencyinjection.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\service\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\service\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\dataaccess\\repo\\userrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|solutionrelative:dataaccess\\repo\\userrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\dataaccess\\irepo\\irolerepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|solutionrelative:dataaccess\\irepo\\irolerepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\dataaccess\\irepo\\iuserrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|solutionrelative:dataaccess\\irepo\\iuserrepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\dataaccess\\repo\\rolerepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A1170DD9-39F2-41F4-9D0D-B803E724744A}|DataAccess\\DataAccess.csproj|solutionrelative:dataaccess\\repo\\rolerepo.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\iservice\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\iservice\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\utils\\pagination.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\utils\\pagination.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\model\\requestdto\\createuserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\model\\requestdto\\createuserdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\businessobject\\serviceresponseformat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{243C813C-08A8-4816-BC34-185E4704EF0B}|BusinessObject\\BusinessObject.csproj|solutionrelative:businessobject\\serviceresponseformat.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{46037D77-8DD2-4728-A508-0F8273E8AC85}|KoiShopController\\KoiShopController.csproj|d:\\major subject\\swp\\koifarm_shop_be\\koishop\\koishopcontroller\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{46037D77-8DD2-4728-A508-0F8273E8AC85}|KoiShopController\\KoiShopController.csproj|solutionrelative:koishopcontroller\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -46,7 +74,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -66,16 +94,64 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "UserController.cs",
-              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\KoiShopController\\Controllers\\UserController.cs",
-              "RelativeDocumentMoniker": "KoiShopController\\Controllers\\UserController.cs",
-              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\KoiShopController\\Controllers\\UserController.cs",
-              "RelativeToolTip": "KoiShopController\\Controllers\\UserController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAzAAAAAAAAAA==",
+              "DocumentIndex": 3,
+              "Title": "MapperConfig.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Mapper\\MapperConfig.cs",
+              "RelativeDocumentMoniker": "BusinessObject\\Mapper\\MapperConfig.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Mapper\\MapperConfig.cs",
+              "RelativeToolTip": "BusinessObject\\Mapper\\MapperConfig.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABEAAAA6AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-23T03:18:35.056Z",
+              "WhenOpened": "2024-09-23T12:25:52.573Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "CreateRoleDTO.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Model\\RequestDTO\\CreateRoleDTO.cs",
+              "RelativeDocumentMoniker": "BusinessObject\\Model\\RequestDTO\\CreateRoleDTO.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Model\\RequestDTO\\CreateRoleDTO.cs",
+              "RelativeToolTip": "BusinessObject\\Model\\RequestDTO\\CreateRoleDTO.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-23T12:24:47.1Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RoleController.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\KoiShopController\\Controllers\\RoleController.cs",
+              "RelativeDocumentMoniker": "KoiShopController\\Controllers\\RoleController.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\KoiShopController\\Controllers\\RoleController.cs",
+              "RelativeToolTip": "KoiShopController\\Controllers\\RoleController.cs",
+              "ViewState": "AgIAAAQAAAAAAAAAAADgvw0AAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-23T12:14:34.761Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RoleService.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Service\\RoleService.cs",
+              "RelativeDocumentMoniker": "BusinessObject\\Service\\RoleService.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Service\\RoleService.cs",
+              "RelativeToolTip": "BusinessObject\\Service\\RoleService.cs",
+              "ViewState": "AgIAABUAAAAAAAAAAAAiwCIAAAAbAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-23T12:08:22.698Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "IRoleService.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\IService\\IRoleService.cs",
+              "RelativeDocumentMoniker": "BusinessObject\\IService\\IRoleService.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\IService\\IRoleService.cs",
+              "RelativeToolTip": "BusinessObject\\IService\\IRoleService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-23T12:08:08.877Z"
             },
             {
               "$type": "Document",
@@ -85,53 +161,85 @@
               "RelativeDocumentMoniker": "BusinessObject\\DependencyInjection.cs",
               "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\DependencyInjection.cs",
               "RelativeToolTip": "BusinessObject\\DependencyInjection.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAYAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-23T03:17:40.99Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-23T12:06:58.409Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "RoleRepo.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\DataAccess\\Repo\\RoleRepo.cs",
+              "RelativeDocumentMoniker": "DataAccess\\Repo\\RoleRepo.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\DataAccess\\Repo\\RoleRepo.cs",
+              "RelativeToolTip": "DataAccess\\Repo\\RoleRepo.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAwAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-23T11:59:18.333Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "IRoleRepo.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\DataAccess\\IRepo\\IRoleRepo.cs",
+              "RelativeDocumentMoniker": "DataAccess\\IRepo\\IRoleRepo.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\DataAccess\\IRepo\\IRoleRepo.cs",
+              "RelativeToolTip": "DataAccess\\IRepo\\IRoleRepo.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAgAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-23T11:57:33.542Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "ServiceResponseFormat.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\ServiceResponseFormat.cs",
+              "RelativeDocumentMoniker": "BusinessObject\\ServiceResponseFormat.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\ServiceResponseFormat.cs",
+              "RelativeToolTip": "BusinessObject\\ServiceResponseFormat.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-23T11:32:21.531Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Pagination.cs",
+              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Utils\\Pagination.cs",
+              "RelativeDocumentMoniker": "BusinessObject\\Utils\\Pagination.cs",
+              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Utils\\Pagination.cs",
+              "RelativeToolTip": "BusinessObject\\Utils\\Pagination.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAABPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-09-23T11:31:40.961Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 6,
-              "Title": "MapperConfig.cs",
-              "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Mapper\\MapperConfig.cs",
-              "RelativeDocumentMoniker": "BusinessObject\\Mapper\\MapperConfig.cs",
-              "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Mapper\\MapperConfig.cs",
-              "RelativeToolTip": "BusinessObject\\Mapper\\MapperConfig.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAaAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-23T03:16:07.992Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "UserService.cs",
               "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Service\\UserService.cs",
               "RelativeDocumentMoniker": "BusinessObject\\Service\\UserService.cs",
               "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Service\\UserService.cs",
               "RelativeToolTip": "BusinessObject\\Service\\UserService.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAACUAAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAACQAAAAAAAAAAAAYwDMAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-23T03:11:32.627Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-23T03:11:32.627Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 11,
               "Title": "IUserService.cs",
               "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\IService\\IUserService.cs",
               "RelativeDocumentMoniker": "BusinessObject\\IService\\IUserService.cs",
               "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\IService\\IUserService.cs",
               "RelativeToolTip": "BusinessObject\\IService\\IUserService.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwA0AAAAmAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwBAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-23T03:11:00.725Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-23T03:11:00.725Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 13,
               "Title": "CreateUserDTO.cs",
               "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\BusinessObject\\Model\\RequestDTO\\CreateUserDTO.cs",
               "RelativeDocumentMoniker": "BusinessObject\\Model\\RequestDTO\\CreateUserDTO.cs",
@@ -139,47 +247,43 @@
               "RelativeToolTip": "BusinessObject\\Model\\RequestDTO\\CreateUserDTO.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-23T03:06:47.462Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-23T03:06:47.462Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 7,
               "Title": "UserRepo.cs",
               "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\DataAccess\\Repo\\UserRepo.cs",
               "RelativeDocumentMoniker": "DataAccess\\Repo\\UserRepo.cs",
               "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\DataAccess\\Repo\\UserRepo.cs",
               "RelativeToolTip": "DataAccess\\Repo\\UserRepo.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAAB4AAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAA0AAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-22T13:08:24.015Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-22T13:08:24.015Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 9,
               "Title": "IUserRepo.cs",
               "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\DataAccess\\IRepo\\IUserRepo.cs",
               "RelativeDocumentMoniker": "DataAccess\\IRepo\\IUserRepo.cs",
               "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\DataAccess\\IRepo\\IUserRepo.cs",
               "RelativeToolTip": "DataAccess\\IRepo\\IUserRepo.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAuwBEAAAAtAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAuwAsAAAApAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-22T13:08:12.65Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-22T13:08:12.65Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 15,
               "Title": "Program.cs",
               "DocumentMoniker": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\KoiShopController\\Program.cs",
               "RelativeDocumentMoniker": "KoiShopController\\Program.cs",
               "ToolTip": "D:\\MAJOR SUBJECT\\SWP\\Koifarm_shop_BE\\KoiShop\\KoiShopController\\Program.cs",
               "RelativeToolTip": "KoiShopController\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABAAAAAhAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAABdAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-09-20T07:34:31.731Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-09-20T07:34:31.731Z"
             }
           ]
         }

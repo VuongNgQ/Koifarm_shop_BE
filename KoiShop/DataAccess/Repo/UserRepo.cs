@@ -11,7 +11,7 @@ namespace DataAccess.Repo
 {
     public class UserRepo : BaseRepo<User>, IUserRepo
     {
-        private readonly DbContext _context;
+        private readonly KoiShopContext _context;
         public UserRepo(KoiShopContext context) : base(context)
         {
             _context = context;

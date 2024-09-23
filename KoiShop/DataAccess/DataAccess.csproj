@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="IRepo\" />
     <Folder Include="Migrations\" />
-    <Folder Include="Repo\" />
   </ItemGroup>
 
   <ItemGroup>

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace BusinessObject.IService
 {
-    public interface IUserService
+    public interface IRoleService
     {
-        Task<ServiceResponseFormat<CreateUserDTO>> CreateUser(CreateUserDTO createUserDTO);
-        Task <ServiceResponseFormat<IEnumerable<CreateUserDTO>>> GetAllUser();
+        Task<ServiceResponseFormat<CreateRoleDTO>> CreateRole(CreateRoleDTO role);
+        Task<ServiceResponseFormat<IEnumerable<Role>>> GetRoles();
     }
 }

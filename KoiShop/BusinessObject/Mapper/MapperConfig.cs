@@ -14,6 +14,8 @@ namespace BusinessObject.Mapper
         {
             //User Mapping
             CreateMap<User, CreateUserDTO>().ReverseMap();
+            //Role Mapping
+            CreateMap<Role, CreateRoleDTO>().ReverseMap();
         }
     }
 }
