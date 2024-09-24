@@ -24,9 +24,19 @@ namespace DataAccess.Repo
             return user;
         }
 
-        public Task<User> DeleteUser(int id)
+        public async Task<bool> DeleteUser(int id)
         {
-            throw new NotImplementedException();
+            var exist = await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId == id);
+            if (exist != null)
+            {
+                _context.Remove(exist);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public async Task<IEnumerable<User>> GetAllUser()
@@ -38,20 +48,35 @@ namespace DataAccess.Repo
         {
             return await _context.Set<User>().FirstOrDefaultAsync(e=>e.Email.Equals(email));
         }
-
-        public Task<User> GetById(int id)
+        public async Task<User> GetByName(string name)
         {
-            throw new NotImplementedException();
+            return await _context.Set<User>().FirstOrDefaultAsync(e => e.Name.Equals(name));
         }
 
-        public Task<User> GetByName(string name)
+        public async Task<bool> Login(string email, string password)
         {
-            throw new NotImplementedException();
+            return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password);
         }
 
-        public Task<User> UpdateUser(User user)
+        public async Task<User> UpdateUser(int id, User newUser)
         {
-            throw new NotImplementedException();
+            var exist = await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId == id);
+            if (exist != null)
+            {
+                exist.Status = newUser.Status;
+                exist.Email = newUser.Email;
+                exist.Name = newUser.Name;
+                exist.RoleId = newUser.RoleId;
+                exist.Password = newUser.Password;
+                exist.Phone = newUser.Phone;
+                _context.Update(exist);
+                await _context.SaveChangesAsync();
+                return newUser;
+            }
+            else
+            {
+                throw new Exception("User not found");
+            }
         }
     }
 }
