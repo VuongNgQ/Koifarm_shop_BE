@@ -16,5 +16,6 @@ namespace DataAccess.IRepo
         Task<User> GetByEmail(string email);
         Task<IEnumerable<User>> GetAllUser();
         Task<bool> Login(string email, string password);
+        Task<User> GetByPhone(string phone);
     }
 }

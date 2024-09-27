@@ -28,6 +28,14 @@ namespace BusinessObject.Service
             var res=new ServiceResponseFormat<ResponseUserDTO>();
             try
             {
+                var emailExist = await _userRepo.GetByEmail(userDTO.Email);
+                var phoneExist = await _userRepo.GetByPhone(userDTO.Phone);
+                if(emailExist==null||phoneExist==null)
+                {
+                    res.Success = false;
+                    res.Message = "User with this Email/Phone exist";
+                    return res;
+                }
                 var mapp=_mapper.Map<User>(userDTO);
                 mapp.Status = "Active";
                 await _userRepo.CreateUser(mapp);
@@ -88,6 +96,7 @@ namespace BusinessObject.Service
                 users = sort.ToLower().Trim() switch
                 {
                     "name" => users.OrderBy(e => e.Name),
+                    "birthday"=>users.OrderBy(e => e.DateOfBirth),
                     _ => users.OrderBy(e => e.UserId)
                 };
                 var mapp = _mapper.Map<IEnumerable<ResponseUserDTO>>(users);
@@ -146,6 +155,14 @@ namespace BusinessObject.Service
             var res = new ServiceResponseFormat<ResponseUserDTO>();
             try
             {
+                var emailExist = await _userRepo.GetByEmail(updateUserDTO.Email);
+                var phoneExist = await _userRepo.GetByPhone(updateUserDTO.Phone);
+                if (emailExist == null || phoneExist == null)
+                {
+                    res.Success = false;
+                    res.Message = "User with this Email/Phone exist";
+                    return res;
+                }
                 var mapp = _mapper.Map<User>(updateUserDTO);
                 var updateUser = await _userRepo.UpdateUser(id, mapp);
                 if(updateUser != null)
