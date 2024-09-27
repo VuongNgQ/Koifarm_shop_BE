@@ -53,6 +53,11 @@ namespace DataAccess.Repo
             return await _context.Set<User>().FirstOrDefaultAsync(e => e.Name.Equals(name));
         }
 
+        public async Task<User> GetByPhone(string phone)
+        {
+            return await _context.Set<User>().FirstOrDefaultAsync(e => e.Phone == phone);
+        }
+
         public async Task<bool> Login(string email, string password)
         {
             return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password);
@@ -69,6 +74,7 @@ namespace DataAccess.Repo
                 exist.RoleId = newUser.RoleId;
                 exist.Password = newUser.Password;
                 exist.Phone = newUser.Phone;
+                exist.DateOfBirth=newUser.DateOfBirth; 
                 _context.Update(exist);
                 await _context.SaveChangesAsync();
                 return newUser;
