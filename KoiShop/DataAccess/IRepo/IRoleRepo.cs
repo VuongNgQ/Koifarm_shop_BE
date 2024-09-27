@@ -11,5 +11,6 @@ namespace DataAccess.IRepo
     {
         Task<Role> CreateRole(Role role);
         Task<IEnumerable<Role>> GetAllRoles();
+        Task<bool> RoleExist(int id);
     }
 }

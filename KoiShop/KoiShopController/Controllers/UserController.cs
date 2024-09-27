@@ -34,6 +34,24 @@ namespace KoiShopController.Controllers
             var result = await _userService.LoginUser(email, pass);
             return Ok(result);
         }
+        [HttpGet("Login/Manager/{email}, {pass}")]
+        public async Task<IActionResult> LoginAdmin(string email, string pass)
+        {
+            var result = await _userService.LoginAdmin(email, pass);
+            return Ok(result);
+        }
+        [HttpGet("Login/Customer/{email}, {pass}")]
+        public async Task<IActionResult> LoginCustomer(string email, string pass)
+        {
+            var result = await _userService.LoginCustomer(email, pass);
+            return Ok(result);
+        }
+        [HttpGet("Login/Staff/{email}, {pass}")]
+        public async Task<IActionResult> LoginStaff(string email, string pass)
+        {
+            var result = await _userService.LoginStaff(email, pass);
+            return Ok(result);
+        }
         [HttpPut("{id}")]
         public async Task<IActionResult>UpdateUser(int id, ResponseUserDTO userDTO)
         {

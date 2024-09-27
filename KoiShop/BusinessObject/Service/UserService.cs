@@ -18,10 +18,12 @@ namespace BusinessObject.Service
     {
         private readonly IUserRepo _userRepo;
         private readonly IMapper _mapper;
-        public UserService(IUserRepo repo, IMapper mapper)
+        private readonly IRoleRepo _roleRepo;
+        public UserService(IUserRepo repo, IMapper mapper, IRoleRepo roleRepo)
         {
             _userRepo = repo;
             _mapper = mapper;
+            _roleRepo = roleRepo;
         }
         public async Task<ServiceResponseFormat<ResponseUserDTO>> CreateUser(CreateUserDTO userDTO)
         {
@@ -30,13 +32,27 @@ namespace BusinessObject.Service
             {
                 var emailExist = await _userRepo.GetByEmail(userDTO.Email);
                 var phoneExist = await _userRepo.GetByPhone(userDTO.Phone);
-                if(emailExist==null||phoneExist==null)
+                var manager = await _userRepo.isManager(userDTO.RoleId);
+                if (manager)
+                {
+                    res.Success = false;
+                    res.Message = "MANAGER EXISTED, OK?";
+                    return res;
+                }
+                if (emailExist!=null||phoneExist!=null)
                 {
                     res.Success = false;
                     res.Message = "User with this Email/Phone exist";
                     return res;
                 }
-                var mapp=_mapper.Map<User>(userDTO);
+                var roleExist = await _roleRepo.RoleExist(userDTO.RoleId);
+                if (!roleExist)
+                {
+                    res.Success = false;
+                    res.Message = "Role doesn't exist";
+                    return res;
+                }
+                var mapp=_mapper.Map<User>(userDTO); 
                 mapp.Status = "Active";
                 await _userRepo.CreateUser(mapp);
                 var result = _mapper.Map<ResponseUserDTO>(mapp);
@@ -58,6 +74,16 @@ namespace BusinessObject.Service
             var res = new ServiceResponseFormat<bool>();
             try
             {
+                var roleRestrict = await _userRepo.GetByIdAsync(id);
+                if (roleRestrict != null)
+                {
+                    if (roleRestrict.RoleId == 1)
+                    {
+                        res.Success = false;
+                        res.Message = "THIS IS MANAGER, OK?";
+                        return res;
+                    }
+                }
                 var result=await _userRepo.DeleteUser(id);
                 if (result)
                 {
@@ -149,7 +175,87 @@ namespace BusinessObject.Service
                 return res;
             }
         }
-
+        public async Task<ServiceResponseFormat<bool>> LoginAdmin(string email, string pass)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var result = await _userRepo.LoginAdmin(email, pass);
+                if (result)
+                {
+                    res.Success = true;
+                    res.Message = "Login Successfully";
+                    res.Data = result;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Password does not match the Email";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Login fail:{ex.Message}";
+                return res;
+            }
+        }
+        public async Task<ServiceResponseFormat<bool>> LoginCustomer(string email, string pass)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var result = await _userRepo.LoginCustomer(email, pass);
+                if (result)
+                {
+                    res.Success = true;
+                    res.Message = "Login Successfully";
+                    res.Data = result;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Password does not match the Email";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Login fail:{ex.Message}";
+                return res;
+            }
+        }
+        public async Task<ServiceResponseFormat<bool>> LoginStaff(string email, string pass)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var result = await _userRepo.LoginStaff(email, pass);
+                if (result)
+                {
+                    res.Success = true;
+                    res.Message = "Login Successfully";
+                    res.Data = result;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Password does not match the Email";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Login fail:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<ResponseUserDTO>> UpdateUser(int id, ResponseUserDTO updateUserDTO)
         {
             var res = new ServiceResponseFormat<ResponseUserDTO>();
@@ -157,15 +263,31 @@ namespace BusinessObject.Service
             {
                 var emailExist = await _userRepo.GetByEmail(updateUserDTO.Email);
                 var phoneExist = await _userRepo.GetByPhone(updateUserDTO.Phone);
-                if (emailExist == null || phoneExist == null)
+                if (emailExist != null || phoneExist != null)
                 {
                     res.Success = false;
                     res.Message = "User with this Email/Phone exist";
                     return res;
                 }
+                var user = await _userRepo.GetById(id);
+                if (user.RoleId == 1)
+                {
+                    res.Success = false;
+                    res.Message = "YOU CAN'T UPDATE MANAGER, OK?";
+                    return res;
+                }
+                    var manager = await _userRepo.isManager(updateUserDTO.RoleId);
+                    if (manager)
+                    {
+                        res.Success = false;
+                        res.Message = "YOU CAN'T PROMOTE OTHERS TO BE MANAGER, OK?";
+                        return res;
+                    }
+                
                 var mapp = _mapper.Map<User>(updateUserDTO);
+                
                 var updateUser = await _userRepo.UpdateUser(id, mapp);
-                if(updateUser != null)
+                if (updateUser != null)
                 {
                     res.Success = true;
                     res.Message = "User Updated Successfully";
