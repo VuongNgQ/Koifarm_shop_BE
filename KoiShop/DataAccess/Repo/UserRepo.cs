@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -48,6 +49,12 @@ namespace DataAccess.Repo
         {
             return await _context.Set<User>().FirstOrDefaultAsync(e=>e.Email.Equals(email));
         }
+
+        public async Task<User> GetById(int id)
+        {
+            return await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId.Equals(id));
+        }
+
         public async Task<User> GetByName(string name)
         {
             return await _context.Set<User>().FirstOrDefaultAsync(e => e.Name.Equals(name));
@@ -58,9 +65,29 @@ namespace DataAccess.Repo
             return await _context.Set<User>().FirstOrDefaultAsync(e => e.Phone == phone);
         }
 
+        public async Task<bool> isManager(int managerRoleId)
+        {
+            return await _context.Set<User>().AnyAsync(e =>managerRoleId==1);
+        }
+
         public async Task<bool> Login(string email, string password)
         {
             return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password);
+        }
+
+        public async Task<bool> LoginAdmin(string email, string password)
+        {
+            return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password&& e.Role.RoleName == "Manager");
+        }
+
+        public async Task<bool> LoginCustomer(string email, string password)
+        {
+            return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password && e.Role.RoleName == "Customer");
+        }
+
+        public async Task<bool> LoginStaff(string email, string password)
+        {
+            return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password && e.Role.RoleName == "Staff");
         }
 
         public async Task<User> UpdateUser(int id, User newUser)

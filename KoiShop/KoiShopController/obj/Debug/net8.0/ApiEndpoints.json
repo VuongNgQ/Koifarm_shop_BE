@@ -129,5 +129,68 @@
       }
     ],
     "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.UserController",
+    "Method": "LoginCustomer",
+    "RelativePath": "api/User/Login/Customer/{email}, {pass}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "pass",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.UserController",
+    "Method": "LoginAdmin",
+    "RelativePath": "api/User/Login/Manager/{email}, {pass}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "pass",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.UserController",
+    "Method": "LoginStaff",
+    "RelativePath": "api/User/Login/Staff/{email}, {pass}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "email",
+        "Type": "System.String",
+        "IsRequired": true
+      },
+      {
+        "Name": "pass",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   }
 ]
