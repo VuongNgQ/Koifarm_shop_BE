@@ -19,6 +19,5 @@ namespace BusinessObject.Model.RequestDTO
         public string ImageUrl { get; set; }
         public int NumberOfFish { get; set; }
         public int RemainingPackage { get; set; }
-        public int StatusId { get; set; }
     }
 }

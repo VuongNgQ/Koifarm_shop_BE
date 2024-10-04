@@ -1,5 +1,84 @@
 [
   {
+    "ContainingType": "KoiShopController.Controllers.ProductStatusController",
+    "Method": "CreateStatus",
+    "RelativePath": "api/FishStatus",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "statusDTO",
+        "Type": "BusinessObject.Model.RequestDTO.CreateFishStatusDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.ProductStatusController",
+    "Method": "GetFishStatus",
+    "RelativePath": "api/FishStatus",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sort",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.ProductStatusController",
+    "Method": "GetStatusById",
+    "RelativePath": "api/FishStatus/StatusID/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.ProductStatusController",
+    "Method": "GetStatusByName",
+    "RelativePath": "api/FishStatus/StatusName/{name}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "name",
+        "Type": "System.String",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "KoiShopController.Controllers.RoleController",
     "Method": "CreateRole",
     "RelativePath": "api/Role",

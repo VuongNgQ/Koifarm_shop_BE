@@ -21,7 +21,9 @@ namespace BusinessObject
             //Role
             services.AddScoped<IRoleRepo, RoleRepo>();
             services.AddScoped<IRoleService, RoleService>();
-            
+            //Fish Status
+            services.AddScoped<IProductStatusRepo, ProductStatusRepo>();
+            services.AddScoped<IProductStatusService, ProductStatusService>();
             return services;
         }
     }

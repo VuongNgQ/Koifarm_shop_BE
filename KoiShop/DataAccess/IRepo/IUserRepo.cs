@@ -13,6 +13,7 @@ namespace DataAccess.IRepo
         Task<User> UpdateUser(int id, User newUser);
         Task<bool> DeleteUser(int id);
         Task<User> GetById(int id);
+        Task<User> GetManager();
         Task<bool> isManager(int managerId);
         Task<User> GetByName(string name);
         Task<User> GetByEmail(string email);

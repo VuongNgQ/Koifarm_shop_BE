@@ -44,7 +44,10 @@ namespace DataAccess.Repo
         {
             return await _context.Set<User>().ToListAsync();
         }
-
+        public async Task<User> GetManager()
+        {
+            return await _context.Set<User>().FirstOrDefaultAsync(u=>u.RoleId==1);
+        }
         public async Task<User> GetByEmail(string email)
         {
             return await _context.Set<User>().FirstOrDefaultAsync(e=>e.Email.Equals(email));
