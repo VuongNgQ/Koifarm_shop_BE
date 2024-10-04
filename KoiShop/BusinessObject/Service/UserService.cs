@@ -269,20 +269,14 @@ namespace BusinessObject.Service
                     res.Message = "User with this Email/Phone exist";
                     return res;
                 }
-                var user = await _userRepo.GetById(id);
-                if (user.RoleId == 1)
+                var user = await _userRepo.GetAllUser();
+                var manager = user.Where(e => e.RoleId == 1).ToList();
+                if (manager.Any(e=>e.UserId==id))
                 {
                     res.Success = false;
                     res.Message = "YOU CAN'T UPDATE MANAGER, OK?";
                     return res;
                 }
-                    var manager = await _userRepo.isManager(updateUserDTO.RoleId);
-                    if (manager)
-                    {
-                        res.Success = false;
-                        res.Message = "YOU CAN'T PROMOTE OTHERS TO BE MANAGER, OK?";
-                        return res;
-                    }
                 
                 var mapp = _mapper.Map<User>(updateUserDTO);
                 

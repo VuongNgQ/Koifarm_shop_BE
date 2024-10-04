@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class _10 : Migration
+    public partial class _20 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -37,7 +37,8 @@ namespace DataAccess.Migrations
                     Size = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OriginCountry = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    OriginCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryStatus = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -249,6 +250,7 @@ namespace DataAccess.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RoleId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true)

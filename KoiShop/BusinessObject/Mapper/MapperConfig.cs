@@ -18,6 +18,12 @@ namespace BusinessObject.Mapper
             CreateMap<User, ResponseUserDTO>().ReverseMap();
             //Role Mapping
             CreateMap<Role, CreateRoleDTO>().ReverseMap();
+            //Package Mapping
+            CreateMap<FishPackage, CreateFishPackageDTO>().ReverseMap();
+            CreateMap<FishPackage, ResponseFishPackageDTO>().ReverseMap();
+            //Fish Status Mapping
+            CreateMap<ProductStatus, CreateFishStatusDTO>().ReverseMap();
+            CreateMap<ProductStatus, ResponseFishStatusDTO>().ReverseMap();
         }
     }
 }

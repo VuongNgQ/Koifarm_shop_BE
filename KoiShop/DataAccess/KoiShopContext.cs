@@ -147,6 +147,11 @@ namespace DataAccess
                 .HasOne(f => f.Status)
                 .WithMany(ps => ps.Fish)
                 .HasForeignKey(f => f.StatusId);
+            // Fish Package and ProductStatus (one-to-many)
+            modelBuilder.Entity<FishPackage>()
+                .HasOne(f => f.Status)
+                .WithMany(ps => ps.FishPackages)
+                .HasForeignKey(f => f.StatusId);
 
             // FishConsignment and Fish (one-to-many)
             modelBuilder.Entity<FishConsignment>()

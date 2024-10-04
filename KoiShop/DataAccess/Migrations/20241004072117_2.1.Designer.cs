@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20240922090416_1.0")]
-    partial class _10
+    [Migration("20241004072117_2.1")]
+    partial class _21
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -112,6 +112,9 @@ namespace DataAccess.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
+
+                    b.Property<string>("CategoryStatus")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
@@ -597,6 +600,9 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -740,7 +746,7 @@ namespace DataAccess.Migrations
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("DataAccess.Entity.ProductStatus", "Status")
-                        .WithMany()
+                        .WithMany("FishPackages")
                         .HasForeignKey("StatusId");
 
                     b.Navigation("Category");
@@ -966,6 +972,8 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("DataAccess.Entity.ProductStatus", b =>
                 {
                     b.Navigation("Fish");
+
+                    b.Navigation("FishPackages");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Role", b =>

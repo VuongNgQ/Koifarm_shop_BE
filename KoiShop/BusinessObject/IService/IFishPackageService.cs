@@ -1,4 +1,6 @@
-﻿using DataAccess.Entity;
+﻿using BusinessObject.Model.RequestDTO;
+using BusinessObject.Model.ResponseDTO;
+using DataAccess.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +11,11 @@ namespace BusinessObject.IService
 {
     public interface IFishPackageService
     {
-        Task<ServiceResponseFormat<IEnumerable<FishPackage>>> GetFishPackages();
-        Task<ServiceResponseFormat<FishPackage>> GetFishPackage(int id);
-        Task<ServiceResponseFormat<FishPackage>> CreatePackage(FishPackage package);
-        Task<ServiceResponseFormat<FishPackage>> UpdatePackage(int id, FishPackage fishPackage);
+        Task<ServiceResponseFormat<PaginationModel<ResponseFishPackageDTO>>> GetFishPackages(int page, int pageSize,
+            string? search, string sort);
+        Task<ServiceResponseFormat<ResponseFishPackageDTO>> GetFishPackage(int id);
+        Task<ServiceResponseFormat<ResponseFishPackageDTO>> CreatePackage(CreateFishPackageDTO package);
+        Task<ServiceResponseFormat<ResponseFishPackageDTO>> UpdatePackage(int id, ResponseFishPackageDTO fishPackage);
         Task<ServiceResponseFormat<bool>> DeletePackage(int id);
     }
 }

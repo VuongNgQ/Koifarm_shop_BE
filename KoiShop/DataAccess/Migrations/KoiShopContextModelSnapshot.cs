@@ -110,6 +110,9 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
 
+                    b.Property<string>("CategoryStatus")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -740,7 +743,7 @@ namespace DataAccess.Migrations
                         .HasForeignKey("CategoryId");
 
                     b.HasOne("DataAccess.Entity.ProductStatus", "Status")
-                        .WithMany()
+                        .WithMany("FishPackages")
                         .HasForeignKey("StatusId");
 
                     b.Navigation("Category");
@@ -966,6 +969,8 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("DataAccess.Entity.ProductStatus", b =>
                 {
                     b.Navigation("Fish");
+
+                    b.Navigation("FishPackages");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Role", b =>
