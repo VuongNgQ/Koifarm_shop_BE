@@ -14,6 +14,7 @@ namespace DataAccess.Entity
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
         public string? OriginCountry { get; set; }
+        public string? CategoryStatus { get; set; }
         public ICollection<FishSingle>? Fish { get; set; }
     }
 }

@@ -8,6 +8,6 @@ namespace BusinessObject.IService
 {
     public interface IOrderService
     {
-        Task<ServiceResponseFormat<>>
+        
     }
 }
