@@ -40,6 +40,7 @@ namespace DataAccess
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<UserAddress> UserAddresses { get; set; }
+        public DbSet<FishStatus> FishStatuses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -230,7 +231,16 @@ namespace DataAccess
                 .HasOne(o => o.Address)
                 .WithMany(os => os.Orders)
                 .HasForeignKey(o => o.AddressId);
-
+            //FishStatus and FishConsignment(one-to-many)
+            modelBuilder.Entity<FishConsignment>()
+                .HasOne(f => f.FishStatus)
+                .WithMany(f => f.FishConsignments)
+                .HasForeignKey(f => f.FishStatusId);
+            //FishStatus and FishConsignment(one-to-many)
+            modelBuilder.Entity<PackageConsignment>()
+                .HasOne(f => f.FishStatus)
+                .WithMany(f => f.PackageConsignments)
+                .HasForeignKey(f => f.PackageStatusId);
             base.OnModelCreating(modelBuilder);
         }
 

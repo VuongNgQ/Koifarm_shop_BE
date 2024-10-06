@@ -48,43 +48,6 @@
   },
   {
     "ContainingType": "KoiShopController.Controllers.FishPackageController",
-    "Method": "DeletePackage",
-    "RelativePath": "api/FishPackage",
-    "HttpMethod": "DELETE",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": false
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "KoiShopController.Controllers.FishPackageController",
-    "Method": "UpdatePackage",
-    "RelativePath": "api/FishPackage",
-    "HttpMethod": "PUT",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "id",
-        "Type": "System.Int32",
-        "IsRequired": false
-      },
-      {
-        "Name": "packageDTO",
-        "Type": "BusinessObject.Model.ResponseDTO.ResponseFishPackageDTO",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "KoiShopController.Controllers.FishPackageController",
     "Method": "GetPackageById",
     "RelativePath": "api/FishPackage/{id}",
     "HttpMethod": "GET",
@@ -94,6 +57,43 @@
       {
         "Name": "id",
         "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.FishPackageController",
+    "Method": "DeletePackage",
+    "RelativePath": "api/FishPackage/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.FishPackageController",
+    "Method": "UpdatePackage",
+    "RelativePath": "api/FishPackage/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "packageDTO",
+        "Type": "BusinessObject.Model.ResponseDTO.ResponseFishPackageDTO",
         "IsRequired": true
       }
     ],
