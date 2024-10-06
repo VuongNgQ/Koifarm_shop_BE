@@ -22,5 +22,6 @@ namespace DataAccess.Entity
         public FishPackage? Package { get; set; }
         public ConsignmentType? ConsignmentType { get; set; }
         public ConsignmentStatus? ConsignmentStatus { get; set; }
+        public FishStatus? FishStatus { get; set; }
     }
 }
