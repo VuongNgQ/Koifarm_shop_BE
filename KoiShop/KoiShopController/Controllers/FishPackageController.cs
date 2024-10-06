@@ -46,7 +46,7 @@ namespace KoiShopController.Controllers
             }
             return Ok(result);
         }
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePackage(int id)
         {
             var result = await _service.DeletePackage(id);
@@ -56,7 +56,7 @@ namespace KoiShopController.Controllers
             }
             return BadRequest();
         }
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePackage(int id, ResponseFishPackageDTO packageDTO)
         {
             var result = await _service.UpdatePackage(id, packageDTO);
