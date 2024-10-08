@@ -14,14 +14,14 @@ namespace DataAccess.Entity
         public string? Gender { get; set; }
         public decimal? Size { get; set; }
         public string? Description { get; set; }
-        public int? CategoryId { get; set; }
+        
         public decimal? TotalPrice { get; set; }
         public decimal? DailyFood { get; set; }
         public string? ImageUrl { get; set; }
         public int? NumberOfFish { get; set; }
-        public int? RemainingPackage { get; set; }
+        
         public int? StatusId { get; set; }
-        public Category? Category { get; set; }
+        
         public ProductStatus? Status { get; set; }
         public ICollection<OrderItem>? OrderItems { get; set; }
         public ICollection<CartItem>? CartItems { get; set; }

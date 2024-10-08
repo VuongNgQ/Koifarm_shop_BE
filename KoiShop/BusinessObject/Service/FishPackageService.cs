@@ -117,7 +117,7 @@ namespace BusinessObject.Service
                 packages = sort.ToLower().Trim() switch
                 {
                     "name" => packages.OrderBy(e => e.Name),
-                    "remaining" => packages.OrderBy(e => e.RemainingPackage),
+                    
                     "fishinpackage" => packages.OrderBy(e => e.NumberOfFish),
                     "age" => packages.OrderBy(e => e.Age),
                     "price" => packages.OrderBy(e => e.TotalPrice),
