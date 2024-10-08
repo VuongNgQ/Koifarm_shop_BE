@@ -20,9 +20,9 @@ namespace KoiShopController.Controllers
             string search = "", string sort = "")
         {
             var result = await _service.GetFishPackages(page, pageSize, search, sort);
-            if(result == null)
+            if(!result.Success)
             {
-                return NotFound();
+                return NotFound(result.Message);
             }
             return Ok(result);
         }
@@ -40,9 +40,9 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> CreatePackage(CreateFishPackageDTO packageDTO)
         {
             var result=await _service.CreatePackage(packageDTO);
-            if( result == null)
+            if( !result.Success)
             {
-                return BadRequest();
+                return BadRequest(result.Message);
             }
             return Ok(result);
         }
@@ -50,21 +50,21 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> DeletePackage(int id)
         {
             var result = await _service.DeletePackage(id);
-            if(result != null)
+            if(result.Success)
             {
                 return Ok(result);
             }
-            return BadRequest();
+            return BadRequest(result.Message);
         }
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePackage(int id, ResponseFishPackageDTO packageDTO)
         {
             var result = await _service.UpdatePackage(id, packageDTO);
-            if (result != null)
+            if (result.Success)
             {
                 return Ok(result);
             }
-            return BadRequest();
+            return BadRequest(result.Message);
         }
     }
     

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using BusinessObject.Model.RequestDTO;
+using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
 using BusinessObject.Model.ResponseDTO;
 using DataAccess.Entity;
 namespace BusinessObject.Mapper
@@ -22,8 +23,9 @@ namespace BusinessObject.Mapper
             CreateMap<FishPackage, CreateFishPackageDTO>().ReverseMap();
             CreateMap<FishPackage, ResponseFishPackageDTO>().ReverseMap();
             //Fish Status Mapping
-            CreateMap<ProductStatus, CreateFishStatusDTO>().ReverseMap();
-            CreateMap<ProductStatus, ResponseFishStatusDTO>().ReverseMap();
+            CreateMap<FishStatus, CreateFishStatusDTO>().ReverseMap();
+            CreateMap<FishStatus, ResponseFishStatusDTO>().ReverseMap();
+            CreateMap<FishStatus, UpdateFishStatusDTO>().ReverseMap();
         }
     }
 }

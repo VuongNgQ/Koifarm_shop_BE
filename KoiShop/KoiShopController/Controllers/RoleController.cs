@@ -18,13 +18,27 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> CreateRole(CreateRoleDTO role)
         {
             var result=await _roleService.CreateRole(role);
-            return Ok(result);
+            if(result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
         [HttpGet]
         public async Task<IActionResult> GetRoles()
         {
             var result = await _roleService.GetRoles();
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
     }
 }

@@ -17,13 +17,13 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> CreateStatus(CreateFishStatusDTO statusDTO)
         {
             var result=await _service.CreateFishStatus(statusDTO);
-            if(result!=null)
+            if(result.Success)
             {
                 return Ok(result);
             }
             else
             {
-                return BadRequest();
+                return BadRequest(result.Message);
             }
         }
         [HttpGet]
@@ -31,39 +31,39 @@ namespace KoiShopController.Controllers
             string search = "", string sort = "")
         {
             var result= await _service.GetFishStatuses(page, pageSize, search, sort);
-            if(result!=null)
+            if(result.Success)
             {
                 return Ok(result);
             }
             else
             {
-                return NotFound();
+                return NotFound(result.Message);
             }
         }
         [HttpGet("StatusID/{id}")]
         public async Task<IActionResult> GetStatusById(int id)
         {
             var result = await _service.GetStatusById(id);
-            if(result!=null)
+            if(result.Success)
             {
                 return Ok(result);
             }
             else
             {
-                return NotFound();
+                return NotFound(result.Message);
             }
         }
         [HttpGet("StatusName/{name}")]
         public  async Task<IActionResult> GetStatusByName(string name)
         {
             var result=await _service.GetStatusByName(name);
-            if (result!=null)
+            if (result.Success)
             {
                 return Ok(result);
             }
             else
             {
-                return NotFound();
+                return NotFound(result.Message);
             }
         }
     }

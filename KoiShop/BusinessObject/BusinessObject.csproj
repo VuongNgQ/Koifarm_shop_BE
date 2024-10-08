@@ -32,6 +32,7 @@
 
   <ItemGroup>
     <Folder Include="Enum\" />
+    <Folder Include="Model\RequestDTO\UpdateReq\Attribute\" />
   </ItemGroup>
 
 </Project>
