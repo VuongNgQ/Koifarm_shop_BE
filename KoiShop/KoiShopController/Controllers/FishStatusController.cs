@@ -1,12 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BusinessObject.IService;
+using BusinessObject.Model.RequestDTO;
+using Microsoft.AspNetCore.Mvc;
 
 namespace KoiShopController.Controllers
 {
-    public class FishStatusController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class FishStatusController : ControllerBase
     {
-        public IActionResult Index()
+        
+        private readonly IFishStatusService _fishStatusService;
+        public FishStatusController(IFishStatusService service)
         {
-            return View();
+            _fishStatusService = service;
         }
+        /*[HttpPost]s
+        public async Task<IActionResult>CreateStatus(CreateFishStatusDTO statusDTO)
+        {
+            var result=await _fishStatusService.CreateStatus(statusDTO);
+            if(result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result.Message);
+        }*/
     }
 }

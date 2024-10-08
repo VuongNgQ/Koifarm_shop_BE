@@ -8,6 +8,7 @@ namespace BusinessObject.Model.ResponseDTO
 {
     public class ResponseFishStatusDTO
     {
+        public int FishStatusId { get; set; }
         public string Name { get; set; }
     }
 }

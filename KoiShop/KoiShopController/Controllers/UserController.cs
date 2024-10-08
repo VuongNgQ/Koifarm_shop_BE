@@ -19,50 +19,106 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> CreateUser(CreateUserDTO newUser)
         {
             var result = await _userService.CreateUser(newUser);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
         [HttpGet]
         public async Task<IActionResult> GetUser(int page=1, int pageSize=10,
             string search="", string sort="")
         {
             var result = await _userService.GetAllUser(page, pageSize, search, sort);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
         [HttpGet("Login")]
         public async Task<IActionResult> Login(string email, string pass)
         {
             var result = await _userService.LoginUser(email, pass);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
         [HttpGet("Login/Manager/{email}, {pass}")]
         public async Task<IActionResult> LoginAdmin(string email, string pass)
         {
             var result = await _userService.LoginAdmin(email, pass);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
         [HttpGet("Login/Customer/{email}, {pass}")]
         public async Task<IActionResult> LoginCustomer(string email, string pass)
         {
             var result = await _userService.LoginCustomer(email, pass);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
         [HttpGet("Login/Staff/{email}, {pass}")]
         public async Task<IActionResult> LoginStaff(string email, string pass)
         {
             var result = await _userService.LoginStaff(email, pass);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
         [HttpPut("{id}")]
         public async Task<IActionResult>UpdateUser(int id, ResponseUserDTO userDTO)
         {
             var result = await _userService.UpdateUser(id, userDTO);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var result=await _userService.DeleteUser(id);
-            return Ok(result);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
         }
     }
 }
