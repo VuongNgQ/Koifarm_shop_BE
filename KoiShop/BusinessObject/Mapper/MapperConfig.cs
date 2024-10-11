@@ -32,6 +32,18 @@ namespace BusinessObject.Mapper
             //Consignment Type Mapping
             CreateMap<ConsignmentType, CreateConsignmentTypeDTO>().ReverseMap();
             CreateMap<ConsignmentType, ResponseConsignmentTypeDTO>().ReverseMap();
+            //Order Status
+            CreateMap<OrderStatus, CreateOrderStatusDTO>().ReverseMap();
+            CreateMap<OrderStatus, ResponseOrderStatusDTO>().ReverseMap();
+            //Addresss
+            CreateMap<Address, CreateAddressDTO>().ReverseMap();
+            //Order 
+            CreateMap<Order, CreateOrderDTO>()
+                .ForMember(dest => dest.CreateAddressDTO, opt => opt.MapFrom(src => src.Address))
+                .ReverseMap();
+            CreateMap<Order, ResponseOrderDTO>()
+                .ForMember(dest=>dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ReverseMap();
         }
     }
 }

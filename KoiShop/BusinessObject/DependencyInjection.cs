@@ -35,6 +35,12 @@ namespace BusinessObject
             //Consignment Type
             services.AddScoped<IConsignmentTypeRepo, ConsignmentTypeRepo>();
             services.AddScoped<IConsignmentTypeService, ConsignmentTypeService>();
+            //Order
+            services.AddScoped<IOrderRepo, OrderRepo>();
+            services.AddScoped<IOrderService, OrderService>();
+            //Order Status
+            services.AddScoped<IOrderStatusRepo, OrderStatusRepo>();
+            services.AddScoped<IOrderStatusService, OrderStatusService>();
             return services;
         }
     }
