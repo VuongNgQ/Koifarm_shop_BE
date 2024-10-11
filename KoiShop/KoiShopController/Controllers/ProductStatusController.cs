@@ -14,9 +14,9 @@ namespace KoiShopController.Controllers
             _service = service;   
         }
         [HttpPost]
-        public async Task<IActionResult> CreateStatus(CreateFishStatusDTO statusDTO)
+        public async Task<IActionResult> CreateStatus(CreateProductStatusDTO statusDTO)
         {
-            var result=await _service.CreateFishStatus(statusDTO);
+            var result=await _service.CreateProductStatus(statusDTO);
             if(result.Success)
             {
                 return Ok(result);
@@ -30,7 +30,7 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> GetFishStatus(int page = 1, int pageSize = 10,
             string search = "", string sort = "")
         {
-            var result= await _service.GetFishStatuses(page, pageSize, search, sort);
+            var result= await _service.GetProductStatuses(page, pageSize, search, sort);
             if(result.Success)
             {
                 return Ok(result);
@@ -57,6 +57,32 @@ namespace KoiShopController.Controllers
         public  async Task<IActionResult> GetStatusByName(string name)
         {
             var result=await _service.GetStatusByName(name);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
+        }
+        [HttpDelete("DeleteStatusWithId/{id}")]
+        public async Task<IActionResult>DeleteStatusById(int id)
+        {
+            var result = await _service.DeleteProductStatus(id);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
+        }
+        [HttpDelete("DeleteStatusWithName/{name}")]
+        public async Task<IActionResult>DeleteStatusByName(string name)
+        {
+            var result= await _service.DeleteStatusByName(name);
             if (result.Success)
             {
                 return Ok(result);

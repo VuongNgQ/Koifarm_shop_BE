@@ -26,6 +26,9 @@ namespace BusinessObject.Mapper
             CreateMap<FishStatus, CreateFishStatusDTO>().ReverseMap();
             CreateMap<FishStatus, ResponseFishStatusDTO>().ReverseMap();
             CreateMap<FishStatus, UpdateFishStatusDTO>().ReverseMap();
+            //Product Status Mapping
+            CreateMap<ProductStatus, CreateProductStatusDTO>().ReverseMap();
+            CreateMap<ProductStatus, ResponseProductStatusDTO>().ReverseMap();
         }
     }
 }
