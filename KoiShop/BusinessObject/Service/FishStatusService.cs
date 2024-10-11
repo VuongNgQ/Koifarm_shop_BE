@@ -3,6 +3,7 @@ using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
 using BusinessObject.Model.ResponseDTO;
+using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.IRepo;
 using System;
@@ -79,14 +80,103 @@ namespace BusinessObject.Service
             }
         }
 
-        public Task<ServiceResponseFormat<IEnumerable<ResponseFishStatusDTO>>> GetAllStatus()
+        public async Task<ServiceResponseFormat<PaginationModel<ResponseFishStatusDTO>>> GetAllStatus(int page, int pageSize,
+            string? search, string sort)
         {
-            throw new NotImplementedException();
+            var res = new ServiceResponseFormat<PaginationModel<ResponseFishStatusDTO>>();
+            try
+            {
+                var statuses = await _repo.GetAllAsync();
+                if (!string.IsNullOrEmpty(search))
+                {
+                    statuses = statuses.Where(s => s.StatusName.Contains(search, StringComparison.OrdinalIgnoreCase));
+                }
+                statuses = sort.ToLower().Trim() switch
+                {
+                    "name" => statuses.OrderBy(s => s.StatusName),
+                    _ => statuses.OrderBy(s => s.FishStatusId)
+                };
+                var mapp = _mapper.Map<IEnumerable<ResponseFishStatusDTO>>(statuses);
+                if (mapp.Any())
+                {
+                    var paginationModel = await Pagination.GetPaginationEnum(mapp, page, pageSize);
+                    res.Success = true;
+                    res.Message = "Get Status successfully";
+                    res.Data = paginationModel;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "No Status";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to get Status:{ex.Message}";
+                return res;
+            }
         }
 
-        public Task<ServiceResponseFormat<ResponseFishStatusDTO>> UpdateStatus(UpdateFishStatusDTO statusDTO)
+        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetStatusById(int id)
         {
-            throw new NotImplementedException();
+            var res = new ServiceResponseFormat<ResponseFishStatusDTO>();
+            try
+            {
+                var result = await _repo.GetByIdAsync(id);
+                if (result != null)
+                {
+                    var mapp = _mapper.Map<ResponseFishStatusDTO>(result);
+                    res.Success = true;
+                    res.Message = "Get Status Successfully";
+                    res.Data = mapp;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "No Status";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to get Status:{ex.Message}";
+                return res;
+            }
+        }
+
+        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetStatusByName(string name)
+        {
+            var res = new ServiceResponseFormat<ResponseFishStatusDTO>();
+            try
+            {
+                var statuses = await _repo.GetAllAsync();
+                var result= statuses.Where(s=>s.StatusName.ToLower().Trim()==name.ToLower()).FirstOrDefault();
+                if (result != null)
+                {
+                    var mapp = _mapper.Map<ResponseFishStatusDTO>(result);
+                    res.Success = true;
+                    res.Message = "Get Status Successfully";
+                    res.Data = mapp;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "No Status";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to get Status:{ex.Message}";
+                return res;
+            }
         }
     }
 }
