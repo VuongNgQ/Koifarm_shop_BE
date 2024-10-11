@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KoiShopController")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+724b8b8350039f676993c18f2ee6ae47c11a897d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+146ecaefa26890cf74d93c2829f4d3deb232ebfe")]
 [assembly: System.Reflection.AssemblyProductAttribute("KoiShopController")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KoiShopController")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
