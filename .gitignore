@@ -1,1 +1,54 @@
+# Visual Studio
+.vscode/
 .vs/
+*.csproj.user
+*.suo
+*.userosscache
+*.sln.ide
+
+# Rider
+.idea/
+
+# Build directories
+bin/
+obj/
+debug/
+release/
+
+# Logs and temporary files
+*.log
+*.tlog
+*.log1
+*.log2
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# Linux
+*~
+
+# NuGet
+*.nupkg
+packages/
+project.lock.json
+.nuget/
+
+# Secrets
+appsettings.Development.json
+appsettings.Local.json
+
+# Build output
+*.dll
+*.exe
+*.pdb
+
+# Other
+.env
