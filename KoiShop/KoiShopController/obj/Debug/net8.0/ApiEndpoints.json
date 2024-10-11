@@ -1,5 +1,68 @@
 [
   {
+    "ContainingType": "KoiShopController.Controllers.ConsignmentTypeController",
+    "Method": "GetTypes",
+    "RelativePath": "api/ConsignmentType",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sort",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.ConsignmentTypeController",
+    "Method": "CreateType",
+    "RelativePath": "api/ConsignmentType",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "typeDTO",
+        "Type": "BusinessObject.Model.RequestDTO.CreateConsignmentTypeDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.ConsignmentTypeController",
+    "Method": "DeleteType",
+    "RelativePath": "api/ConsignmentType/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "KoiShopController.Controllers.FishPackageController",
     "Method": "GetPackages",
     "RelativePath": "api/FishPackage",
@@ -100,9 +163,88 @@
     "ReturnTypes": []
   },
   {
-    "ContainingType": "KoiShopController.Controllers.ProductStatusController",
-    "Method": "CreateStatus",
+    "ContainingType": "KoiShopController.Controllers.FishStatusController",
+    "Method": "CreateFishStatus",
     "RelativePath": "api/FishStatus",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "statusDTO",
+        "Type": "BusinessObject.Model.RequestDTO.CreateFishStatusDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.FishStatusController",
+    "Method": "GetFishStatuses",
+    "RelativePath": "api/FishStatus",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "search",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "sort",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.FishStatusController",
+    "Method": "GetFishStatusById",
+    "RelativePath": "api/FishStatus/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.FishStatusController",
+    "Method": "DeleteFishStatusById",
+    "RelativePath": "api/FishStatus/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.ProductStatusController",
+    "Method": "CreateProductStatus",
+    "RelativePath": "api/ProductStatus",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -117,8 +259,8 @@
   },
   {
     "ContainingType": "KoiShopController.Controllers.ProductStatusController",
-    "Method": "GetFishStatus",
-    "RelativePath": "api/FishStatus",
+    "Method": "GetProductStatuses",
+    "RelativePath": "api/ProductStatus",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -149,7 +291,7 @@
   {
     "ContainingType": "KoiShopController.Controllers.ProductStatusController",
     "Method": "DeleteStatusById",
-    "RelativePath": "api/FishStatus/DeleteStatusWithId/{id}",
+    "RelativePath": "api/ProductStatus/DeleteStatusWithId/{id}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -165,7 +307,7 @@
   {
     "ContainingType": "KoiShopController.Controllers.ProductStatusController",
     "Method": "DeleteStatusByName",
-    "RelativePath": "api/FishStatus/DeleteStatusWithName/{name}",
+    "RelativePath": "api/ProductStatus/DeleteStatusWithName/{name}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -180,8 +322,8 @@
   },
   {
     "ContainingType": "KoiShopController.Controllers.ProductStatusController",
-    "Method": "GetStatusById",
-    "RelativePath": "api/FishStatus/StatusID/{id}",
+    "Method": "GetProductStatusById",
+    "RelativePath": "api/ProductStatus/StatusID/{id}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -197,7 +339,7 @@
   {
     "ContainingType": "KoiShopController.Controllers.ProductStatusController",
     "Method": "GetStatusByName",
-    "RelativePath": "api/FishStatus/StatusName/{name}",
+    "RelativePath": "api/ProductStatus/StatusName/{name}",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,

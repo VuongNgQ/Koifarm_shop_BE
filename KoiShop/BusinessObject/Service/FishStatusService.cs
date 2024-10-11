@@ -24,7 +24,7 @@ namespace BusinessObject.Service
             _repo = repo;
         }
 
-        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> CreateStatus(CreateFishStatusDTO statusDTO)
+        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> CreateFishStatus(CreateFishStatusDTO statusDTO)
         {
             var res = new ServiceResponseFormat<ResponseFishStatusDTO>();
             try
@@ -52,7 +52,7 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<bool>> DeleteStatus(int id)
+        public async Task<ServiceResponseFormat<bool>> DeleteFishStatus(int id)
         {
             var res= new ServiceResponseFormat<bool>();
             try
@@ -80,7 +80,7 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<PaginationModel<ResponseFishStatusDTO>>> GetAllStatus(int page, int pageSize,
+        public async Task<ServiceResponseFormat<PaginationModel<ResponseFishStatusDTO>>> GetAllFishStatus(int page, int pageSize,
             string? search, string sort)
         {
             var res = new ServiceResponseFormat<PaginationModel<ResponseFishStatusDTO>>();
@@ -120,7 +120,7 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetStatusById(int id)
+        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetFishStatusById(int id)
         {
             var res = new ServiceResponseFormat<ResponseFishStatusDTO>();
             try
@@ -149,7 +149,7 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetStatusByName(string name)
+        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetFishStatusByName(string name)
         {
             var res = new ServiceResponseFormat<ResponseFishStatusDTO>();
             try

@@ -15,45 +15,57 @@ namespace KoiShopController.Controllers
             _fishStatusService = service;
         }
         [HttpPost]
-        public async Task<IActionResult> CreateStatus(CreateFishStatusDTO statusDTO)
+        public async Task<IActionResult> CreateFishStatus(CreateFishStatusDTO statusDTO)
         {
-            var result = await _fishStatusService.CreateStatus(statusDTO);
+            var result = await _fishStatusService.CreateFishStatus(statusDTO);
             if (result.Success)
             {
                 return Ok(result);
             }
-            return BadRequest(result.Message);
+            else
+            {
+                return BadRequest(result.Message);
+            }
         }
         [HttpGet]
-        public async Task<IActionResult> GetStatuses(int page, int pageSize,
+        public async Task<IActionResult> GetFishStatuses(int page, int pageSize,
             string? search, string sort)
         {
-            var result = await _fishStatusService.GetAllStatus(page, pageSize, search, sort);
+            var result = await _fishStatusService.GetAllFishStatus(page, pageSize, search, sort);
             if (result.Success)
             {
                 return Ok(result);
             }
-            return BadRequest(result.Message);
+            else
+            {
+                return BadRequest(result.Message);
+            }
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> GetFishStatusById(int id)
         {
-            var result = await _fishStatusService.GetStatusById(id);
+            var result = await _fishStatusService.GetFishStatusById(id);
             if (result.Success)
             {
                 return Ok(result);
             }
-            return BadRequest(result.Message);
+            else
+            {
+                return BadRequest(result.Message);
+            }
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult>DeleteById(int id)
+        public async Task<IActionResult> DeleteFishStatusById(int id)
         {
-            var result= await _fishStatusService.DeleteStatus(id);
+            var result = await _fishStatusService.DeleteFishStatus(id);
             if (result.Success)
             {
                 return Ok(result);
             }
-            return BadRequest(result.Message);
+            else
+            {
+                return BadRequest(result.Message);
+            }
         }
     }
 }

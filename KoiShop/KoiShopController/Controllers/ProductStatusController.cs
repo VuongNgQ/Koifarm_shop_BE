@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace KoiShopController.Controllers
 {
     [ApiController]
-    [Route("api/FishStatus")]
-    public class ProductStatusController : Controller
+    [Route("api/[controller]")]
+    public class ProductStatusController : ControllerBase
     {
         private readonly IProductStatusService _service;
         public ProductStatusController(IProductStatusService service)
@@ -14,10 +14,10 @@ namespace KoiShopController.Controllers
             _service = service;   
         }
         [HttpPost]
-        public async Task<IActionResult> CreateStatus(CreateProductStatusDTO statusDTO)
+        public async Task<IActionResult> CreateProductStatus(CreateProductStatusDTO statusDTO)
         {
-            var result=await _service.CreateProductStatus(statusDTO);
-            if(result.Success)
+            var result = await _service.CreateProductStatus(statusDTO);
+            if (result.Success)
             {
                 return Ok(result);
             }
@@ -27,11 +27,11 @@ namespace KoiShopController.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> GetFishStatus(int page = 1, int pageSize = 10,
+        public async Task<IActionResult> GetProductStatuses(int page = 1, int pageSize = 10,
             string search = "", string sort = "")
         {
-            var result= await _service.GetProductStatuses(page, pageSize, search, sort);
-            if(result.Success)
+            var result = await _service.GetProductStatuses(page, pageSize, search, sort);
+            if (result.Success)
             {
                 return Ok(result);
             }
@@ -41,10 +41,10 @@ namespace KoiShopController.Controllers
             }
         }
         [HttpGet("StatusID/{id}")]
-        public async Task<IActionResult> GetStatusById(int id)
+        public async Task<IActionResult> GetProductStatusById(int id)
         {
             var result = await _service.GetStatusById(id);
-            if(result.Success)
+            if (result.Success)
             {
                 return Ok(result);
             }
@@ -54,9 +54,9 @@ namespace KoiShopController.Controllers
             }
         }
         [HttpGet("StatusName/{name}")]
-        public  async Task<IActionResult> GetStatusByName(string name)
+        public async Task<IActionResult> GetStatusByName(string name)
         {
-            var result=await _service.GetStatusByName(name);
+            var result = await _service.GetStatusByName(name);
             if (result.Success)
             {
                 return Ok(result);
@@ -67,7 +67,7 @@ namespace KoiShopController.Controllers
             }
         }
         [HttpDelete("DeleteStatusWithId/{id}")]
-        public async Task<IActionResult>DeleteStatusById(int id)
+        public async Task<IActionResult> DeleteStatusById(int id)
         {
             var result = await _service.DeleteProductStatus(id);
             if (result.Success)
@@ -80,9 +80,9 @@ namespace KoiShopController.Controllers
             }
         }
         [HttpDelete("DeleteStatusWithName/{name}")]
-        public async Task<IActionResult>DeleteStatusByName(string name)
+        public async Task<IActionResult> DeleteStatusByName(string name)
         {
-            var result= await _service.DeleteStatusByName(name);
+            var result = await _service.DeleteStatusByName(name);
             if (result.Success)
             {
                 return Ok(result);
