@@ -17,14 +17,14 @@ namespace DataAccess.Repo
             _context = context;
         }
 
-        public async Task<ProductStatus> CreateFishStatus(ProductStatus status)
+        public async Task<ProductStatus> CreateProductStatus(ProductStatus status)
         {
             await _context.Set<ProductStatus>().AddAsync(status);
             await _context.SaveChangesAsync();
             return status;
         }
 
-        public async Task<bool> DeleteFishStatus(int id)
+        public async Task<bool> DeleteProductStatus(int id)
         {
             var exist = await _context.Set<ProductStatus>().FirstOrDefaultAsync(s => s.ProductStatusId == id);
             if (exist != null)
@@ -38,7 +38,7 @@ namespace DataAccess.Repo
 
         public async Task<bool> DeleteStatusByName(string name)
         {
-            var exist = await _context.Set<ProductStatus>().FirstOrDefaultAsync(s => s.Name == name);
+            var exist = await _context.Set<ProductStatus>().FirstOrDefaultAsync(s => s.Name.ToLower().Trim() == name.ToLower());
             if (exist != null)
             {
                 _context.Remove(exist);
@@ -48,7 +48,7 @@ namespace DataAccess.Repo
             return false;
         }
 
-        public async Task<IEnumerable<ProductStatus>> GetFishStatuses()
+        public async Task<IEnumerable<ProductStatus>> GetProductStatuses()
         {
             return await _context.Set<ProductStatus>().ToListAsync();
         }

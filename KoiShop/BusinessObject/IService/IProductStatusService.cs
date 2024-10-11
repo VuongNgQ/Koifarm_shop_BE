@@ -11,12 +11,12 @@ namespace BusinessObject.IService
 {
     public interface IProductStatusService
     {
-        Task<ServiceResponseFormat<ResponseFishStatusDTO>> CreateFishStatus(CreateFishStatusDTO status);
-        Task<ServiceResponseFormat<PaginationModel<ResponseFishStatusDTO>>> GetFishStatuses(int page, int pageSize,
+        Task<ServiceResponseFormat<ResponseProductStatusDTO>> CreateProductStatus(CreateProductStatusDTO status);
+        Task<ServiceResponseFormat<PaginationModel<ResponseProductStatusDTO>>> GetProductStatuses(int page, int pageSize,
             string? search, string sort);
-        Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetStatusByName(string name);
-        Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetStatusById(int id);
-        Task<ServiceResponseFormat<bool>> DeleteFishStatus(int id);
+        Task<ServiceResponseFormat<ResponseProductStatusDTO>> GetStatusByName(string name);
+        Task<ServiceResponseFormat<ResponseProductStatusDTO>> GetStatusById(int id);
+        Task<ServiceResponseFormat<bool>> DeleteProductStatus(int id);
         Task<ServiceResponseFormat<bool>> DeleteStatusByName(string name);
     }
 }

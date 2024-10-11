@@ -109,7 +109,7 @@
     "Parameters": [
       {
         "Name": "statusDTO",
-        "Type": "BusinessObject.Model.RequestDTO.CreateFishStatusDTO",
+        "Type": "BusinessObject.Model.RequestDTO.CreateProductStatusDTO",
         "IsRequired": true
       }
     ],
@@ -142,6 +142,38 @@
         "Name": "sort",
         "Type": "System.String",
         "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.ProductStatusController",
+    "Method": "DeleteStatusById",
+    "RelativePath": "api/FishStatus/DeleteStatusWithId/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "KoiShopController.Controllers.ProductStatusController",
+    "Method": "DeleteStatusByName",
+    "RelativePath": "api/FishStatus/DeleteStatusWithName/{name}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "name",
+        "Type": "System.String",
+        "IsRequired": true
       }
     ],
     "ReturnTypes": []

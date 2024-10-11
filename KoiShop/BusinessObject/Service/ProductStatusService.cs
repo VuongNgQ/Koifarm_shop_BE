@@ -24,14 +24,14 @@ namespace BusinessObject.Service
             _repo = repo;
         }
 
-        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> CreateFishStatus(CreateFishStatusDTO status)
+        public async Task<ServiceResponseFormat<ResponseProductStatusDTO>> CreateProductStatus(CreateProductStatusDTO status)
         {
-            var res = new ServiceResponseFormat<ResponseFishStatusDTO>();
+            var res = new ServiceResponseFormat<ResponseProductStatusDTO>();
             try
             {
                 var map=_mapper.Map<ProductStatus>(status);
-                await _repo.CreateFishStatus(map);
-                var result=_mapper.Map<ResponseFishStatusDTO>(map);
+                await _repo.CreateProductStatus(map);
+                var result=_mapper.Map<ResponseProductStatusDTO>(map);
                 res.Success = true;
                 res.Message = "Status created successfully";
                 res.Data = result;
@@ -45,12 +45,12 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<bool>> DeleteFishStatus(int id)
+        public async Task<ServiceResponseFormat<bool>> DeleteProductStatus(int id)
         {
             var res = new ServiceResponseFormat<bool>();
             try
             {
-                var result=await _repo.DeleteFishStatus(id);
+                var result=await _repo.DeleteProductStatus(id);
                 if (result)
                 {
                     res.Success = true;
@@ -99,13 +99,13 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<PaginationModel<ResponseFishStatusDTO>>> GetFishStatuses(int page, int pageSize,
+        public async Task<ServiceResponseFormat<PaginationModel<ResponseProductStatusDTO>>> GetProductStatuses(int page, int pageSize,
             string? search, string sort)
         {
-            var res = new ServiceResponseFormat<PaginationModel<ResponseFishStatusDTO>>();
+            var res = new ServiceResponseFormat<PaginationModel<ResponseProductStatusDTO>>();
             try
             {
-                var statuses = await _repo.GetFishStatuses();
+                var statuses = await _repo.GetProductStatuses();
                 if (!string.IsNullOrEmpty(search))
                 {
                     statuses = statuses.Where(s => s.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
@@ -115,7 +115,7 @@ namespace BusinessObject.Service
                     "name" => statuses.OrderBy(s => s.Name),
                     _ => statuses.OrderBy(s => s.ProductStatusId)
                 };
-                var mapp = _mapper.Map<IEnumerable<ResponseFishStatusDTO>>(statuses);
+                var mapp = _mapper.Map<IEnumerable<ResponseProductStatusDTO>>(statuses);
                 if (mapp.Any())
                 {
                     var paginationModel = await Pagination.GetPaginationEnum(mapp, page, pageSize);
@@ -139,15 +139,15 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetStatusById(int id)
+        public async Task<ServiceResponseFormat<ResponseProductStatusDTO>> GetStatusById(int id)
         {
-            var res = new ServiceResponseFormat<ResponseFishStatusDTO>();
+            var res = new ServiceResponseFormat<ResponseProductStatusDTO>();
             try
             {
                 var result = await _repo.GetStatusById(id);
                 if(result!=null)
                 {
-                    var mapp = _mapper.Map<ResponseFishStatusDTO>(result);
+                    var mapp = _mapper.Map<ResponseProductStatusDTO>(result);
                     res.Success = true;
                     res.Message = "Get Status Successfully";
                     res.Data = mapp;
@@ -168,15 +168,15 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<ResponseFishStatusDTO>> GetStatusByName(string name)
+        public async Task<ServiceResponseFormat<ResponseProductStatusDTO>> GetStatusByName(string name)
         {
-            var res = new ServiceResponseFormat<ResponseFishStatusDTO>();
+            var res = new ServiceResponseFormat<ResponseProductStatusDTO>();
             try
             {
                 var result = await _repo.GetStatusByName(name);
                 if (result != null)
                 {
-                    var mapp = _mapper.Map<ResponseFishStatusDTO>(result);
+                    var mapp = _mapper.Map<ResponseProductStatusDTO>(result);
                     res.Success = true;
                     res.Message = "Get Status Successfully";
                     res.Data = mapp;
