@@ -29,6 +29,9 @@ namespace BusinessObject.Mapper
             //Product Status Mapping
             CreateMap<ProductStatus, CreateProductStatusDTO>().ReverseMap();
             CreateMap<ProductStatus, ResponseProductStatusDTO>().ReverseMap();
+            //Consignment Type Mapping
+            CreateMap<ConsignmentType, CreateConsignmentTypeDTO>().ReverseMap();
+            CreateMap<ConsignmentType, ResponseConsignmentTypeDTO>().ReverseMap();
         }
     }
 }

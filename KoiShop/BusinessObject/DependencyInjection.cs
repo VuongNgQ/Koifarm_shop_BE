@@ -23,12 +23,18 @@ namespace BusinessObject
             //Role
             services.AddScoped<IRoleRepo, RoleRepo>();
             services.AddScoped<IRoleService, RoleService>();
-            //Fish Status
+            //Product Status
             services.AddScoped<IProductStatusRepo, ProductStatusRepo>();
             services.AddScoped<IProductStatusService, ProductStatusService>();
+            //Fish Status
+            services.AddScoped<IFishStatusRepo, FishStatusRepo>();
+            services.AddScoped<IFishStatusService, FishStatusService>();
             //Fish Package
             services.AddScoped<IFishPackageService, FishPackageService>();
             services.AddScoped<IFishPackageRepo, FishPackageRepo>();
+            //Consignment Type
+            services.AddScoped<IConsignmentTypeRepo, ConsignmentTypeRepo>();
+            services.AddScoped<IConsignmentTypeService, ConsignmentTypeService>();
             return services;
         }
     }
