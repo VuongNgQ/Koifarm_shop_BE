@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepo
 {
-    public interface IOrderRepo:IBaseRepo<Order>
+    public interface IOrderStatusRepo : IBaseRepo<OrderStatus>
     {
-        Task<IEnumerable<Order>> GetAllOrder();
     }
 }

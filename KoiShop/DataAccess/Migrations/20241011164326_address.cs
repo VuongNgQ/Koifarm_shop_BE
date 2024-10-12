@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class _20 : Migration
+    public partial class address : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,8 +19,7 @@ namespace DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Street = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    District = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    District = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -83,6 +82,19 @@ namespace DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FAQs", x => x.FaqId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FishStatuses",
+                columns: table => new
+                {
+                    FishStatusId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StatusName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FishStatuses", x => x.FishStatusId);
                 });
 
             migrationBuilder.CreateTable(
@@ -194,22 +206,15 @@ namespace DataAccess.Migrations
                     Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Size = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CategoryId = table.Column<int>(type: "int", nullable: true),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     DailyFood = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NumberOfFish = table.Column<int>(type: "int", nullable: true),
-                    RemainingPackage = table.Column<int>(type: "int", nullable: true),
                     StatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FishPackages", x => x.FishPackageId);
-                    table.ForeignKey(
-                        name: "FK_FishPackages_Categories_CategoryId",
-                        column: x => x.CategoryId,
-                        principalTable: "Categories",
-                        principalColumn: "CategoryId");
                     table.ForeignKey(
                         name: "FK_FishPackages_ProductStatuses_StatusId",
                         column: x => x.StatusId,
@@ -347,6 +352,11 @@ namespace DataAccess.Migrations
                         principalTable: "ConsignmentTypes",
                         principalColumn: "ConsignmentTypeId");
                     table.ForeignKey(
+                        name: "FK_FishConsignments_FishStatuses_FishStatusId",
+                        column: x => x.FishStatusId,
+                        principalTable: "FishStatuses",
+                        principalColumn: "FishStatusId");
+                    table.ForeignKey(
                         name: "FK_FishConsignments_Fish_FishId",
                         column: x => x.FishId,
                         principalTable: "Fish",
@@ -432,6 +442,11 @@ namespace DataAccess.Migrations
                         column: x => x.PackageId,
                         principalTable: "FishPackages",
                         principalColumn: "FishPackageId");
+                    table.ForeignKey(
+                        name: "FK_PackageConsignments_FishStatuses_PackageStatusId",
+                        column: x => x.PackageStatusId,
+                        principalTable: "FishStatuses",
+                        principalColumn: "FishStatusId");
                     table.ForeignKey(
                         name: "FK_PackageConsignments_Users_UserId",
                         column: x => x.UserId,
@@ -600,14 +615,14 @@ namespace DataAccess.Migrations
                 column: "FishId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_FishConsignments_FishStatusId",
+                table: "FishConsignments",
+                column: "FishStatusId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_FishConsignments_UserId",
                 table: "FishConsignments",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FishPackages_CategoryId",
-                table: "FishPackages",
-                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FishPackages_StatusId",
@@ -663,6 +678,11 @@ namespace DataAccess.Migrations
                 name: "IX_PackageConsignments_PackageId",
                 table: "PackageConsignments",
                 column: "PackageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PackageConsignments_PackageStatusId",
+                table: "PackageConsignments",
+                column: "PackageStatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PackageConsignments_UserId",
@@ -739,7 +759,13 @@ namespace DataAccess.Migrations
                 name: "FishPackages");
 
             migrationBuilder.DropTable(
+                name: "FishStatuses");
+
+            migrationBuilder.DropTable(
                 name: "Permissions");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Addresses");
@@ -752,9 +778,6 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "ProductStatuses");
