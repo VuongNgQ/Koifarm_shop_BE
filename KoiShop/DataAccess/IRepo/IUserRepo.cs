@@ -18,10 +18,10 @@ namespace DataAccess.IRepo
         Task<User> GetByName(string name);
         Task<User> GetByEmail(string email);
         Task<IEnumerable<User>> GetAllUser();
-        Task<bool> Login(string email, string password);
+        Task<User> Login(string email, string password);
         Task<User> GetByPhone(string phone);
-        Task<bool> LoginCustomer(string email, string password);
-        Task<bool> LoginAdmin(string email, string password);
-        Task<bool> LoginStaff(string email, string password);
+        //Task<bool> LoginCustomer(string email, string password);
+        //Task<bool> LoginAdmin(string email, string password);
+        //Task<bool> LoginStaff(string email, string password);
     }
 }

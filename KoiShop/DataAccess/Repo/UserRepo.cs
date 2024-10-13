@@ -20,6 +20,10 @@ namespace DataAccess.Repo
 
         public async Task<User> CreateUser(User user)
         {
+            if (user.RoleId == null || user.RoleId == 0)
+            {
+                user.RoleId = 3;
+            }
             await _context.Set<User>().AddAsync(user);
             await _context.SaveChangesAsync();
             return user;
@@ -72,26 +76,34 @@ namespace DataAccess.Repo
         {
             return await _context.Set<User>().AnyAsync(e =>managerRoleId==1);
         }
-
-        public async Task<bool> Login(string email, string password)
+        public async Task<User> Login(string email, string password)
         {
-            return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password);
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(e => e.Email == email && e.Password == password);
+            if (user == null)
+            {
+                throw new Exception("Invalid email or password");
+            }
+            return user;
         }
+        //public async Task<bool> Login(string email, string password)
+        //{
+        //    return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password);
+        //}
 
-        public async Task<bool> LoginAdmin(string email, string password)
-        {
-            return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password&& e.Role.RoleName == "Manager");
-        }
+        //public async Task<bool> LoginAdmin(string email, string password)
+        //{
+        //    return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password&& e.Role.RoleName == "Manager");
+        //}
 
-        public async Task<bool> LoginCustomer(string email, string password)
-        {
-            return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password && e.Role.RoleName == "Customer");
-        }
+        //public async Task<bool> LoginCustomer(string email, string password)
+        //{
+        //    return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password && e.Role.RoleName == "Customer");
+        //}
 
-        public async Task<bool> LoginStaff(string email, string password)
-        {
-            return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password && e.Role.RoleName == "Staff");
-        }
+        //public async Task<bool> LoginStaff(string email, string password)
+        //{
+        //    return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password && e.Role.RoleName == "Staff");
+        //}
 
         public async Task<User> UpdateUser(int id, User newUser)
         {
