@@ -36,13 +36,13 @@ namespace BusinessObject.Service
                 if (manager)
                 {
                     res.Success = false;
-                    res.Message = "MANAGER EXISTED, OK?";
+                    res.Message = "Only one manager allowed.";
                     return res;
                 }
                 if (emailExist!=null||phoneExist!=null)
                 {
                     res.Success = false;
-                    res.Message = "User with this Email/Phone exist";
+                    res.Message = "User with this email or phone already exists.";
                     return res;
                 }
                 var roleExist = await _roleRepo.RoleExist(userDTO.RoleId);
@@ -149,13 +149,13 @@ namespace BusinessObject.Service
             return res;
         }
 
-        public async Task<ServiceResponseFormat<bool>> LoginUser(string email, string pass)
+        public async Task<ServiceResponseFormat<User>> LoginUser(string email, string pass)
         {
-            var res = new ServiceResponseFormat<bool>();
+            var res = new ServiceResponseFormat<User>();
             try
             {
                 var result=await _userRepo.Login(email, pass);
-                if (result)
+                if (result != null)
                 {
                     res.Success = true;
                     res.Message = "Login Successfully";
@@ -175,92 +175,99 @@ namespace BusinessObject.Service
                 return res;
             }
         }
-        public async Task<ServiceResponseFormat<bool>> LoginAdmin(string email, string pass)
-        {
-            var res = new ServiceResponseFormat<bool>();
-            try
-            {
-                var result = await _userRepo.LoginAdmin(email, pass);
-                if (result)
-                {
-                    res.Success = true;
-                    res.Message = "Login Successfully";
-                    res.Data = result;
-                    return res;
-                }
-                else
-                {
-                    res.Success = false;
-                    res.Message = "Password does not match the Email";
-                    return res;
-                }
-            }
-            catch (Exception ex)
-            {
-                res.Success = false;
-                res.Message = $"Login fail:{ex.Message}";
-                return res;
-            }
-        }
-        public async Task<ServiceResponseFormat<bool>> LoginCustomer(string email, string pass)
-        {
-            var res = new ServiceResponseFormat<bool>();
-            try
-            {
-                var result = await _userRepo.LoginCustomer(email, pass);
-                if (result)
-                {
-                    res.Success = true;
-                    res.Message = "Login Successfully";
-                    res.Data = result;
-                    return res;
-                }
-                else
-                {
-                    res.Success = false;
-                    res.Message = "Password does not match the Email";
-                    return res;
-                }
-            }
-            catch (Exception ex)
-            {
-                res.Success = false;
-                res.Message = $"Login fail:{ex.Message}";
-                return res;
-            }
-        }
-        public async Task<ServiceResponseFormat<bool>> LoginStaff(string email, string pass)
-        {
-            var res = new ServiceResponseFormat<bool>();
-            try
-            {
-                var result = await _userRepo.LoginStaff(email, pass);
-                if (result)
-                {
-                    res.Success = true;
-                    res.Message = "Login Successfully";
-                    res.Data = result;
-                    return res;
-                }
-                else
-                {
-                    res.Success = false;
-                    res.Message = "Password does not match the Email";
-                    return res;
-                }
-            }
-            catch (Exception ex)
-            {
-                res.Success = false;
-                res.Message = $"Login fail:{ex.Message}";
-                return res;
-            }
-        }
+        //public async Task<ServiceResponseFormat<bool>> LoginAdmin(string email, string pass)
+        //{
+        //    var res = new ServiceResponseFormat<bool>();
+        //    try
+        //    {
+        //        var result = await _userRepo.LoginAdmin(email, pass);
+        //        if (result)
+        //        {
+        //            res.Success = true;
+        //            res.Message = "Login Successfully";
+        //            res.Data = result;
+        //            return res;
+        //        }
+        //        else
+        //        {
+        //            res.Success = false;
+        //            res.Message = "Password does not match the Email";
+        //            return res;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        res.Success = false;
+        //        res.Message = $"Login fail:{ex.Message}";
+        //        return res;
+        //    }
+        //}
+        //public async Task<ServiceResponseFormat<bool>> LoginCustomer(string email, string pass)
+        //{
+        //    var res = new ServiceResponseFormat<bool>();
+        //    try
+        //    {
+        //        var result = await _userRepo.LoginCustomer(email, pass);
+        //        if (result)
+        //        {
+        //            res.Success = true;
+        //            res.Message = "Login Successfully";
+        //            res.Data = result;
+        //            return res;
+        //        }
+        //        else
+        //        {
+        //            res.Success = false;
+        //            res.Message = "Password does not match the Email";
+        //            return res;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        res.Success = false;
+        //        res.Message = $"Login fail:{ex.Message}";
+        //        return res;
+        //    }
+        //}
+        //public async Task<ServiceResponseFormat<bool>> LoginStaff(string email, string pass)
+        //{
+        //    var res = new ServiceResponseFormat<bool>();
+        //    try
+        //    {
+        //        var result = await _userRepo.LoginStaff(email, pass);
+        //        if (result)
+        //        {
+        //            res.Success = true;
+        //            res.Message = "Login Successfully";
+        //            res.Data = result;
+        //            return res;
+        //        }
+        //        else
+        //        {
+        //            res.Success = false;
+        //            res.Message = "Password does not match the Email";
+        //            return res;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        res.Success = false;
+        //        res.Message = $"Login fail:{ex.Message}";
+        //        return res;
+        //    }
+        //}
         public async Task<ServiceResponseFormat<ResponseUserDTO>> UpdateUser(int id, ResponseUserDTO updateUserDTO)
         {
             var res = new ServiceResponseFormat<ResponseUserDTO>();
             try
             {
+                var user = await _userRepo.GetById(id);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "User not found.";
+                    return res;
+                }
                 var emailExist = await _userRepo.GetByEmail(updateUserDTO.Email);
                 var phoneExist = await _userRepo.GetByPhone(updateUserDTO.Phone);
                 if (emailExist != null || phoneExist != null)
@@ -269,17 +276,14 @@ namespace BusinessObject.Service
                     res.Message = "User with this Email/Phone exist";
                     return res;
                 }
-                var user = await _userRepo.GetAllUser();
-                var manager = user.Where(e => e.RoleId == 1).ToList();
-                if (manager.Any(e=>e.UserId==id))
-                {
-                    res.Success = false;
-                    res.Message = "YOU CAN'T UPDATE MANAGER, OK?";
-                    return res;
-                }
+                //if (user.RoleId == 1)
+                //{
+                //    res.Success = false;
+                //    res.Message = "YOU CAN'T UPDATE MANAGER, OK?";
+                //    return res;
+                //}
                 
                 var mapp = _mapper.Map<User>(updateUserDTO);
-                
                 var updateUser = await _userRepo.UpdateUser(id, mapp);
                 if (updateUser != null)
                 {
