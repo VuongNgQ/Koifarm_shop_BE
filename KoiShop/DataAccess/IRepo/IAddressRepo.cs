@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepo
 {
-    public interface IOrderRepo:IBaseRepo<Order>
+    public interface IAddressRepo:IBaseRepo<Address>
     {
-        Task<IEnumerable<Order>> GetAllOrder();
     }
 }

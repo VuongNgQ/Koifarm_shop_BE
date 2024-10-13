@@ -12,7 +12,7 @@ namespace DataAccess.Entity
         public string? Street { get; set; }
         public string? City { get; set; }
         public string? District { get; set; }
-        public int? UserId { get; set; }
+        
         public ICollection<Order>? Orders { get; set; }
         public ICollection<UserAddress>? UserAddresses { get; set; }
     }

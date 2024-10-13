@@ -39,9 +39,6 @@ namespace DataAccess.Migrations
                     b.Property<string>("Street")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("AddressId");
 
                     b.ToTable("Addresses");
@@ -277,9 +274,6 @@ namespace DataAccess.Migrations
                     b.Property<int?>("Age")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CategoryId")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("DailyFood")
                         .HasColumnType("decimal(18,2)");
 
@@ -298,9 +292,6 @@ namespace DataAccess.Migrations
                     b.Property<int?>("NumberOfFish")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RemainingPackage")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("Size")
                         .HasColumnType("decimal(18,2)");
 
@@ -311,8 +302,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.HasKey("FishPackageId");
-
-                    b.HasIndex("CategoryId");
 
                     b.HasIndex("StatusId");
 
@@ -764,15 +753,9 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entity.FishPackage", b =>
                 {
-                    b.HasOne("DataAccess.Entity.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId");
-
                     b.HasOne("DataAccess.Entity.ProductStatus", "Status")
                         .WithMany("FishPackages")
                         .HasForeignKey("StatusId");
-
-                    b.Navigation("Category");
 
                     b.Navigation("Status");
                 });
