@@ -27,7 +27,7 @@ namespace DataAccess
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
         public DbSet<UserCart> UserCarts { get; set; }
-        public DbSet<FishSingle> Fish { get; set; }
+        public DbSet<Fish> Fish { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ProductStatus> ProductStatuses { get; set; }
         public DbSet<FishPackage> FishPackages { get; set; }
@@ -138,13 +138,13 @@ namespace DataAccess
                 .HasForeignKey(ci => ci.PackageId);
 
             // Fish and Category (one-to-many)
-            modelBuilder.Entity<FishSingle>()
+            modelBuilder.Entity<Fish>()
                 .HasOne(f => f.Category)
                 .WithMany(c => c.Fish)
                 .HasForeignKey(f => f.CategoryId);
 
             // Fish and ProductStatus (one-to-many)
-            modelBuilder.Entity<FishSingle>()
+            modelBuilder.Entity<Fish>()
                 .HasOne(f => f.Status)
                 .WithMany(ps => ps.Fish)
                 .HasForeignKey(f => f.StatusId);

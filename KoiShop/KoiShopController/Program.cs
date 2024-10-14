@@ -68,6 +68,7 @@ builder.Services.AddAuthentication(x =>
 });
 
 var app = builder.Build();
+await SeedData.SeedDataAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

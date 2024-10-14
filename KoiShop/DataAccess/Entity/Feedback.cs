@@ -16,7 +16,7 @@ namespace DataAccess.Entity
         public DateTime? AddedDate { get; set; }
 
         public User? User { get; set; }
-        public FishSingle? Fish { get; set; }
+        public Fish? Fish { get; set; }
         public FishPackage? Package { get; set; }
     }
 }
