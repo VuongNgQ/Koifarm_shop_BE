@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Entity
 {
-    public class FishSingle
+    public class Fish
     {
-        public int FishSingleId { get; set; }
+        public int FishId { get; set; }
         public string? Name { get; set; }
         public int? Age { get; set; }
         public string? Gender { get; set; }

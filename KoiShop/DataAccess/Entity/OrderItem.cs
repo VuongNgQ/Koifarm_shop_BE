@@ -15,7 +15,7 @@ namespace DataAccess.Entity
         public int? Quantity { get; set; }
         public decimal? Price { get; set; }
         public Order? Order { get; set; }
-        public FishSingle? Fish { get; set; }
+        public Fish? Fish { get; set; }
         public FishPackage? Package { get; set; }
     }
 }

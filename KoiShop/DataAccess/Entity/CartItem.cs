@@ -14,7 +14,7 @@ namespace DataAccess.Entity
         public int? PackageId { get; set; }
         public int? Quantity { get; set; }
         public UserCart? UserCart { get; set; }
-        public FishSingle? Fish { get; set; }
+        public Fish? Fish { get; set; }
         public FishPackage? Package { get; set; }
     }
 }

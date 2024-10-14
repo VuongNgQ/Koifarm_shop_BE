@@ -5,12 +5,6 @@ using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.IRepo;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessObject.Service
 {
@@ -27,44 +21,140 @@ namespace BusinessObject.Service
         }
         public async Task<ServiceResponseFormat<ResponseUserDTO>> CreateUser(CreateUserDTO userDTO)
         {
-            var res=new ServiceResponseFormat<ResponseUserDTO>();
+            var res = new ServiceResponseFormat<ResponseUserDTO>();
             try
             {
                 var emailExist = await _userRepo.GetByEmail(userDTO.Email);
                 var phoneExist = await _userRepo.GetByPhone(userDTO.Phone);
-                var manager = await _userRepo.isManager(userDTO.RoleId);
-                if (manager)
+                if (emailExist != null)
                 {
                     res.Success = false;
-                    res.Message = "Only one manager allowed.";
+                    res.Message = "User with this email already exists.";
                     return res;
                 }
-                if (emailExist!=null||phoneExist!=null)
+                else if (phoneExist != null)
                 {
                     res.Success = false;
-                    res.Message = "User with this email or phone already exists.";
+                    res.Message = "User with this phone already exists.";
                     return res;
                 }
-                var roleExist = await _roleRepo.RoleExist(userDTO.RoleId);
-                if (!roleExist)
-                {
-                    res.Success = false;
-                    res.Message = "Role doesn't exist";
-                    return res;
-                }
-                var mapp=_mapper.Map<User>(userDTO); 
+                var mapp = _mapper.Map<User>(userDTO);
                 mapp.Status = "Active";
+                mapp.RoleId = 3;
                 await _userRepo.CreateUser(mapp);
+
                 var result = _mapper.Map<ResponseUserDTO>(mapp);
                 res.Success = true;
                 res.Message = "User created successfully";
                 res.Data = result;
                 return res;
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 res.Success = false;
                 res.Message = $"Fail to create User:{ex.Message}";
+            }
+            return res;
+        }
+        public async Task<ServiceResponseFormat<ResponseUserDTO>> CreateStaff(CreateUserDTO CreateStaffDTO)
+        {
+            var res = new ServiceResponseFormat<ResponseUserDTO>();
+            try
+            {
+                var emailExist = await _userRepo.GetByEmail(CreateStaffDTO.Email);
+                var phoneExist = await _userRepo.GetByPhone(CreateStaffDTO.Phone);
+                if (emailExist != null)
+                {
+                    res.Success = false;
+                    res.Message = "User with this email already exists.";
+                    return res;
+                }
+                else if (phoneExist != null)
+                {
+                    res.Success = false;
+                    res.Message = "User with this phone already exists.";
+                    return res;
+                }
+
+                var newStaff = _mapper.Map<User>(CreateStaffDTO);
+                newStaff.Status = "Active";
+                newStaff.RoleId = 2;
+
+                var createdUser = await _userRepo.CreateUser(newStaff);
+                if (createdUser != null)
+                {
+                    res.Success = true;
+                    res.Message = "Staff created successfully.";
+                    res.Data = _mapper.Map<ResponseUserDTO>(createdUser);
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Failed to create staff. Repository error.";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Error creating staff: {ex.Message}";
+                return res;
+            }
+        }
+
+        public async Task<ServiceResponseFormat<UpdateProfileDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO)
+        {
+            var res = new ServiceResponseFormat<UpdateProfileDTO>();
+            try
+            {
+                var user = await _userRepo.GetById(id);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "User not found.";
+                    return res;
+                }
+
+                var emailExist = await _userRepo.GetByEmail(updateProfileDTO.Email);
+                var phoneExist = await _userRepo.GetByPhone(updateProfileDTO.Phone);
+                if (emailExist != null && emailExist.UserId != user.UserId)
+                {
+                    res.Success = false;
+                    res.Message = "User with this Email already exist";
+                    return res;
+                }
+                if (phoneExist != null && phoneExist.UserId != user.UserId)
+                {
+                    res.Success = false;
+                    res.Message = "User with this Phone already exist";
+                    return res;
+                }
+
+                user.Name = updateProfileDTO.Name ?? user.Name;
+                user.Email = updateProfileDTO.Email ?? user.Email;
+                user.Phone = updateProfileDTO.Phone ?? user.Phone;
+                user.DateOfBirth = updateProfileDTO.DateOfBirth;
+
+                var updateUser = await _userRepo.UpdateUser(id, user);
+                if (updateUser != null)
+                {
+                    res.Success = true;
+                    res.Message = "Updated Successfully.";
+                    res.Data = _mapper.Map<UpdateProfileDTO>(user);
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Failed to update User. Repository error.";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Error updating profile: {ex.Message}";
             }
             return res;
         }
@@ -149,30 +239,15 @@ namespace BusinessObject.Service
             return res;
         }
 
-        public async Task<ServiceResponseFormat<User>> LoginUser(string email, string pass)
+        public async Task<User> LoginUser(string email, string pass)
         {
-            var res = new ServiceResponseFormat<User>();
             try
             {
-                var result=await _userRepo.Login(email, pass);
-                if (result != null)
-                {
-                    res.Success = true;
-                    res.Message = "Login Successfully";
-                    return res;
-                }
-                else
-                {
-                    res.Success = false;
-                    res.Message = "Password does not match the Email";
-                    return res;
-                }
+                return await _userRepo.Login(email, pass);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                res.Success = false;
-                res.Message = $"Login fail:{ex.Message}";
-                return res;
+                throw new Exception($"Failed to login: {ex.Message}");
             }
         }
         //public async Task<ServiceResponseFormat<bool>> LoginAdmin(string email, string pass)
@@ -270,26 +345,37 @@ namespace BusinessObject.Service
                 }
                 var emailExist = await _userRepo.GetByEmail(updateUserDTO.Email);
                 var phoneExist = await _userRepo.GetByPhone(updateUserDTO.Phone);
-                if (emailExist != null || phoneExist != null)
+                if (emailExist != null && emailExist.UserId != user.UserId)
                 {
                     res.Success = false;
-                    res.Message = "User with this Email/Phone exist";
+                    res.Message = "User with this Email already exist";
                     return res;
                 }
-                //if (user.RoleId == 1)
-                //{
-                //    res.Success = false;
-                //    res.Message = "YOU CAN'T UPDATE MANAGER, OK?";
-                //    return res;
-                //}
-                
-                var mapp = _mapper.Map<User>(updateUserDTO);
-                var updateUser = await _userRepo.UpdateUser(id, mapp);
+                if (phoneExist != null && phoneExist.UserId != user.UserId)
+                {
+                    res.Success = false;
+                    res.Message = "User with this Phone already exist";
+                    return res;
+                }
+                if (user.RoleId == 1)
+                {
+                    res.Success = false;
+                    res.Message = "YOU CAN'T UPDATE MANAGER, OK?";
+                    return res;
+                }
+
+                user.Name = updateUserDTO.Name ?? user.Name;
+                user.Email = updateUserDTO.Email ?? user.Email;
+                user.Phone = updateUserDTO.Phone ?? user.Phone;
+                user.DateOfBirth = updateUserDTO.DateOfBirth;
+
+                //var mapp = _mapper.Map<User>(updateUserDTO);
+                var updateUser = await _userRepo.UpdateUser(id, user);
                 if (updateUser != null)
                 {
                     res.Success = true;
                     res.Message = "User Updated Successfully";
-                    res.Data = updateUserDTO;
+                    res.Data = _mapper.Map<ResponseUserDTO>(user); ;
                     return res;
                 }
                 else
