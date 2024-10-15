@@ -346,15 +346,30 @@ namespace BusinessObject.Service
             return res;
         }
 
-        public async Task<User> LoginUser(string email, string pass)
+        public async Task<ServiceResponseFormat<ResponseUserDTO>> LoginUser(string email, string pass)
         {
+            var res = new ServiceResponseFormat<ResponseUserDTO>();
             try
             {
-                return await _userRepo.Login(email, pass);
+                var user = await _userRepo.Login(email, pass);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "Invalid email or password.";
+                    return res;
+                }
+
+                var responseUser = _mapper.Map<ResponseUserDTO>(user);
+                res.Success = true;
+                res.Message = "Login successful.";
+                res.Data = responseUser;
+                return res;
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to login: {ex.Message}");
+                res.Success = false;
+                res.Message = $"Failed to login: {ex.Message}";
+                return res;
             }
         }
         public async Task<ServiceResponseFormat<ResponseUserDTO>> UpdateUser(int id, ResponseUserDTO updateUserDTO)

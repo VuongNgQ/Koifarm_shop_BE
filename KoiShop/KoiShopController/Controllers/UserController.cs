@@ -71,23 +71,22 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
         {
             var result = await _userService.LoginUser(loginRequest.Email, loginRequest.Password);
-            if (result == null)
+            if (!result.Success)
             {
                 return BadRequest("Your email or password is incorrect!");
             }
-
-            // Tạo danh sách claim dựa trên role của user sau khi xác thực
+            var user = result.Data;
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.Name, result.Name),
-        new Claim(ClaimTypes.NameIdentifier, result.UserId.ToString()),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(ClaimTypes.Role, result.Role.RoleName)  // Role là Manager, Customer hay Staff
-    };
+            {
+               new Claim(ClaimTypes.Name, user.Name),
+               new Claim(ClaimTypes.NameIdentifier, user.Email),
+               new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+               new Claim(ClaimTypes.Role, user.RoleId.ToString())
+            };
 
             // Tạo token
             var token = CreateToken(claims);
-            return Ok(new { Token = token, Role = result.Role.ToString() });
+            return Ok(new { Token = token, Role = user.RoleId.ToString() });
         }
 
 

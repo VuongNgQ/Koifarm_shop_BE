@@ -20,7 +20,7 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<bool>> RemoveUser(int id);
         Task<ServiceResponseFormat<bool>> DeleteUser(int id);
         Task<ServiceResponseFormat<bool>> RestoreUser(int id);
-        Task<User> LoginUser(string email, string pass);
+        Task<ServiceResponseFormat<ResponseUserDTO>> LoginUser(string email, string pass);
         //Task<ServiceResponseFormat<bool>> LoginAdmin(string email, string pass);
         //Task<ServiceResponseFormat<bool>> LoginCustomer(string email, string pass);
         //Task<ServiceResponseFormat<bool>> LoginStaff(string email, string pass);
