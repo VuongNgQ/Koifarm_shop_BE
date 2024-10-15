@@ -17,7 +17,9 @@ namespace BusinessObject.IService
             string search, string sort);
         Task<ServiceResponseFormat<ResponseUserDTO>> UpdateUser(int id, ResponseUserDTO updateUserDTO);
         Task<ServiceResponseFormat<UpdateProfileDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO);
+        Task<ServiceResponseFormat<bool>> RemoveUser(int id);
         Task<ServiceResponseFormat<bool>> DeleteUser(int id);
+        Task<ServiceResponseFormat<bool>> RestoreUser(int id);
         Task<User> LoginUser(string email, string pass);
         //Task<ServiceResponseFormat<bool>> LoginAdmin(string email, string pass);
         //Task<ServiceResponseFormat<bool>> LoginCustomer(string email, string pass);

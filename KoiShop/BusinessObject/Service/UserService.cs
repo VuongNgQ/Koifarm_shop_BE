@@ -42,6 +42,7 @@ namespace BusinessObject.Service
                 }
                 var mapp = _mapper.Map<User>(userDTO);
                 mapp.Status = "Active";
+                mapp.RoleId = 3;
                 await _userRepo.CreateUser(mapp);
 
                 if (mapp.Role?.RoleName =="customer")
@@ -144,6 +145,7 @@ namespace BusinessObject.Service
 
                 user.Name = updateProfileDTO.Name ?? user.Name;
                 user.Email = updateProfileDTO.Email ?? user.Email;
+                user.Password = updateProfileDTO.Password ?? user.Password;
                 user.Phone = updateProfileDTO.Phone ?? user.Phone;
                 user.DateOfBirth = updateProfileDTO.DateOfBirth;
 
@@ -169,8 +171,102 @@ namespace BusinessObject.Service
             }
             return res;
         }
-
         public async Task<ServiceResponseFormat<bool>> DeleteUser(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var user = await _userRepo.GetByIdAsync(id);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "User not found.";
+                    return res;
+                }
+
+                // Kiểm tra nếu người dùng là Manager thì không được phép xóa
+                if (user.RoleId == 1)
+                {
+                    res.Success = false;
+                    res.Message = "THIS IS MANAGER, OK?";
+                    return res;
+                }
+
+                // Thay đổi trạng thái của người dùng thành "Unactive"
+                user.Status = "Disable";
+                var result = await _userRepo.UpdateUser(id, user);
+
+                if (result != null)
+                {
+                    res.Success = true;
+                    res.Message = "User status changed to Unactive successfully.";
+                    res.Data = true;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Failed to update User status.";
+                    res.Data = false;
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change User status: {ex.Message}";
+                res.Data = false;
+                return res;
+            }
+        }
+        public async Task<ServiceResponseFormat<bool>> RestoreUser(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var user = await _userRepo.GetByIdAsync(id);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "User not found.";
+                    return res;
+                }
+
+                if (user.RoleId == 1)
+                {
+                    res.Success = false;
+                    res.Message = "THIS IS MANAGER, OK?";
+                    return res;
+                }
+
+                user.Status = "Active";
+                var result = await _userRepo.UpdateUser(id, user);
+
+                if (result != null)
+                {
+                    res.Success = true;
+                    res.Message = "User status changed to Active successfully.";
+                    res.Data = true;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Failed to update User status.";
+                    res.Data = false;
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change User status: {ex.Message}";
+                res.Data = false;
+                return res;
+            }
+        }
+
+        public async Task<ServiceResponseFormat<bool>> RemoveUser(int id)
         {
             var res = new ServiceResponseFormat<bool>();
             try
@@ -189,7 +285,7 @@ namespace BusinessObject.Service
                 if (result)
                 {
                     res.Success = true;
-                    res.Message = "User Deleted successfully";
+                    res.Message = "User remove successfully";
                     return res;
                 }
                 else
@@ -202,7 +298,7 @@ namespace BusinessObject.Service
             catch(Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to delete User:{ex.Message}";
+                res.Message = $"Fail to remove User:{ex.Message}";
                 return res;
             }
         }
@@ -261,87 +357,6 @@ namespace BusinessObject.Service
                 throw new Exception($"Failed to login: {ex.Message}");
             }
         }
-        //public async Task<ServiceResponseFormat<bool>> LoginAdmin(string email, string pass)
-        //{
-        //    var res = new ServiceResponseFormat<bool>();
-        //    try
-        //    {
-        //        var result = await _userRepo.LoginAdmin(email, pass);
-        //        if (result)
-        //        {
-        //            res.Success = true;
-        //            res.Message = "Login Successfully";
-        //            res.Data = result;
-        //            return res;
-        //        }
-        //        else
-        //        {
-        //            res.Success = false;
-        //            res.Message = "Password does not match the Email";
-        //            return res;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        res.Success = false;
-        //        res.Message = $"Login fail:{ex.Message}";
-        //        return res;
-        //    }
-        //}
-        //public async Task<ServiceResponseFormat<bool>> LoginCustomer(string email, string pass)
-        //{
-        //    var res = new ServiceResponseFormat<bool>();
-        //    try
-        //    {
-        //        var result = await _userRepo.LoginCustomer(email, pass);
-        //        if (result)
-        //        {
-        //            res.Success = true;
-        //            res.Message = "Login Successfully";
-        //            res.Data = result;
-        //            return res;
-        //        }
-        //        else
-        //        {
-        //            res.Success = false;
-        //            res.Message = "Password does not match the Email";
-        //            return res;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        res.Success = false;
-        //        res.Message = $"Login fail:{ex.Message}";
-        //        return res;
-        //    }
-        //}
-        //public async Task<ServiceResponseFormat<bool>> LoginStaff(string email, string pass)
-        //{
-        //    var res = new ServiceResponseFormat<bool>();
-        //    try
-        //    {
-        //        var result = await _userRepo.LoginStaff(email, pass);
-        //        if (result)
-        //        {
-        //            res.Success = true;
-        //            res.Message = "Login Successfully";
-        //            res.Data = result;
-        //            return res;
-        //        }
-        //        else
-        //        {
-        //            res.Success = false;
-        //            res.Message = "Password does not match the Email";
-        //            return res;
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        res.Success = false;
-        //        res.Message = $"Login fail:{ex.Message}";
-        //        return res;
-        //    }
-        //}
         public async Task<ServiceResponseFormat<ResponseUserDTO>> UpdateUser(int id, ResponseUserDTO updateUserDTO)
         {
             var res = new ServiceResponseFormat<ResponseUserDTO>();

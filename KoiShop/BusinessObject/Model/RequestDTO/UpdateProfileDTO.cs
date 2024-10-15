@@ -10,6 +10,7 @@ namespace BusinessObject.Model.RequestDTO
 {
     public string Name { get; set; }
     public string Email { get; set; }
+    public String Password { get; set; }
     public string Phone { get; set; }
     public DateTime DateOfBirth { get; set; }
 }

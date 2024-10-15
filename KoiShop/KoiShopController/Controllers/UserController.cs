@@ -131,11 +131,11 @@ namespace KoiShopController.Controllers
         //    }
         //}
 
-        [HttpPut("{id}")]
+        [HttpPut("updateUser/{userId}")]
         [Authorize(Roles = "Manager, Staff")]
-        public async Task<IActionResult>UpdateUser(int id, ResponseUserDTO userDTO)
+        public async Task<IActionResult>UpdateUser(int userId, ResponseUserDTO userDTO)
         {
-            var result = await _userService.UpdateUser(id, userDTO);
+            var result = await _userService.UpdateUser(userId, userDTO);
             if (result.Success)
             {
                 return Ok(result);
@@ -145,11 +145,11 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
-        [HttpDelete("{id}")]
+        [HttpDelete("{userId}")]
         [Authorize(Roles = "Manager")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> RemoveUser(int userId)
         {
-            var result=await _userService.DeleteUser(id);
+            var result=await _userService.RemoveUser(userId);
             if (result.Success)
             {
                 return Ok(result);
@@ -158,6 +158,30 @@ namespace KoiShopController.Controllers
             {
                 return NotFound(result.Message);
             }
+        }
+
+        [HttpPut("deleteUser/{userId}")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> DeleteUser(int userId)
+        {
+            var result = await _userService.DeleteUser(userId);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
+        }
+
+        [HttpPut("restoreUser/{userId}")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> RestoreUser(int userId)
+        {
+            var result = await _userService.RestoreUser(userId);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
         }
 
         [HttpPut("updateProfile/{userId}")]
