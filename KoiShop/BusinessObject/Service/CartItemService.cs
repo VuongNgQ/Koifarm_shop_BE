@@ -41,7 +41,7 @@ namespace BusinessObject.Service
                     res.Message = "You haved added this Fish before, now you can only update Quantity inside";
                     return res;
                 }
-                var exist = await _fishRepo.GetByIdAsync(itemDTO.FishId);
+                var exist = await _fishRepo.GetFishByIdAsync(itemDTO.FishId);
                 if (exist==null)
                 {
                     res.Success = false;
