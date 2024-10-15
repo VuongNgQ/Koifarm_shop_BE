@@ -13,11 +13,13 @@ namespace BusinessObject.Service
         private readonly IUserRepo _userRepo;
         private readonly IMapper _mapper;
         private readonly IRoleRepo _roleRepo;
-        public UserService(IUserRepo repo, IMapper mapper, IRoleRepo roleRepo)
+        private readonly ICartRepo _cartRepo;
+        public UserService(IUserRepo repo, IMapper mapper, IRoleRepo roleRepo, ICartRepo cartRepo)
         {
             _userRepo = repo;
             _mapper = mapper;
             _roleRepo = roleRepo;
+            _cartRepo = cartRepo;
         }
         public async Task<ServiceResponseFormat<ResponseUserDTO>> CreateUser(CreateUserDTO userDTO)
         {
@@ -42,6 +44,16 @@ namespace BusinessObject.Service
                 mapp.Status = "Active";
                 mapp.RoleId = 3;
                 await _userRepo.CreateUser(mapp);
+
+                if (mapp.Role?.RoleName =="customer")
+                {
+                    CreateCartDTO userCart = new CreateCartDTO()
+                    {
+                        UserId=mapp.UserId,
+                    };
+                    var cartmapp = _mapper.Map<UserCart>(userCart);
+                    await _cartRepo.AddAsync(cartmapp);
+                }
 
                 var result = _mapper.Map<ResponseUserDTO>(mapp);
                 res.Success = true;
