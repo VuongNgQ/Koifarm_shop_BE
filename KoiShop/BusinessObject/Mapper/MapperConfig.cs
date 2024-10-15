@@ -51,10 +51,13 @@ namespace BusinessObject.Mapper
             CreateMap<PaymentMethod, ResponsePaymentMethodDTO>().ReverseMap();
             //Cart
             CreateMap<UserCart, CreateCartDTO>().ReverseMap();
-            //Cart Item
+            //Item
             CreateMap<CartItem, CreateFishItemDTO>().ReverseMap();
             CreateMap<CartItem, CreatePackageItemDTO>().ReverseMap();
             CreateMap<CartItem, ResponseCartItemDTO>().ReverseMap();
+            CreateMap<OrderItem, CreateFishItemDTO>().ReverseMap();
+            CreateMap<OrderItem, CreatePackageItemDTO>().ReverseMap();
+            CreateMap<OrderItem, ResponseOrderItemDTO>().ReverseMap();
         }
     }
 }

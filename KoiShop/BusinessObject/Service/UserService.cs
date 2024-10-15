@@ -42,7 +42,6 @@ namespace BusinessObject.Service
                 }
                 var mapp = _mapper.Map<User>(userDTO);
                 mapp.Status = "Active";
-                mapp.RoleId = 3;
                 await _userRepo.CreateUser(mapp);
 
                 if (mapp.Role?.RoleName =="customer")

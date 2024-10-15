@@ -54,6 +54,9 @@ namespace BusinessObject
             //Cart Item
             services.AddScoped<ICartItemRepo, CartItemRepo>();
             services.AddScoped<ICartItemService, CartItemService>();
+            //Order Item
+            services.AddScoped<IOrderItemRepo, OrderItemRepo>();
+            services.AddScoped<IOrderItemService, OrderItemService>();
             return services;
         }
     }
