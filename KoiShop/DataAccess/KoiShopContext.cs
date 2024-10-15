@@ -18,6 +18,7 @@ namespace DataAccess
 
         // DbSets for each entity
         public DbSet<User> Users { get; set; }
+        public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
@@ -242,6 +243,12 @@ namespace DataAccess
                 .WithMany(f => f.PackageConsignments)
                 .HasForeignKey(f => f.PackageStatusId);
             base.OnModelCreating(modelBuilder);
+
+            // User and PasswordResetToken
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasOne(p => p.User)
+                .WithMany(u => u.PasswordResetTokens)
+                .HasForeignKey(p => p.UserId);
         }
 
     }

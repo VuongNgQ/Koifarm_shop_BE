@@ -1,4 +1,6 @@
 using BusinessObject;
+using BusinessObject.IService;
+using BusinessObject.Service;
 using DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -66,6 +68,8 @@ builder.Services.AddAuthentication(x =>
         ClockSkew = TimeSpan.Zero,
     };
 });
+builder.Services.AddTransient<IEmailService, EmailService>();
+
 
 var app = builder.Build();
 await SeedData.SeedDataAsync(app.Services);

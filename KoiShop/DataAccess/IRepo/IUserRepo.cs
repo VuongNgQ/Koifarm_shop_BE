@@ -22,8 +22,9 @@ namespace DataAccess.IRepo
         Task<IEnumerable<User>> GetAllUser();
         Task<User> Login(string email, string password);
         Task<User?> GetByPhone(string phone);
-        //Task<bool> LoginCustomer(string email, string password);
-        //Task<bool> LoginAdmin(string email, string password);
-        //Task<bool> LoginStaff(string email, string password);
+        Task<bool> SavePasswordResetToken(PasswordResetToken token);
+        Task<PasswordResetToken> GetPasswordResetToken(string token);
+        Task<bool> DeletePasswordResetToken(string token);
+
     }
 }

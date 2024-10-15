@@ -1,6 +1,7 @@
 ﻿using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
+using BusinessObject.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -38,7 +39,7 @@ namespace KoiShopController.Controllers
         }
 
         [HttpPost("CreateStaff")]
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> CreateStaff(CreateUserDTO newStaff)
         {
             var result = await _userService.CreateStaff(newStaff);
@@ -52,7 +53,7 @@ namespace KoiShopController.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Manager, Staff")]
+        [Authorize(Roles = "Admin, Manager, Staff")]
         public async Task<IActionResult> GetUser(int page=1, int pageSize=10,
             string search="", string sort="")
         {
@@ -131,7 +132,7 @@ namespace KoiShopController.Controllers
         //}
 
         [HttpPut("updateUser/{userId}")]
-        [Authorize(Roles = "Manager, Staff")]
+        [Authorize(Roles = "Admin, Manager, Staff")]
         public async Task<IActionResult>UpdateUser(int userId, ResponseUserDTO userDTO)
         {
             var result = await _userService.UpdateUser(userId, userDTO);
@@ -145,7 +146,7 @@ namespace KoiShopController.Controllers
             }
         }
         [HttpDelete("{userId}")]
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> RemoveUser(int userId)
         {
             var result=await _userService.RemoveUser(userId);
@@ -160,7 +161,7 @@ namespace KoiShopController.Controllers
         }
 
         [HttpPut("deleteUser/{userId}")]
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> DeleteUser(int userId)
         {
             var result = await _userService.DeleteUser(userId);
@@ -172,7 +173,7 @@ namespace KoiShopController.Controllers
         }
 
         [HttpPut("restoreUser/{userId}")]
-        [Authorize(Roles = "Manager")]
+        [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> RestoreUser(int userId)
         {
             var result = await _userService.RestoreUser(userId);
@@ -209,6 +210,31 @@ namespace KoiShopController.Controllers
              );
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
+        }
+        [HttpPost("request-password-reset")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetDTO request)
+        {
+            var result = await _userService.GeneratePasswordResetToken(request.Email);
+            if (!result)
+            {
+                return BadRequest("Invalid email address.");
+            }
+
+            return Ok("Password reset email has been sent.");
+        }
+
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDto)
+        {
+            var result = await _userService.ResetPassword(resetPasswordDto.Token, resetPasswordDto.NewPassword);
+            if (!result)
+            {
+                return BadRequest("Invalid or expired token.");
+            }
+
+            return Ok("Password has been reset successfully.");
         }
     }
 }
