@@ -1,5 +1,4 @@
 # Visual Studio
-.vscode/
 .vs/
 *.csproj.user
 *.suo

@@ -1,18 +1,12 @@
 ﻿using DataAccess.Entity;
 using DataAccess.IRepo;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Repo
 {
     public class UserRepo : BaseRepo<User>, IUserRepo
     {
-        private readonly KoiShopContext _context;
+        private readonly new KoiShopContext _context;
         public UserRepo(KoiShopContext context) : base(context)
         {
             _context = context;
@@ -20,11 +14,13 @@ namespace DataAccess.Repo
 
         public async Task<User> CreateUser(User user)
         {
-            if (user.RoleId == null || user.RoleId == 0)
-            {
-                user.RoleId = 3;
-            }
             await _context.Set<User>().AddAsync(user);
+            await _context.SaveChangesAsync();
+            return user;
+        }
+        public async Task<User> CreateStaff(User user)
+        {
+            _context.Set<User>().Add(user);
             await _context.SaveChangesAsync();
             return user;
         }
@@ -50,24 +46,25 @@ namespace DataAccess.Repo
         }
         public async Task<User> GetManager()
         {
-            return await _context.Set<User>().FirstOrDefaultAsync(u=>u.RoleId==1);
+            var user = await _context.Set<User>().FirstOrDefaultAsync(u => u.RoleId == 1);
+            return user ?? throw new InvalidOperationException("Manager not found.");
         }
-        public async Task<User> GetByEmail(string email)
+        public async Task<User?> GetByEmail(string email)
         {
             return await _context.Set<User>().FirstOrDefaultAsync(e=>e.Email.Equals(email));
         }
 
-        public async Task<User> GetById(int id)
+        public async Task<User?> GetById(int id)
         {
             return await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId.Equals(id));
         }
 
-        public async Task<User> GetByName(string name)
+        public async Task<User?> GetByName(string name)
         {
             return await _context.Set<User>().FirstOrDefaultAsync(e => e.Name.Equals(name));
         }
 
-        public async Task<User> GetByPhone(string phone)
+        public async Task<User?> GetByPhone(string phone)
         {
             return await _context.Set<User>().FirstOrDefaultAsync(e => e.Phone == phone);
         }
@@ -85,25 +82,28 @@ namespace DataAccess.Repo
             }
             return user;
         }
-        //public async Task<bool> Login(string email, string password)
-        //{
-        //    return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password);
-        //}
+        public async Task<User> UpdateProfile(int id, User user)
+        {
+            var exist = await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId == id);
+            if (exist != null)
+            {
+                exist.Status = user.Status;
+                exist.Email = user.Email;
+                exist.Name = user.Name;
+                exist.RoleId = user.RoleId;
+                exist.Password = user.Password;
+                exist.Phone = user.Phone;
+                exist.DateOfBirth = user.DateOfBirth;
+                _context.Update(exist);
+                await _context.SaveChangesAsync();
+                return user;
+            }
+            else
+            {
+                throw new Exception("User not found");
+            }
+        }
 
-        //public async Task<bool> LoginAdmin(string email, string password)
-        //{
-        //    return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password&& e.Role.RoleName == "Manager");
-        //}
-
-        //public async Task<bool> LoginCustomer(string email, string password)
-        //{
-        //    return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password && e.Role.RoleName == "Customer");
-        //}
-
-        //public async Task<bool> LoginStaff(string email, string password)
-        //{
-        //    return await _context.Set<User>().AnyAsync(e => e.Email == email && e.Password == password && e.Role.RoleName == "Staff");
-        //}
 
         public async Task<User> UpdateUser(int id, User newUser)
         {

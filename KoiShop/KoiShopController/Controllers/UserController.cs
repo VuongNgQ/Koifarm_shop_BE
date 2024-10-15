@@ -12,7 +12,7 @@ namespace KoiShopController.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(AuthenticationSchemes = "Bearer")]
-    public class UserController:ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
         private readonly IConfiguration _configuration;
@@ -23,6 +23,7 @@ namespace KoiShopController.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> CreateUser(CreateUserDTO newUser)
         {
             var result = await _userService.CreateUser(newUser);
@@ -40,9 +41,7 @@ namespace KoiShopController.Controllers
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> CreateStaff(CreateUserDTO newStaff)
         {
-            newStaff.RoleId = 2;
-
-            var result = await _userService.CreateUser(newStaff);
+            var result = await _userService.CreateStaff(newStaff);
 
             if (!result.Success)
             {
@@ -67,9 +66,9 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
-        [HttpGet("Login")]
+        [HttpPost("Login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginRequestDTO loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
         {
             var result = await _userService.LoginUser(loginRequest.Email, loginRequest.Password);
             if (result == null)
@@ -77,18 +76,20 @@ namespace KoiShopController.Controllers
                 return BadRequest("Your email or password is incorrect!");
             }
 
+            // Tạo danh sách claim dựa trên role của user sau khi xác thực
             var claims = new List<Claim>
-            {
-            new Claim(ClaimTypes.Name, result.Data.Name),
-            new Claim(ClaimTypes.NameIdentifier, result.Data.UserId.ToString()),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.Role, result.Data.Role.RoleName)
-            };
+    {
+        new Claim(ClaimTypes.Name, result.Name),
+        new Claim(ClaimTypes.NameIdentifier, result.UserId.ToString()),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.Role, result.Role.RoleName)  // Role là Manager, Customer hay Staff
+    };
 
             // Tạo token
             var token = CreateToken(claims);
-            return Ok(new { Token = token, Role = result.Data.Role.ToString() });
+            return Ok(new { Token = token, Role = result.Role.ToString() });
         }
+
 
         //[HttpGet("Login/Manager/{email}, {pass}")]
         //public async Task<IActionResult> LoginAdmin(string email, string pass)
@@ -158,6 +159,19 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
+
+        [HttpPut("updateProfile/{userId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateProfile(int userId, [FromBody] UpdateProfileDTO updateProfileDTO)
+        {
+            var result = await _userService.UpdateProfile(userId, updateProfileDTO);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
+        }
+
         private string CreateToken(List<Claim> claims)
         {
             var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(

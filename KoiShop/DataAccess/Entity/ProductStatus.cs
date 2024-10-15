@@ -10,7 +10,7 @@ namespace DataAccess.Entity
     {
         public int ProductStatusId { get; set; }
         public string? Name { get; set; }
-        public ICollection<FishSingle>? Fish { get; set; }
+        public ICollection<Fish>? Fish { get; set; }
         public ICollection<FishPackage>? FishPackages { get; set; }
     }
 }

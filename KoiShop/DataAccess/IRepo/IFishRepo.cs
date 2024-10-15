@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepo
 {
-    public interface IFishRepo:IBaseRepo<FishSingle>
+
+    public interface IFishRepo
     {
+        Task<IEnumerable<Fish>> GetAllFishesAsync();
+        Task<Fish> GetFishByIdAsync(int fishId);
+        Task AddFishAsync(Fish fish);
+        Task UpdateFishAsync(Fish fish);
+        Task DeleteFishAsync(int fishId);
     }
 }

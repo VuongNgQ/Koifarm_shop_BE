@@ -19,7 +19,7 @@ namespace DataAccess.Entity
         public int? ConsignmentStatusId { get; set; }
         public int? FishStatusId { get; set; }
         public User? User { get; set; }
-        public FishSingle? Fish { get; set; }
+        public Fish? Fish { get; set; }
         public ConsignmentType? ConsignmentType { get; set; }
         public ConsignmentStatus? ConsignmentStatus { get; set; }
         public FishStatus? FishStatus { get; set; }
