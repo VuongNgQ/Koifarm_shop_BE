@@ -103,8 +103,6 @@ namespace DataAccess.Repo
                 throw new Exception("User not found");
             }
         }
-
-
         public async Task<User> UpdateUser(int id, User newUser)
         {
             var exist = await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId == id);
@@ -116,7 +114,7 @@ namespace DataAccess.Repo
                 exist.RoleId = newUser.RoleId;
                 exist.Password = newUser.Password;
                 exist.Phone = newUser.Phone;
-                exist.DateOfBirth=newUser.DateOfBirth; 
+                exist.DateOfBirth = newUser.DateOfBirth;
                 _context.Update(exist);
                 await _context.SaveChangesAsync();
                 return newUser;
@@ -126,5 +124,26 @@ namespace DataAccess.Repo
                 throw new Exception("User not found");
             }
         }
+        public async Task<bool> SavePasswordResetToken(PasswordResetToken token)
+        {
+            _context.PasswordResetTokens.Add(token);
+            return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<PasswordResetToken> GetPasswordResetToken(string token)
+        {
+            return await _context.PasswordResetTokens.FirstOrDefaultAsync(t => t.Token == token);
+        }
+
+        public async Task<bool> DeletePasswordResetToken(string token)
+        {
+            var resetToken = await GetPasswordResetToken(token);
+            if (resetToken != null)
+            {
+                _context.PasswordResetTokens.Remove(resetToken);
+                return await _context.SaveChangesAsync() > 0;
+            }
+            return false;
+        }
+
     }
 }

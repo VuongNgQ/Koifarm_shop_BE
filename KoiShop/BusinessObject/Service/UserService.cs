@@ -14,12 +14,14 @@ namespace BusinessObject.Service
         private readonly IMapper _mapper;
         private readonly IRoleRepo _roleRepo;
         private readonly ICartRepo _cartRepo;
-        public UserService(IUserRepo repo, IMapper mapper, IRoleRepo roleRepo, ICartRepo cartRepo)
+        private readonly IEmailService _emailService;
+        public UserService(IUserRepo repo, IMapper mapper, IRoleRepo roleRepo, ICartRepo cartRepo, IEmailService emailService)
         {
             _userRepo = repo;
             _mapper = mapper;
             _roleRepo = roleRepo;
             _cartRepo = cartRepo;
+            _emailService = emailService;
         }
         public async Task<ServiceResponseFormat<ResponseUserDTO>> CreateUser(CreateUserDTO userDTO)
         {
@@ -432,6 +434,48 @@ namespace BusinessObject.Service
                 res.Message = $"Fail to update User:{ex.Message}";
                 return res;
             }
+        }
+        public async Task<bool> GeneratePasswordResetToken(string email)
+        {
+            var user = await _userRepo.GetByEmail(email);
+            if (user == null) return false;
+
+            var token = Guid.NewGuid().ToString();
+            var expirationTime = DateTime.UtcNow.AddHours(1); // Token có hiệu lực 1 giờ
+
+            var resetToken = new PasswordResetToken
+            {
+                Token = token,
+                Email = email,
+                ExpirationTime = expirationTime
+            };
+
+            if (await _userRepo.SavePasswordResetToken(resetToken))
+            {
+                // Gửi email cho người dùng với token
+                //await _emailService.SendPasswordResetEmail(email, token);
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<bool> ResetPassword(string token, string newPassword)
+        {
+            var resetToken = await _userRepo.GetPasswordResetToken(token);
+            if (resetToken == null || resetToken.ExpirationTime < DateTime.UtcNow)
+            {
+                return false; // Token không hợp lệ hoặc đã hết hạn
+            }
+
+            var user = await _userRepo.GetByEmail(resetToken.Email);
+            if (user == null) return false;
+
+            user.Password = newPassword; // Bảo mật: Bạn cần mã hóa password
+            //await _userRepo.UpdateUser(user); // Cập nhật mật khẩu cho người dùng
+
+            await _userRepo.DeletePasswordResetToken(token); // Xóa token sau khi sử dụng
+            return true;
         }
     }
 }

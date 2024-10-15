@@ -10,7 +10,7 @@ namespace DataAccess.Entity
     {
         public int UserId { get; set; }
         public required string Name { get; set; }
-        public string? Email { get; set; }
+        public required string Email { get; set; }
         public required string Password { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public required string Phone { get; set; }
@@ -23,5 +23,6 @@ namespace DataAccess.Entity
         public ICollection<Feedback>? Feedbacks { get; set; }
         public ICollection<FishConsignment>? FishConsignments { get; set; }
         public ICollection<PackageConsignment>? PackageConsignments { get; set; }
+        public ICollection<PasswordResetToken>? PasswordResetTokens { get; set; }
     }
 }

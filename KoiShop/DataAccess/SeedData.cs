@@ -17,6 +17,7 @@ namespace DataAccess
             {
                 context.Roles.AddRange(new List<Role>
             {
+                new Role { RoleName = "Admin"},
                 new Role { RoleName = "Manager" },
                 new Role { RoleName = "Staff" },
                 new Role { RoleName = "Customer" }
@@ -25,18 +26,18 @@ namespace DataAccess
                 await context.SaveChangesAsync();
             }
 
-            if (!context.Users.Any(u => u.Email == "manager@example.com"))
+            if (!context.Users.Any(u => u.Email == "admin@admin.com"))
             {
-                var manager = new User
+                var admin = new User
                 {
-                    Name = "Default Manager",
-                    Email = "manager@example.com",
+                    Name = "Admin",
+                    Email = "admin@admin.com",
                     Password = "password",
                     Phone = "0123456789",
                     RoleId = 1,
                     Status = "Active"
                 };
-                context.Users.Add(manager);
+                context.Users.Add(admin);
                 await context.SaveChangesAsync();
             }
 
