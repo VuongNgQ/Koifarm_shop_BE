@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepo
 {
+
     public interface IFishRepo
     {
         Task<IEnumerable<Fish>> GetAllFishesAsync();
