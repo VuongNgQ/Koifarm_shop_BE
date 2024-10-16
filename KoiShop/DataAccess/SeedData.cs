@@ -40,6 +40,20 @@ namespace DataAccess
                 context.Users.Add(admin);
                 await context.SaveChangesAsync();
             }
+            if (!context.Users.Any(u => u.Email == "manager@manager.com"))
+            {
+                var admin = new User
+                {
+                    Name = "Manager",
+                    Email = "manager@manager.com",
+                    Password = "password",
+                    Phone = "0123456788",
+                    RoleId = 2,
+                    Status = "Active"
+                };
+                context.Users.Add(admin);
+                await context.SaveChangesAsync();
+            }
 
             // Thêm các dữ liệu khởi tạo khác nếu cần
         }
