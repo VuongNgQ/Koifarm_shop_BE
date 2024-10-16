@@ -44,7 +44,7 @@ namespace BusinessObject.Service
                 }
                 var mapp = _mapper.Map<User>(userDTO);
                 mapp.Status = "Active";
-                mapp.RoleId = 3;
+                mapp.RoleId = 4;
                 await _userRepo.CreateUser(mapp);
 
                 if (mapp.Role?.RoleName =="customer")
@@ -59,7 +59,7 @@ namespace BusinessObject.Service
 
                 var result = _mapper.Map<ResponseUserDTO>(mapp);
                 res.Success = true;
-                res.Message = "User created successfully";
+                res.Message = "Created successfully";
                 res.Data = result;
                 return res;
             }
@@ -92,13 +92,59 @@ namespace BusinessObject.Service
 
                 var newStaff = _mapper.Map<User>(CreateStaffDTO);
                 newStaff.Status = "Active";
-                newStaff.RoleId = 2;
+                newStaff.RoleId = 3;
 
                 var createdUser = await _userRepo.CreateUser(newStaff);
                 if (createdUser != null)
                 {
                     res.Success = true;
                     res.Message = "Staff created successfully.";
+                    res.Data = _mapper.Map<ResponseUserDTO>(createdUser);
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Failed to create staff. Repository error.";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Error creating staff: {ex.Message}";
+                return res;
+            }
+        }
+        public async Task<ServiceResponseFormat<ResponseUserDTO>> CreateManager(CreateUserDTO CreateManagerDTO)
+        {
+            var res = new ServiceResponseFormat<ResponseUserDTO>();
+            try
+            {
+                var emailExist = await _userRepo.GetByEmail(CreateManagerDTO.Email);
+                var phoneExist = await _userRepo.GetByPhone(CreateManagerDTO.Phone);
+                if (emailExist != null)
+                {
+                    res.Success = false;
+                    res.Message = "User with this email already exists.";
+                    return res;
+                }
+                else if (phoneExist != null)
+                {
+                    res.Success = false;
+                    res.Message = "User with this phone already exists.";
+                    return res;
+                }
+
+                var newStaff = _mapper.Map<User>(CreateManagerDTO);
+                newStaff.Status = "Active";
+                newStaff.RoleId = 2;
+
+                var createdUser = await _userRepo.CreateUser(newStaff);
+                if (createdUser != null)
+                {
+                    res.Success = true;
+                    res.Message = "Manager created successfully.";
                     res.Data = _mapper.Map<ResponseUserDTO>(createdUser);
                     return res;
                 }
@@ -348,9 +394,9 @@ namespace BusinessObject.Service
             return res;
         }
 
-        public async Task<ServiceResponseFormat<ResponseUserDTO>> LoginUser(string email, string pass)
+        public async Task<ServiceResponseFormat<User>> LoginUser(string email, string pass)
         {
-            var res = new ServiceResponseFormat<ResponseUserDTO>();
+            var res = new ServiceResponseFormat<User>();
             try
             {
                 var user = await _userRepo.Login(email, pass);
@@ -361,7 +407,7 @@ namespace BusinessObject.Service
                     return res;
                 }
 
-                var responseUser = _mapper.Map<ResponseUserDTO>(user);
+                var responseUser = _mapper.Map<User>(user);
                 res.Success = true;
                 res.Message = "Login successful.";
                 res.Data = responseUser;

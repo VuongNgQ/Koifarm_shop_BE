@@ -52,6 +52,20 @@ namespace KoiShopController.Controllers
             return Ok(result);
         }
 
+        [HttpPost("CreateManager")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateManager(CreateUserDTO newManager)
+        {
+            var result = await _userService.CreateManager(newManager);
+
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+
+            return Ok(result);
+        }
+
         [HttpGet]
         [Authorize(Roles = "Admin, Manager, Staff")]
         public async Task<IActionResult> GetUser(int page=1, int pageSize=10,
@@ -82,12 +96,12 @@ namespace KoiShopController.Controllers
                new Claim(ClaimTypes.Name, user.Name),
                new Claim(ClaimTypes.NameIdentifier, user.Email),
                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-               new Claim(ClaimTypes.Role, user.RoleId.ToString())
+               new Claim(ClaimTypes.Role, user.Role.RoleName)
             };
 
             // Tạo token
             var token = CreateToken(claims);
-            return Ok(new { Token = token, Role = user.RoleId.ToString() });
+            return Ok(new { Token = token, Role = user.Role.RoleName });
         }
 
 
