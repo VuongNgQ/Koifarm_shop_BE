@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241015215326_AddPasswordResetToken")]
-    partial class AddPasswordResetToken
+    [Migration("20241016125230_Khoa_REadjust")]
+    partial class Khoa_REadjust
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

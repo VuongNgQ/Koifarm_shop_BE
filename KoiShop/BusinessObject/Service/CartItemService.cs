@@ -84,7 +84,15 @@ namespace BusinessObject.Service
                     res.Message = "No Package with this Id";
                     return res;
                 }
+                var cartExist = await _cartRepo.GetByIdAsync(itemDTO.UserCartId);
+                if (cartExist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Cart with this Id";
+                    return res;
+                }
                 var mapp = _mapper.Map<CartItem>(itemDTO);
+                mapp.Quantity = 1;
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 result.TotalPricePerItem = exist.TotalPrice;
@@ -180,7 +188,14 @@ namespace BusinessObject.Service
             {
                 var item=await _repo.GetAllAsync();
                 var itemCart = item.Where(i=>i.UserCartId==id).ToList();
-                if (itemCart != null)
+                var cartExist = await _cartRepo.GetByIdAsync(id);
+                if (cartExist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Cart with this Id";
+                    return res;
+                }
+                if (itemCart.Any())
                 {
                     var mapp = _mapper.Map<IEnumerable<ResponseCartItemDTO>>(itemCart);
                     res.Success = true;
@@ -211,6 +226,12 @@ namespace BusinessObject.Service
                 var exist = await _repo.GetByIdAsync(id);
                 if (exist != null)
                 {
+                    if (exist.FishId == null)
+                    {
+                        res.Success = false;
+                        res.Message = "You can get only 1 package";
+                        return res;
+                    }
                     exist.Quantity = quantity;
                     _repo.Update(exist);
                     res.Success = true;
