@@ -147,7 +147,7 @@ namespace KoiShopController.Controllers
 
         [HttpPut("updateUser/{userId}")]
         [Authorize(Roles = "Admin, Manager, Staff")]
-        public async Task<IActionResult>UpdateUser(int userId, ResponseUserDTO userDTO)
+        public async Task<IActionResult>UpdateUser(int userId, UpdateUserDTO userDTO)
         {
             var result = await _userService.UpdateUser(userId, userDTO);
             if (result.Success)
