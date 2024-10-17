@@ -47,7 +47,7 @@ namespace BusinessObject.Service
                 mapp.RoleId = 4;
                 await _userRepo.CreateUser(mapp);
 
-                if (mapp.Role?.RoleName =="customer")
+                if (mapp.RoleId ==4)
                 {
                     CreateCartDTO userCart = new CreateCartDTO()
                     {

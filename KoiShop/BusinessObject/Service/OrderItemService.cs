@@ -20,13 +20,22 @@ namespace BusinessObject.Service
         private readonly IFishRepo _fishRepo;
         private readonly IFishPackageRepo _fishPackageRepo;
         private readonly IOrderRepo _orderRepo;
-        public OrderItemService(IOrderItemRepo repo, IMapper mapper, IFishRepo fishRepo, IFishPackageRepo packageRepo, IOrderRepo orderRepo)
+        private readonly ICartRepo _cartRepo;
+        private readonly ICartItemRepo _cartItemRepo;
+        private readonly ICartItemService _cartItemService;
+        public OrderItemService(IOrderItemRepo repo, IMapper mapper, IFishRepo fishRepo, 
+            IFishPackageRepo packageRepo, IOrderRepo orderRepo, 
+            ICartRepo cartRepo, ICartItemRepo cartItemRepo,
+            ICartItemService cartItemService)
         {
             _repo = repo;
             _mapper = mapper;
             _fishRepo = fishRepo;
             _fishPackageRepo = packageRepo;
             _orderRepo = orderRepo;
+            _cartRepo = cartRepo;
+            _cartItemRepo = cartItemRepo;
+            _cartItemService = cartItemService;
         }
 
         public async Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreateFishItem(CreateFishItemDTO itemDTO)
@@ -66,32 +75,51 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreatePackageItem(CreatePackageItemDTO itemDTO)
+        public async Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreatePackageItem(CreateOrderPackageItemDTO itemDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderItemDTO>();
             try
             {
-                var items = await _repo.GetAllAsync();
-                if (items.Any(i => i.PackageId == itemDTO.PackageId))
+                var orderExist = await _orderRepo.GetByIdAsync(itemDTO.OrderId);
+                if (orderExist == null)
                 {
                     res.Success = false;
-                    res.Message = "You haved added this Package before";
+                    res.Message = "No Order with this Id";
                     return res;
                 }
-                var exist = await _fishPackageRepo.GetByIdAsync(itemDTO.PackageId);
-                if (exist == null)
+                var cartExist = await _cartRepo.GetByIdAsync(itemDTO.UserCartId);
+                if(cartExist == null)
                 {
                     res.Success = false;
-                    res.Message = "No Package with this Id";
+                    res.Message = "No Cart with this Id";
                     return res;
                 }
-                var mapp = _mapper.Map<OrderItem>(itemDTO);
-                await _repo.AddAsync(mapp);
-                mapp.Price = exist.TotalPrice;
-                var result = _mapper.Map<ResponseOrderItemDTO>(mapp);
+                else
+                {
+                    var items=await _cartItemRepo.GetAllAsync();
+                    var packageInCart = items.Where(i => i.UserCartId == itemDTO.UserCartId&&i.PackageId!=null).ToList();
+                    if (!packageInCart.Any())
+                    {
+                        res.Success = false;
+                        res.Message = "No Package in cart";
+                        return res;
+                    }
+                    foreach (var item in packageInCart)
+                    {
+
+                        OrderItem newItem = new OrderItem()
+                        {
+                            OrderId = itemDTO.OrderId,
+                            PackageId = item.PackageId,
+                            Quantity = item.Quantity,
+                            Price = item.Package?.TotalPrice
+                        };
+                        await _repo.AddAsync(newItem);
+                        await _cartItemService.DeleteCartItemById(item.CartItemId);
+                    }
+                }
                 res.Success = true;
                 res.Message = "Create Item Successfully";
-                res.Data = result;
                 return res;
             }
             catch (Exception ex)
@@ -130,7 +158,7 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<PaginationModel<ResponseOrderItemDTO>>> GetAllItem(int page, int pageSize, string search, string sort)
+        public async Task<ServiceResponseFormat<PaginationModel<ResponseOrderItemDTO>>> GetAllItem(int page, int pageSize, string sort)
         {
             var res = new ServiceResponseFormat<PaginationModel<ResponseOrderItemDTO>>();
             try
@@ -167,7 +195,14 @@ namespace BusinessObject.Service
             {
                 var item = await _repo.GetAllAsync();
                 var itemCart = item.Where(i => i.OrderId == id).ToList();
-                if (itemCart != null)
+                var orderExist = await _orderRepo.GetByIdAsync(id);
+                if (orderExist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Order with this Id";
+                    return res;
+                }
+                if (itemCart.Any())
                 {
                     var mapp = _mapper.Map<IEnumerable<ResponseOrderItemDTO>>(itemCart);
                     res.Success = true;
@@ -196,7 +231,7 @@ namespace BusinessObject.Service
             try
             {
                 var exist = await _repo.GetByIdAsync(id);
-                if (exist != null)
+                if (exist != null&&exist.FishId!=null&&exist.PackageId==null)
                 {
                     exist.Quantity = quantity;
                     _repo.Update(exist);
@@ -207,7 +242,7 @@ namespace BusinessObject.Service
                 else
                 {
                     res.Success = false;
-                    res.Message = "No Item Found";
+                    res.Message = "No Fish Item Found";
                     return res;
                 }
             }

@@ -57,8 +57,9 @@ namespace BusinessObject.Mapper
             CreateMap<CartItem, CreateFishItemDTO>().ReverseMap();
             CreateMap<CartItem, CreatePackageItemDTO>().ReverseMap();
             CreateMap<CartItem, ResponseCartItemDTO>().ReverseMap();
+
             CreateMap<OrderItem, CreateFishItemDTO>().ReverseMap();
-            CreateMap<OrderItem, CreatePackageItemDTO>().ReverseMap();
+            CreateMap<OrderItem, CreateOrderPackageItemDTO>().ReverseMap();
             CreateMap<OrderItem, ResponseOrderItemDTO>().ReverseMap();
         }
     }
