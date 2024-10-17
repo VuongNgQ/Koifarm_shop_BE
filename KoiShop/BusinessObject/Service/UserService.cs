@@ -393,6 +393,21 @@ namespace BusinessObject.Service
             }
             return res;
         }
+        public async Task<ServiceResponseFormat<CreateUserDTO>> GetUserById(int userId)
+        {
+            var res = new ServiceResponseFormat<CreateUserDTO>();
+            var user = await _userRepo.GetById(userId);
+            if (user == null)
+            {
+                res.Success = false;
+                res.Message = "User not found.";
+                return res;
+            }
+
+            res.Success = true;
+            res.Data = _mapper.Map<CreateUserDTO>(user);
+            return res;
+        }
 
         public async Task<ServiceResponseFormat<User>> LoginUser(string email, string pass)
         {

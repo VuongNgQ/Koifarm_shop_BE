@@ -81,6 +81,38 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
+
+        [HttpGet("{userId}")]
+        [Authorize(Roles = "Admin, Manager, Staff, Customer")]
+        public async Task<IActionResult> GetUserById(int userId)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+            var currentUserId = int.Parse(userIdClaim);
+
+            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
+            if (string.IsNullOrEmpty(currentUserRole))
+            {
+                return Unauthorized("User role not found in token.");
+            }
+
+            if (currentUserRole == "Customer" && currentUserId != userId)
+            {
+                return StatusCode(403, new { message = "You are not authorized to view other users' information." });
+            }
+
+            var result = await _userService.GetUserById(userId);
+            if (!result.Success)
+            {
+                return NotFound(result.Message);
+            }
+
+            return Ok(result);
+        }
+
         [HttpPost("Login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
@@ -199,7 +231,7 @@ namespace KoiShopController.Controllers
         }
 
         [HttpPut("updateProfile/{userId}")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin, Manager, Staff, Customer")]
         public async Task<IActionResult> UpdateProfile(int userId, [FromBody] UpdateProfileDTO updateProfileDTO)
         {
             var result = await _userService.UpdateProfile(userId, updateProfileDTO);

@@ -16,6 +16,7 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<ResponseUserDTO>> CreateManager(CreateUserDTO createUserDTO);
         Task<ServiceResponseFormat<PaginationModel<ResponseUserDTO>>> GetAllUser(int page, int pageSize,
             string search, string sort);
+        Task<ServiceResponseFormat<CreateUserDTO>> GetUserById(int id);
         Task<ServiceResponseFormat<UpdateUserDTO>> UpdateUser(int id, UpdateUserDTO updateUserDTO);
         Task<ServiceResponseFormat<UpdateProfileDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO);
         Task<ServiceResponseFormat<bool>> RemoveUser(int id);
