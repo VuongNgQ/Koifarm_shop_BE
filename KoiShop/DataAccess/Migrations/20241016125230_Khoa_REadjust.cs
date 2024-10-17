@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class address : Migration
+    public partial class Khoa_REadjust : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -166,7 +166,7 @@ namespace DataAccess.Migrations
                 name: "Fish",
                 columns: table => new
                 {
-                    FishSingleId = table.Column<int>(type: "int", nullable: false)
+                    FishId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Age = table.Column<int>(type: "int", nullable: true),
@@ -182,7 +182,7 @@ namespace DataAccess.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Fish", x => x.FishSingleId);
+                    table.PrimaryKey("PK_Fish", x => x.FishId);
                     table.ForeignKey(
                         name: "FK_Fish_Categories_CategoryId",
                         column: x => x.CategoryId,
@@ -252,11 +252,11 @@ namespace DataAccess.Migrations
                 {
                     UserId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: true),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -314,7 +314,7 @@ namespace DataAccess.Migrations
                         name: "FK_Feedbacks_Fish_FishId",
                         column: x => x.FishId,
                         principalTable: "Fish",
-                        principalColumn: "FishSingleId");
+                        principalColumn: "FishId");
                     table.ForeignKey(
                         name: "FK_Feedbacks_Users_UserId",
                         column: x => x.UserId,
@@ -360,7 +360,7 @@ namespace DataAccess.Migrations
                         name: "FK_FishConsignments_Fish_FishId",
                         column: x => x.FishId,
                         principalTable: "Fish",
-                        principalColumn: "FishSingleId");
+                        principalColumn: "FishId");
                     table.ForeignKey(
                         name: "FK_FishConsignments_Users_UserId",
                         column: x => x.UserId,
@@ -455,6 +455,28 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PasswordResetTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Token = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpirationTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PasswordResetTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PasswordResetTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserAddresses",
                 columns: table => new
                 {
@@ -520,7 +542,7 @@ namespace DataAccess.Migrations
                         name: "FK_OrderItems_Fish_FishId",
                         column: x => x.FishId,
                         principalTable: "Fish",
-                        principalColumn: "FishSingleId");
+                        principalColumn: "FishId");
                     table.ForeignKey(
                         name: "FK_OrderItems_Orders_OrderId",
                         column: x => x.OrderId,
@@ -551,7 +573,7 @@ namespace DataAccess.Migrations
                         name: "FK_CartItems_Fish_FishId",
                         column: x => x.FishId,
                         principalTable: "Fish",
-                        principalColumn: "FishSingleId");
+                        principalColumn: "FishId");
                     table.ForeignKey(
                         name: "FK_CartItems_UserCarts_UserCartId",
                         column: x => x.UserCartId,
@@ -690,6 +712,11 @@ namespace DataAccess.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PasswordResetTokens_UserId",
+                table: "PasswordResetTokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_PermissionId",
                 table: "RolePermissions",
                 column: "PermissionId");
@@ -733,6 +760,9 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "PackageConsignments");
+
+            migrationBuilder.DropTable(
+                name: "PasswordResetTokens");
 
             migrationBuilder.DropTable(
                 name: "RolePermissions");
