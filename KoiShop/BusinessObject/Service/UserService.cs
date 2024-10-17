@@ -420,9 +420,9 @@ namespace BusinessObject.Service
                 return res;
             }
         }
-        public async Task<ServiceResponseFormat<ResponseUserDTO>> UpdateUser(int id, ResponseUserDTO updateUserDTO)
+        public async Task<ServiceResponseFormat<UpdateUserDTO>> UpdateUser(int id, UpdateUserDTO updateUserDTO)
         {
-            var res = new ServiceResponseFormat<ResponseUserDTO>();
+            var res = new ServiceResponseFormat<UpdateUserDTO>();
             try
             {
                 var user = await _userRepo.GetById(id);
@@ -453,18 +453,23 @@ namespace BusinessObject.Service
                     return res;
                 }
 
-                user.Name = updateUserDTO.Name ?? user.Name;
-                user.Email = updateUserDTO.Email ?? user.Email;
-                user.Phone = updateUserDTO.Phone ?? user.Phone;
+                //user.Name = updateUserDTO.Name ?? user.Name;
+                //user.Email = updateUserDTO.Email ?? user.Email;
+                //user.Password = updateUserDTO.Password ?? user.Password;
+                //user.Phone = updateUserDTO.Phone ?? user.Phone;
+                //user.DateOfBirth = updateUserDTO.DateOfBirth;
+                user.Name = !string.IsNullOrWhiteSpace(updateUserDTO.Name) ? updateUserDTO.Name : user.Name;
+                user.Email = !string.IsNullOrWhiteSpace(updateUserDTO.Email) ? updateUserDTO.Email : user.Email;
+                user.Password = !string.IsNullOrWhiteSpace(updateUserDTO.Password) ? updateUserDTO.Password : user.Password;
+                user.Phone = !string.IsNullOrWhiteSpace(updateUserDTO.Phone) ? updateUserDTO.Phone : user.Phone;
                 user.DateOfBirth = updateUserDTO.DateOfBirth;
 
-                //var mapp = _mapper.Map<User>(updateUserDTO);
                 var updateUser = await _userRepo.UpdateUser(id, user);
                 if (updateUser != null)
                 {
                     res.Success = true;
                     res.Message = "User Updated Successfully";
-                    res.Data = _mapper.Map<ResponseUserDTO>(user); ;
+                    res.Data = _mapper.Map<UpdateUserDTO>(user); ;
                     return res;
                 }
                 else

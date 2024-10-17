@@ -17,6 +17,7 @@ namespace BusinessObject.Mapper
             //User Mapping
             CreateMap<User, CreateUserDTO>().ReverseMap();
             CreateMap<User, ResponseUserDTO>().ReverseMap();
+            CreateMap<User, UpdateUserDTO> ().ReverseMap();
             CreateMap<User, UpdateProfileDTO>().ReverseMap();
             //Role Mapping
             CreateMap<Role, CreateRoleDTO>().ReverseMap();
