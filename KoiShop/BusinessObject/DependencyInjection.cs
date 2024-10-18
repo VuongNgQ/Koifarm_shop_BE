@@ -20,6 +20,8 @@ namespace BusinessObject
             //User
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserRepo, UserRepo>();
+            //User Address
+            services.AddScoped<IUserAddressRepo, UserAddressRepo>();
             //Role
             services.AddScoped<IRoleRepo, RoleRepo>();
             services.AddScoped<IRoleService, RoleService>();
