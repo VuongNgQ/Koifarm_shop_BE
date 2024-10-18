@@ -3,6 +3,7 @@ using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
+using DataAccess;
 using DataAccess.Entity;
 using DataAccess.IRepo;
 using System;
@@ -18,11 +19,13 @@ namespace BusinessObject.Service
         private readonly IOrderRepo _repo;
         private readonly IAddressRepo _addressRepo;
         private readonly IMapper _mapper;
-        public OrderService(IOrderRepo repo, IMapper mapper, IAddressRepo addressRepo)
+        private readonly IUserAddressRepo _uaRepo;
+        public OrderService(IOrderRepo repo, IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo)
         {
             _repo = repo;
             _mapper = mapper;
             _addressRepo = addressRepo;
+            _uaRepo = uaRepo;
         }
 
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrder(CreateOrderDTO orderDTO)
@@ -33,6 +36,12 @@ namespace BusinessObject.Service
                 var mapp = _mapper.Map<Order>(orderDTO);
                 var addressMap=_mapper.Map<Address>(orderDTO.CreateAddressDTO);
                 await _addressRepo.AddAsync(addressMap);
+                UserAddress userAddress = new()
+                {
+                    UserId=orderDTO.UserId,
+                    AddressId=addressMap.AddressId,
+                };
+                await _uaRepo.AddAsync(userAddress);
                 await _repo.AddAsync(mapp);
                 var addressResult = _mapper.Map<ResponseAddressDTO>(addressMap);
                 var result = _mapper.Map<ResponseOrderDTO>(mapp);
