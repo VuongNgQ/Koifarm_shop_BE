@@ -30,18 +30,18 @@ namespace DataAccess
         public DbSet<UserCart> UserCarts { get; set; }
         public DbSet<Fish> Fish { get; set; }
         public DbSet<Category> Categories { get; set; }
-        public DbSet<ProductStatus> ProductStatuses { get; set; }
+        
         public DbSet<FishPackage> FishPackages { get; set; }
         public DbSet<FishConsignment> FishConsignments { get; set; }
         public DbSet<PackageConsignment> PackageConsignments { get; set; }
         public DbSet<ConsignmentType> ConsignmentTypes { get; set; }
-        public DbSet<ConsignmentStatus> ConsignmentStatuses { get; set; }
+        
         public DbSet<Feedback> Feedbacks { get; set; }
-        public DbSet<OrderStatus> OrderStatuses { get; set; }
+        
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<UserAddress> UserAddresses { get; set; }
-        public DbSet<FishStatus> FishStatuses { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -144,16 +144,7 @@ namespace DataAccess
                 .WithMany(c => c.Fish)
                 .HasForeignKey(f => f.CategoryId);
 
-            // Fish and ProductStatus (one-to-many)
-            modelBuilder.Entity<Fish>()
-                .HasOne(f => f.Status)
-                .WithMany(ps => ps.Fish)
-                .HasForeignKey(f => f.StatusId);
-            // Fish Package and ProductStatus (one-to-many)
-            modelBuilder.Entity<FishPackage>()
-                .HasOne(f => f.Status)
-                .WithMany(ps => ps.FishPackages)
-                .HasForeignKey(f => f.StatusId);
+            
 
             // FishConsignment and Fish (one-to-many)
             modelBuilder.Entity<FishConsignment>()
@@ -173,11 +164,7 @@ namespace DataAccess
                 .WithMany(ct => ct.FishConsignments)
                 .HasForeignKey(fc => fc.ConsignmentTypeId);
 
-            // FishConsignment and ConsignmentStatus (one-to-many)
-            modelBuilder.Entity<FishConsignment>()
-                .HasOne(fc => fc.ConsignmentStatus)
-                .WithMany(cs => cs.FishConsignments)
-                .HasForeignKey(fc => fc.ConsignmentStatusId);
+            
 
             // PackageConsignment and FishPackage (one-to-many)
             modelBuilder.Entity<PackageConsignment>()
@@ -197,11 +184,7 @@ namespace DataAccess
                 .WithMany(ct => ct.PackageConsignments)
                 .HasForeignKey(pc => pc.ConsignmentTypeId);
 
-            // PackageConsignment and ConsignmentStatus (one-to-many)
-            modelBuilder.Entity<PackageConsignment>()
-                .HasOne(pc => pc.ConsignmentStatus)
-                .WithMany(cs => cs.PackageConsignments)
-                .HasForeignKey(pc => pc.ConsignmentStatusId);
+            
 
             // Feedback and User (one-to-many)
             modelBuilder.Entity<Feedback>()
@@ -221,27 +204,14 @@ namespace DataAccess
                 .WithMany(f => f.Feedbacks)
                 .HasForeignKey(fb => fb.FishId);
 
-            // Order and OrderStatus (one-to-many)
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.OrderStatus)
-                .WithMany(os => os.Orders)
-                .HasForeignKey(o => o.StatusId);
-
+           
             // Address and Order (one-to-many)
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Address)
                 .WithMany(os => os.Orders)
                 .HasForeignKey(o => o.AddressId);
-            //FishStatus and FishConsignment(one-to-many)
-            modelBuilder.Entity<FishConsignment>()
-                .HasOne(f => f.FishStatus)
-                .WithMany(f => f.FishConsignments)
-                .HasForeignKey(f => f.FishStatusId);
-            //FishStatus and FishConsignment(one-to-many)
-            modelBuilder.Entity<PackageConsignment>()
-                .HasOne(f => f.FishStatus)
-                .WithMany(f => f.PackageConsignments)
-                .HasForeignKey(f => f.PackageStatusId);
+            
+           
             base.OnModelCreating(modelBuilder);
 
             // User and PasswordResetToken

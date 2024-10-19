@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
+using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using DataAccess;
 using DataAccess.Entity;
+using DataAccess.Enum;
 using DataAccess.IRepo;
 using System;
 using System.Collections.Generic;
@@ -20,12 +22,16 @@ namespace BusinessObject.Service
         private readonly IAddressRepo _addressRepo;
         private readonly IMapper _mapper;
         private readonly IUserAddressRepo _uaRepo;
-        public OrderService(IOrderRepo repo, IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo)
+        private readonly IUserRepo _userRepo;
+        public OrderService(IOrderRepo repo, 
+            IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo
+            , IUserRepo userRepo)
         {
             _repo = repo;
             _mapper = mapper;
             _addressRepo = addressRepo;
             _uaRepo = uaRepo;
+            _userRepo = userRepo;
         }
 
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrder(CreateOrderDTO orderDTO)
@@ -34,8 +40,17 @@ namespace BusinessObject.Service
             try
             {
                 var mapp = _mapper.Map<Order>(orderDTO);
+                mapp.Status = OrderStatusEnum.PENDING;
+                mapp.OrderDate = DateTime.Now;
                 var addressMap=_mapper.Map<Address>(orderDTO.CreateAddressDTO);
                 await _addressRepo.AddAsync(addressMap);
+                var userExist = await _userRepo.GetByIdAsync(orderDTO.UserId);
+                if(userExist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No User found";
+                    return res;
+                }
                 UserAddress userAddress = new()
                 {
                     UserId=orderDTO.UserId,
@@ -43,6 +58,7 @@ namespace BusinessObject.Service
                 };
                 await _uaRepo.AddAsync(userAddress);
                 await _repo.AddAsync(mapp);
+                var userRes = _mapper.Map<ResponseUserDTO>(userExist);
                 var addressResult = _mapper.Map<ResponseAddressDTO>(addressMap);
                 var result = _mapper.Map<ResponseOrderDTO>(mapp);
                 res.Success = true;
@@ -121,12 +137,10 @@ namespace BusinessObject.Service
             try
             {
                 var users = await _repo.GetAllOrder();
-                /*if (!string.IsNullOrEmpty(search))
+                if (!string.IsNullOrEmpty(search))
                 {
-                    users = users.Where(e => e.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                    e.Email.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                    e.Phone.Contains(search, StringComparison.OrdinalIgnoreCase));
-                }*/
+                    users = users.Where(e => e.Status.ToString().Contains(search, StringComparison.OrdinalIgnoreCase));
+                }
                 users = sort.ToLower().Trim() switch
                 {
                     "date" => users.OrderBy(e => e.OrderDate),
@@ -157,9 +171,49 @@ namespace BusinessObject.Service
             return res;
         }
 
-        public Task<ServiceResponseFormat<ResponseOrderDTO>> UpdateOrder(ResponseOrderDTO orderDTO)
+        public async Task<ServiceResponseFormat<ResponseOrderDTO>> UpdateOrder(int id, UpdateOrderDTO orderDTO)
         {
-            throw new NotImplementedException();
+            var res = new ServiceResponseFormat<ResponseOrderDTO>();
+            try
+            {
+                var orders = await _repo.GetAllOrder();
+                var exist = orders.FirstOrDefault(x=>x.OrderId==id);
+                if (exist != null)
+                {
+                    var mapp = _mapper.Map<Order>(orderDTO);
+                    var addressMap = _mapper.Map<Address>(orderDTO.Address);
+                    if (OrderStatusEnum.PENDING.Equals(orderDTO.Status.ToUpper().Trim()))
+                    {
+                        mapp.Status = OrderStatusEnum.PENDING;
+                    }
+                    if (OrderStatusEnum.COMPLETED.Equals(orderDTO.Status.ToUpper().Trim()))
+                    {
+                        mapp.Status = OrderStatusEnum.COMPLETED;
+                    }
+                    mapp.PaymentMethodId=orderDTO.PaymentMethodId;
+                    mapp.IsSent=orderDTO.IsSent;
+                    _addressRepo.Update(addressMap);
+                    _repo.Update(exist);
+                    var addRes=_mapper.Map<ResponseAddressDTO>(addressMap);
+                    var result = _mapper.Map<ResponseOrderDTO>(exist);
+                    res.Success = true;
+                    res.Message = "Order Updated Successfully";
+                    res.Data = result;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "No Order Found ";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to update Order:{ex.Message}";
+                return res;
+            }
         }
     }
 }

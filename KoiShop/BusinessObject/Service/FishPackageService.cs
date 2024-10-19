@@ -4,6 +4,7 @@ using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using DataAccess.Entity;
+using DataAccess.Enum;
 using DataAccess.IRepo;
 using System;
 using System.Collections.Generic;
@@ -30,7 +31,7 @@ namespace BusinessObject.Service
             {
 
                 var mapp=_mapper.Map<FishPackage>(package);
-                mapp.StatusId = 1;
+                mapp.Status = ProductStatusEnum.AVAILABLE;
                 await _repo.CreatePackage(mapp);
                 var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
                 res.Success = true;
@@ -153,6 +154,14 @@ namespace BusinessObject.Service
             try
             {
                 var mapp = _mapper.Map<FishPackage>(fishPackage);
+                if(ProductStatusEnum.AVAILABLE.Equals(fishPackage.Status.ToUpper().Trim()))
+                {
+                    mapp.Status = ProductStatusEnum.AVAILABLE;
+                }
+                if (ProductStatusEnum.UNAVAILABLE.Equals(fishPackage.Status.ToUpper().Trim()))
+                {
+                    mapp.Status = ProductStatusEnum.UNAVAILABLE;
+                }
                 var update = await _repo.UpdatePackage(id, mapp);
                 if (update != null)
                 {

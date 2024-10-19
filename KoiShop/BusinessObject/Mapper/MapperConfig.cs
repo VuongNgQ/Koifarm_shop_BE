@@ -26,13 +26,6 @@ namespace BusinessObject.Mapper
             //Package Mapping
             CreateMap<FishPackage, CreateFishPackageDTO>().ReverseMap();
             CreateMap<FishPackage, ResponseFishPackageDTO>().ReverseMap();
-            //Fish Status Mapping
-            CreateMap<FishStatus, CreateFishStatusDTO>().ReverseMap();
-            CreateMap<FishStatus, ResponseFishStatusDTO>().ReverseMap();
-            CreateMap<FishStatus, UpdateFishStatusDTO>().ReverseMap();
-            //Product Status Mapping
-            CreateMap<ProductStatus, CreateProductStatusDTO>().ReverseMap();
-            CreateMap<ProductStatus, ResponseProductStatusDTO>().ReverseMap();
             //Consignment Type Mapping
             CreateMap<ConsignmentType, CreateConsignmentTypeDTO>().ReverseMap();
             CreateMap<ConsignmentType, ResponseConsignmentTypeDTO>().ReverseMap();
@@ -46,10 +39,8 @@ namespace BusinessObject.Mapper
             CreateMap<Order, ResponseOrderDTO>()
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+                .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems))
                 .ReverseMap();
-            //Order Status
-            CreateMap<OrderStatus, CreateOrderStatusDTO>().ReverseMap();
-            CreateMap<OrderStatus, ResponseOrderStatusDTO>().ReverseMap();
             //Payment Method
             CreateMap<PaymentMethod, CreatePaymentMethodDTO>().ReverseMap();
             CreateMap<PaymentMethod, ResponsePaymentMethodDTO>().ReverseMap();
