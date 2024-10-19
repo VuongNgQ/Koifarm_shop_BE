@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccess.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,12 +17,11 @@ namespace DataAccess.Entity
         public DateTime? CreateDate { get; set; }
         public DateTime? TransferDate { get; set; }
         public DateTime? ReceiveDate { get; set; }
-        public int? ConsignmentStatusId { get; set; }
+        public ConsignmentStatusEnum ConsignmentStatusId { get; set; }
         public int? FishStatusId { get; set; }
         public User? User { get; set; }
         public Fish? Fish { get; set; }
         public ConsignmentType? ConsignmentType { get; set; }
-        public ConsignmentStatus? ConsignmentStatus { get; set; }
-        public FishStatus? FishStatus { get; set; }
+        
     }
 }

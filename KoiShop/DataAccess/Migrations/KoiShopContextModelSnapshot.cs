@@ -130,22 +130,6 @@ namespace DataAccess.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("DataAccess.Entity.ConsignmentStatus", b =>
-                {
-                    b.Property<int>("ConsignmentStatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConsignmentStatusId"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ConsignmentStatusId");
-
-                    b.ToTable("ConsignmentStatuses");
-                });
-
             modelBuilder.Entity("DataAccess.Entity.ConsignmentType", b =>
                 {
                     b.Property<int>("ConsignmentTypeId")
@@ -251,14 +235,12 @@ namespace DataAccess.Migrations
                     b.Property<decimal?>("Size")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("StatusId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.HasKey("FishId");
 
                     b.HasIndex("CategoryId");
-
-                    b.HasIndex("StatusId");
 
                     b.ToTable("Fish");
                 });
@@ -271,7 +253,7 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FishConsignmentId"));
 
-                    b.Property<int?>("ConsignmentStatusId")
+                    b.Property<int>("ConsignmentStatusId")
                         .HasColumnType("int");
 
                     b.Property<int?>("ConsignmentTypeId")
@@ -300,13 +282,9 @@ namespace DataAccess.Migrations
 
                     b.HasKey("FishConsignmentId");
 
-                    b.HasIndex("ConsignmentStatusId");
-
                     b.HasIndex("ConsignmentTypeId");
 
                     b.HasIndex("FishId");
-
-                    b.HasIndex("FishStatusId");
 
                     b.HasIndex("UserId");
 
@@ -345,7 +323,7 @@ namespace DataAccess.Migrations
                     b.Property<decimal?>("Size")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("StatusId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")
@@ -353,25 +331,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("FishPackageId");
 
-                    b.HasIndex("StatusId");
-
                     b.ToTable("FishPackages");
-                });
-
-            modelBuilder.Entity("DataAccess.Entity.FishStatus", b =>
-                {
-                    b.Property<int>("FishStatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FishStatusId"));
-
-                    b.Property<string>("StatusName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("FishStatusId");
-
-                    b.ToTable("FishStatuses");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Order", b =>
@@ -394,7 +354,7 @@ namespace DataAccess.Migrations
                     b.Property<int?>("PaymentMethodId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("StatusId")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalAmount")
@@ -411,8 +371,6 @@ namespace DataAccess.Migrations
                     b.HasIndex("AddressId");
 
                     b.HasIndex("PaymentMethodId");
-
-                    b.HasIndex("StatusId");
 
                     b.HasIndex("UserId");
 
@@ -453,22 +411,6 @@ namespace DataAccess.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("DataAccess.Entity.OrderStatus", b =>
-                {
-                    b.Property<int>("OrderStatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OrderStatusId"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("OrderStatusId");
-
-                    b.ToTable("OrderStatuses");
-                });
-
             modelBuilder.Entity("DataAccess.Entity.PackageConsignment", b =>
                 {
                     b.Property<int>("PackageConsignmentId")
@@ -476,9 +418,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PackageConsignmentId"));
-
-                    b.Property<int?>("ConsignmentStatusId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("ConsignmentTypeId")
                         .HasColumnType("int");
@@ -498,6 +437,9 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("ReceiveDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<DateTime?>("TransferDate")
                         .HasColumnType("datetime2");
 
@@ -506,13 +448,9 @@ namespace DataAccess.Migrations
 
                     b.HasKey("PackageConsignmentId");
 
-                    b.HasIndex("ConsignmentStatusId");
-
                     b.HasIndex("ConsignmentTypeId");
 
                     b.HasIndex("PackageId");
-
-                    b.HasIndex("PackageStatusId");
 
                     b.HasIndex("UserId");
 
@@ -578,22 +516,6 @@ namespace DataAccess.Migrations
                     b.HasKey("PermissionId");
 
                     b.ToTable("Permissions");
-                });
-
-            modelBuilder.Entity("DataAccess.Entity.ProductStatus", b =>
-                {
-                    b.Property<int>("ProductStatusId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProductStatusId"));
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ProductStatusId");
-
-                    b.ToTable("ProductStatuses");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Role", b =>
@@ -757,21 +679,11 @@ namespace DataAccess.Migrations
                         .WithMany("Fish")
                         .HasForeignKey("CategoryId");
 
-                    b.HasOne("DataAccess.Entity.ProductStatus", "Status")
-                        .WithMany("Fish")
-                        .HasForeignKey("StatusId");
-
                     b.Navigation("Category");
-
-                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.FishConsignment", b =>
                 {
-                    b.HasOne("DataAccess.Entity.ConsignmentStatus", "ConsignmentStatus")
-                        .WithMany("FishConsignments")
-                        .HasForeignKey("ConsignmentStatusId");
-
                     b.HasOne("DataAccess.Entity.ConsignmentType", "ConsignmentType")
                         .WithMany("FishConsignments")
                         .HasForeignKey("ConsignmentTypeId");
@@ -780,32 +692,15 @@ namespace DataAccess.Migrations
                         .WithMany("Consignments")
                         .HasForeignKey("FishId");
 
-                    b.HasOne("DataAccess.Entity.FishStatus", "FishStatus")
-                        .WithMany("FishConsignments")
-                        .HasForeignKey("FishStatusId");
-
                     b.HasOne("DataAccess.Entity.User", "User")
                         .WithMany("FishConsignments")
                         .HasForeignKey("UserId");
-
-                    b.Navigation("ConsignmentStatus");
 
                     b.Navigation("ConsignmentType");
 
                     b.Navigation("Fish");
 
-                    b.Navigation("FishStatus");
-
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DataAccess.Entity.FishPackage", b =>
-                {
-                    b.HasOne("DataAccess.Entity.ProductStatus", "Status")
-                        .WithMany("FishPackages")
-                        .HasForeignKey("StatusId");
-
-                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Order", b =>
@@ -818,18 +713,12 @@ namespace DataAccess.Migrations
                         .WithMany("Orders")
                         .HasForeignKey("PaymentMethodId");
 
-                    b.HasOne("DataAccess.Entity.OrderStatus", "OrderStatus")
-                        .WithMany("Orders")
-                        .HasForeignKey("StatusId");
-
                     b.HasOne("DataAccess.Entity.User", "User")
                         .WithMany("Orders")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Address");
-
-                    b.Navigation("OrderStatus");
 
                     b.Navigation("PaymentMethod");
 
@@ -859,10 +748,6 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entity.PackageConsignment", b =>
                 {
-                    b.HasOne("DataAccess.Entity.ConsignmentStatus", "ConsignmentStatus")
-                        .WithMany("PackageConsignments")
-                        .HasForeignKey("ConsignmentStatusId");
-
                     b.HasOne("DataAccess.Entity.ConsignmentType", "ConsignmentType")
                         .WithMany("PackageConsignments")
                         .HasForeignKey("ConsignmentTypeId");
@@ -871,19 +756,11 @@ namespace DataAccess.Migrations
                         .WithMany("Consignments")
                         .HasForeignKey("PackageId");
 
-                    b.HasOne("DataAccess.Entity.FishStatus", "FishStatus")
-                        .WithMany("PackageConsignments")
-                        .HasForeignKey("PackageStatusId");
-
                     b.HasOne("DataAccess.Entity.User", "User")
                         .WithMany("PackageConsignments")
                         .HasForeignKey("UserId");
 
-                    b.Navigation("ConsignmentStatus");
-
                     b.Navigation("ConsignmentType");
-
-                    b.Navigation("FishStatus");
 
                     b.Navigation("Package");
 
@@ -969,13 +846,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Fish");
                 });
 
-            modelBuilder.Entity("DataAccess.Entity.ConsignmentStatus", b =>
-                {
-                    b.Navigation("FishConsignments");
-
-                    b.Navigation("PackageConsignments");
-                });
-
             modelBuilder.Entity("DataAccess.Entity.ConsignmentType", b =>
                 {
                     b.Navigation("FishConsignments");
@@ -1005,21 +875,9 @@ namespace DataAccess.Migrations
                     b.Navigation("OrderItems");
                 });
 
-            modelBuilder.Entity("DataAccess.Entity.FishStatus", b =>
-                {
-                    b.Navigation("FishConsignments");
-
-                    b.Navigation("PackageConsignments");
-                });
-
             modelBuilder.Entity("DataAccess.Entity.Order", b =>
                 {
                     b.Navigation("OrderItems");
-                });
-
-            modelBuilder.Entity("DataAccess.Entity.OrderStatus", b =>
-                {
-                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.PaymentMethod", b =>
@@ -1030,13 +888,6 @@ namespace DataAccess.Migrations
             modelBuilder.Entity("DataAccess.Entity.Permission", b =>
                 {
                     b.Navigation("RolePermissions");
-                });
-
-            modelBuilder.Entity("DataAccess.Entity.ProductStatus", b =>
-                {
-                    b.Navigation("Fish");
-
-                    b.Navigation("FishPackages");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Role", b =>
