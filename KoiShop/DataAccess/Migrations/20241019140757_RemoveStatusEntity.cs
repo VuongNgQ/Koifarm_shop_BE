@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Khoa_REadjust : Migration
+    public partial class RemoveStatusEntity : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -45,19 +45,6 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ConsignmentStatuses",
-                columns: table => new
-                {
-                    ConsignmentStatusId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ConsignmentStatuses", x => x.ConsignmentStatusId);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ConsignmentTypes",
                 columns: table => new
                 {
@@ -85,29 +72,25 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FishStatuses",
+                name: "FishPackages",
                 columns: table => new
                 {
-                    FishStatusId = table.Column<int>(type: "int", nullable: false)
+                    FishPackageId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StatusName = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Age = table.Column<int>(type: "int", nullable: true),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Size = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    DailyFood = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NumberOfFish = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FishStatuses", x => x.FishStatusId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderStatuses",
-                columns: table => new
-                {
-                    OrderStatusId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderStatuses", x => x.OrderStatusId);
+                    table.PrimaryKey("PK_FishPackages", x => x.FishPackageId);
                 });
 
             migrationBuilder.CreateTable(
@@ -134,19 +117,6 @@ namespace DataAccess.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Permissions", x => x.PermissionId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProductStatuses",
-                columns: table => new
-                {
-                    ProductStatusId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductStatuses", x => x.ProductStatusId);
                 });
 
             migrationBuilder.CreateTable(
@@ -178,7 +148,7 @@ namespace DataAccess.Migrations
                     DailyFood = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     QuantityInStock = table.Column<int>(type: "int", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: true)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -188,38 +158,6 @@ namespace DataAccess.Migrations
                         column: x => x.CategoryId,
                         principalTable: "Categories",
                         principalColumn: "CategoryId");
-                    table.ForeignKey(
-                        name: "FK_Fish_ProductStatuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "ProductStatuses",
-                        principalColumn: "ProductStatusId");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FishPackages",
-                columns: table => new
-                {
-                    FishPackageId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Age = table.Column<int>(type: "int", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Size = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    DailyFood = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NumberOfFish = table.Column<int>(type: "int", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FishPackages", x => x.FishPackageId);
-                    table.ForeignKey(
-                        name: "FK_FishPackages_ProductStatuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "ProductStatuses",
-                        principalColumn: "ProductStatusId");
                 });
 
             migrationBuilder.CreateTable(
@@ -335,27 +273,17 @@ namespace DataAccess.Migrations
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TransferDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ConsignmentStatusId = table.Column<int>(type: "int", nullable: true),
+                    ConsignmentStatusId = table.Column<int>(type: "int", nullable: false),
                     FishStatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FishConsignments", x => x.FishConsignmentId);
                     table.ForeignKey(
-                        name: "FK_FishConsignments_ConsignmentStatuses_ConsignmentStatusId",
-                        column: x => x.ConsignmentStatusId,
-                        principalTable: "ConsignmentStatuses",
-                        principalColumn: "ConsignmentStatusId");
-                    table.ForeignKey(
                         name: "FK_FishConsignments_ConsignmentTypes_ConsignmentTypeId",
                         column: x => x.ConsignmentTypeId,
                         principalTable: "ConsignmentTypes",
                         principalColumn: "ConsignmentTypeId");
-                    table.ForeignKey(
-                        name: "FK_FishConsignments_FishStatuses_FishStatusId",
-                        column: x => x.FishStatusId,
-                        principalTable: "FishStatuses",
-                        principalColumn: "FishStatusId");
                     table.ForeignKey(
                         name: "FK_FishConsignments_Fish_FishId",
                         column: x => x.FishId,
@@ -379,7 +307,7 @@ namespace DataAccess.Migrations
                     AddressId = table.Column<int>(type: "int", nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     PaymentMethodId = table.Column<int>(type: "int", nullable: true),
                     IsSent = table.Column<bool>(type: "bit", nullable: true)
                 },
@@ -391,11 +319,6 @@ namespace DataAccess.Migrations
                         column: x => x.AddressId,
                         principalTable: "Addresses",
                         principalColumn: "AddressId");
-                    table.ForeignKey(
-                        name: "FK_Orders_OrderStatuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "OrderStatuses",
-                        principalColumn: "OrderStatusId");
                     table.ForeignKey(
                         name: "FK_Orders_PaymentMethods_PaymentMethodId",
                         column: x => x.PaymentMethodId,
@@ -421,17 +344,12 @@ namespace DataAccess.Migrations
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TransferDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     ReceiveDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ConsignmentStatusId = table.Column<int>(type: "int", nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
                     PackageStatusId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_PackageConsignments", x => x.PackageConsignmentId);
-                    table.ForeignKey(
-                        name: "FK_PackageConsignments_ConsignmentStatuses_ConsignmentStatusId",
-                        column: x => x.ConsignmentStatusId,
-                        principalTable: "ConsignmentStatuses",
-                        principalColumn: "ConsignmentStatusId");
                     table.ForeignKey(
                         name: "FK_PackageConsignments_ConsignmentTypes_ConsignmentTypeId",
                         column: x => x.ConsignmentTypeId,
@@ -442,11 +360,6 @@ namespace DataAccess.Migrations
                         column: x => x.PackageId,
                         principalTable: "FishPackages",
                         principalColumn: "FishPackageId");
-                    table.ForeignKey(
-                        name: "FK_PackageConsignments_FishStatuses_PackageStatusId",
-                        column: x => x.PackageStatusId,
-                        principalTable: "FishStatuses",
-                        principalColumn: "FishStatusId");
                     table.ForeignKey(
                         name: "FK_PackageConsignments_Users_UserId",
                         column: x => x.UserId,
@@ -617,16 +530,6 @@ namespace DataAccess.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Fish_StatusId",
-                table: "Fish",
-                column: "StatusId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FishConsignments_ConsignmentStatusId",
-                table: "FishConsignments",
-                column: "ConsignmentStatusId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_FishConsignments_ConsignmentTypeId",
                 table: "FishConsignments",
                 column: "ConsignmentTypeId");
@@ -637,19 +540,9 @@ namespace DataAccess.Migrations
                 column: "FishId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FishConsignments_FishStatusId",
-                table: "FishConsignments",
-                column: "FishStatusId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_FishConsignments_UserId",
                 table: "FishConsignments",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FishPackages_StatusId",
-                table: "FishPackages",
-                column: "StatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_FishId",
@@ -677,19 +570,9 @@ namespace DataAccess.Migrations
                 column: "PaymentMethodId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Orders_StatusId",
-                table: "Orders",
-                column: "StatusId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Orders_UserId",
                 table: "Orders",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PackageConsignments_ConsignmentStatusId",
-                table: "PackageConsignments",
-                column: "ConsignmentStatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PackageConsignments_ConsignmentTypeId",
@@ -700,11 +583,6 @@ namespace DataAccess.Migrations
                 name: "IX_PackageConsignments_PackageId",
                 table: "PackageConsignments",
                 column: "PackageId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PackageConsignments_PackageStatusId",
-                table: "PackageConsignments",
-                column: "PackageStatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PackageConsignments_UserId",
@@ -780,16 +658,10 @@ namespace DataAccess.Migrations
                 name: "Orders");
 
             migrationBuilder.DropTable(
-                name: "ConsignmentStatuses");
-
-            migrationBuilder.DropTable(
                 name: "ConsignmentTypes");
 
             migrationBuilder.DropTable(
                 name: "FishPackages");
-
-            migrationBuilder.DropTable(
-                name: "FishStatuses");
 
             migrationBuilder.DropTable(
                 name: "Permissions");
@@ -801,16 +673,10 @@ namespace DataAccess.Migrations
                 name: "Addresses");
 
             migrationBuilder.DropTable(
-                name: "OrderStatuses");
-
-            migrationBuilder.DropTable(
                 name: "PaymentMethods");
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "ProductStatuses");
 
             migrationBuilder.DropTable(
                 name: "Roles");

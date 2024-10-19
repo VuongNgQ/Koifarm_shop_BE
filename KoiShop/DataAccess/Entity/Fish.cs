@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccess.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,9 +20,9 @@ namespace DataAccess.Entity
         public decimal? DailyFood { get; set; }
         public string? ImageUrl { get; set; }
         public int? QuantityInStock { get; set; }
-        public int? StatusId { get; set; }
+        public ProductStatusEnum Status { get; set; }
         public Category? Category { get; set; }
-        public ProductStatus? Status { get; set; }
+        
         public ICollection<OrderItem>? OrderItems { get; set; }
         public ICollection<CartItem>? CartItems { get; set; }
         public ICollection<Feedback>? Feedbacks { get; set; }

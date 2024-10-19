@@ -25,12 +25,7 @@ namespace BusinessObject
             //Role
             services.AddScoped<IRoleRepo, RoleRepo>();
             services.AddScoped<IRoleService, RoleService>();
-            //Product Status
-            services.AddScoped<IProductStatusRepo, ProductStatusRepo>();
-            services.AddScoped<IProductStatusService, ProductStatusService>();
-            //Fish Status
-            services.AddScoped<IFishStatusRepo, FishStatusRepo>();
-            services.AddScoped<IFishStatusService, FishStatusService>();
+           
             //Fish Package
             services.AddScoped<IFishPackageService, FishPackageService>();
             services.AddScoped<IFishPackageRepo, FishPackageRepo>();
@@ -40,9 +35,7 @@ namespace BusinessObject
             //Order
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepo, OrderRepo>();
-            //Order Status
-            services.AddScoped<IOrderStatusRepo, OrderStatusRepo>();
-            services.AddScoped<IOrderStatusService, OrderStatusService>();
+            
             //Address
             services.AddScoped<IAddressRepo, AddressRepo>();
             //Payment Method

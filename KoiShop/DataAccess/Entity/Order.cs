@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccess.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,11 +15,10 @@ namespace DataAccess.Entity
         public int? AddressId { get; set; }
         public decimal? TotalAmount { get; set; }
         public decimal? TotalPrice { get; set; }
-        public int? StatusId { get; set; }
+        public OrderStatusEnum Status { get; set; }
         public int? PaymentMethodId { get; set; }
         public bool? IsSent { get; set; }
         public User? User { get; set; }
-        public OrderStatus? OrderStatus { get; set; }
         public Address? Address { get; set; }
         public PaymentMethod? PaymentMethod { get; set; }
         public ICollection<OrderItem>? OrderItems { get; set; }
