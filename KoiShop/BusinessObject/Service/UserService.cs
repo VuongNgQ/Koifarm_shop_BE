@@ -163,9 +163,9 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<UpdateProfileDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO)
+        public async Task<ServiceResponseFormat<UpdateUserDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO)
         {
-            var res = new ServiceResponseFormat<UpdateProfileDTO>();
+            var res = new ServiceResponseFormat<UpdateUserDTO>();
             try
             {
                 var user = await _userRepo.GetById(id);
@@ -191,18 +191,20 @@ namespace BusinessObject.Service
                     return res;
                 }
 
-                user.Name = updateProfileDTO.Name ?? user.Name;
-                user.Email = updateProfileDTO.Email ?? user.Email;
-                user.Password = updateProfileDTO.Password ?? user.Password;
-                user.Phone = updateProfileDTO.Phone ?? user.Phone;
+                user.Name = !string.IsNullOrWhiteSpace(updateProfileDTO.Name) ? updateProfileDTO.Name : user.Name;
+                user.Email = !string.IsNullOrWhiteSpace(updateProfileDTO.Email) ? updateProfileDTO.Email : user.Email;
+                user.Phone = !string.IsNullOrWhiteSpace(updateProfileDTO.Phone) ? updateProfileDTO.Phone : user.Phone;
                 user.DateOfBirth = updateProfileDTO.DateOfBirth;
-
-                var updateUser = await _userRepo.UpdateUser(id, user);
+                if (!string.IsNullOrEmpty(updateProfileDTO.NewPassword))
+                {
+                    user.Password = updateProfileDTO.NewPassword;
+                }
+                var updateUser = await _userRepo.UpdateProfile(id, user);
                 if (updateUser != null)
                 {
                     res.Success = true;
                     res.Message = "Updated Successfully.";
-                    res.Data = _mapper.Map<UpdateProfileDTO>(user);
+                    res.Data = _mapper.Map<UpdateUserDTO>(user);
                     return res;
                 }
                 else
@@ -468,11 +470,6 @@ namespace BusinessObject.Service
                     return res;
                 }
 
-                //user.Name = updateUserDTO.Name ?? user.Name;
-                //user.Email = updateUserDTO.Email ?? user.Email;
-                //user.Password = updateUserDTO.Password ?? user.Password;
-                //user.Phone = updateUserDTO.Phone ?? user.Phone;
-                //user.DateOfBirth = updateUserDTO.DateOfBirth;
                 user.Name = !string.IsNullOrWhiteSpace(updateUserDTO.Name) ? updateUserDTO.Name : user.Name;
                 user.Email = !string.IsNullOrWhiteSpace(updateUserDTO.Email) ? updateUserDTO.Email : user.Email;
                 user.Password = !string.IsNullOrWhiteSpace(updateUserDTO.Password) ? updateUserDTO.Password : user.Password;
@@ -500,6 +497,16 @@ namespace BusinessObject.Service
                 res.Message = $"Fail to update User:{ex.Message}";
                 return res;
             }
+        }
+        public async Task<bool> ValidateOldPassword(int userId, string oldPassword)
+        {
+            var user = await _userRepo.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return false;
+            }
+
+            return user.Password == oldPassword;
         }
         public async Task<bool> GeneratePasswordResetToken(string email)
         {

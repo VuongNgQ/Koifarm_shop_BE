@@ -16,10 +16,12 @@ namespace BusinessObject.Model.RequestDTO
     }
     public class UpdateProfileDTO
     {
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public String Password { get; set; }
-        public string Phone { get; set; }
+        public string? Name { get; set; }
+        public string? Email { get; set; }
+        public string? OldPassword { get; set; }
+        public string? NewPassword { get; set; }
+        public string? ConfirmPassword { get; set; }
+        public string? Phone { get; set; }
         public DateTime DateOfBirth { get; set; }
     }
 

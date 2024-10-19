@@ -87,10 +87,8 @@ namespace DataAccess.Repo
             var exist = await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId == id);
             if (exist != null)
             {
-                exist.Status = user.Status;
                 exist.Email = user.Email;
                 exist.Name = user.Name;
-                exist.RoleId = user.RoleId;
                 exist.Password = user.Password;
                 exist.Phone = user.Phone;
                 exist.DateOfBirth = user.DateOfBirth;
