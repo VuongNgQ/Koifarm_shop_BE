@@ -1,7 +1,6 @@
 ﻿using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
-using BusinessObject.Model.ResponseDTO;
-using BusinessObject.Service;
+using BusinessObject.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -77,6 +76,7 @@ namespace KoiShopController.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> CreateUser(CreateUserDTO newUser)
         {
+            newUser.Password = Util.HashPassword(newUser.Password);
             var result = await _userService.CreateUser(newUser);
             if (result.Success)
             {
@@ -120,25 +120,41 @@ namespace KoiShopController.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
         {
-            var result = await _userService.LoginUser(loginRequest.Email, loginRequest.Password);
-            if (!result.Success)
+            // Gọi phương thức LoginUser từ service
+            var loginResult = await _userService.LoginUser(loginRequest.Email, loginRequest.Password);
+
+            // Kiểm tra xem đăng nhập có thành công hay không
+            if (!loginResult.Success)
             {
-                return BadRequest("Your email or password is incorrect!");
+                return BadRequest(new { Message = loginResult.Message });
             }
-            var user = result.Data;
+
+            // Lấy thông tin user sau khi đăng nhập thành công
+            var user = loginResult.Data;
+
+            // Tạo danh sách claim
             var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Role, user.Role.RoleName)
-            };
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+        new Claim(ClaimTypes.Name, user.Name),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(ClaimTypes.Role, user.RoleId.ToString()) // Nếu Role là tên, đổi lại cho phù hợp
+    };
 
             // Tạo token
             var token = CreateToken(claims);
-            return Ok(new { Token = token, UserId = user.UserId, Role = user.Role.RoleName });
+
+            // Trả về kết quả đăng nhập thành công
+            return Ok(new
+            {
+                Token = token,
+                UserId = user.UserId,
+                Role = user.RoleId,
+                Message = loginResult.Message
+            });
         }
+
 
         [HttpPut("updateUser/{userId}")]
         [Authorize(Roles = "Admin, Manager, Staff")]

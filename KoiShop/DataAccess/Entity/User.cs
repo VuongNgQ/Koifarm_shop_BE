@@ -11,11 +11,11 @@ namespace DataAccess.Entity
         public int UserId { get; set; }
         public required string Name { get; set; }
         public required string Email { get; set; }
-        public required string Password { get; set; }
+        public required string PasswordHash { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public required string Phone { get; set; }
         public int? RoleId { get; set; }
-        public string? Status { get; set; }
+        public UserStatusEnum Status { get; set; }
         public Role? Role { get; set; }
         public ICollection<UserAddress>? UserAddresses { get; set; }
         public ICollection<UserCart>? UserCarts { get; set; }
@@ -24,5 +24,11 @@ namespace DataAccess.Entity
         public ICollection<FishConsignment>? FishConsignments { get; set; }
         public ICollection<PackageConsignment>? PackageConsignments { get; set; }
         public ICollection<PasswordResetToken>? PasswordResetTokens { get; set; }
+    }
+
+    public enum UserStatusEnum
+    {
+        Active,
+        Disable
     }
 }

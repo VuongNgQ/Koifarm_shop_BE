@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DataAccess
@@ -32,10 +33,10 @@ namespace DataAccess
                 {
                     Name = "Admin",
                     Email = "admin@admin.com",
-                    Password = "password",
+                    PasswordHash = "hTIB5M6ztDPGX1Ms1YGcl+I1FvznkP4oe7dRSEA7oIhizNEyhqwM6e5Dl1hiP29tLNh3mgtv/wDWmrIY3QNlRA==\r\n",
                     Phone = "0123456789",
                     RoleId = 1,
-                    Status = "Active"
+                    Status = UserStatusEnum.Active
                 };
                 context.Users.Add(admin);
                 await context.SaveChangesAsync();
@@ -46,10 +47,10 @@ namespace DataAccess
                 {
                     Name = "Manager",
                     Email = "manager@manager.com",
-                    Password = "password",
+                    PasswordHash = "hTIB5M6ztDPGX1Ms1YGcl+I1FvznkP4oe7dRSEA7oIhizNEyhqwM6e5Dl1hiP29tLNh3mgtv/wDWmrIY3QNlRA==\r\n",
                     Phone = "0123456788",
                     RoleId = 2,
-                    Status = "Active"
+                    Status = UserStatusEnum.Active
                 };
                 context.Users.Add(admin);
                 await context.SaveChangesAsync();

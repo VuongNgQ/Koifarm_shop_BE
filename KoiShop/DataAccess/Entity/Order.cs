@@ -13,7 +13,6 @@ namespace DataAccess.Entity
         public int? UserId { get; set; }
         public DateTime? OrderDate { get; set; }
         public int? AddressId { get; set; }
-        public decimal? TotalAmount { get; set; }
         public decimal? TotalPrice { get; set; }
         public OrderStatusEnum Status { get; set; }
         public int? PaymentMethodId { get; set; }
