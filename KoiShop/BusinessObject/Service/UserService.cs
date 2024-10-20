@@ -2,9 +2,9 @@
 using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
-using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.IRepo;
+using Microsoft.Extensions.Configuration;
 
 namespace BusinessObject.Service
 {
@@ -15,13 +15,15 @@ namespace BusinessObject.Service
         private readonly IRoleRepo _roleRepo;
         private readonly ICartRepo _cartRepo;
         private readonly IEmailService _emailService;
-        public UserService(IUserRepo repo, IMapper mapper, IRoleRepo roleRepo, ICartRepo cartRepo, IEmailService emailService)
+        private readonly IConfiguration _configuration;
+        public UserService(IUserRepo repo, IMapper mapper, IRoleRepo roleRepo, ICartRepo cartRepo, IEmailService emailService, IConfiguration configuration)
         {
             _userRepo = repo;
             _mapper = mapper;
             _roleRepo = roleRepo;
             _cartRepo = cartRepo;
             _emailService = emailService;
+            _configuration = configuration;
         }
         public async Task<ServiceResponseFormat<ResponseUserDTO>> CreateUser(CreateUserDTO userDTO)
         {
@@ -43,7 +45,7 @@ namespace BusinessObject.Service
                     return res;
                 }
                 var mapp = _mapper.Map<User>(userDTO);
-                mapp.Status = "Active";
+                mapp.Status = UserStatusEnum.Active;
                 mapp.RoleId = 4;
                 await _userRepo.CreateUser(mapp);
 
@@ -91,7 +93,7 @@ namespace BusinessObject.Service
                 }
 
                 var newStaff = _mapper.Map<User>(CreateStaffDTO);
-                newStaff.Status = "Active";
+                newStaff.Status = UserStatusEnum.Active;
                 newStaff.RoleId = 3;
 
                 var createdUser = await _userRepo.CreateUser(newStaff);
@@ -137,7 +139,7 @@ namespace BusinessObject.Service
                 }
 
                 var newStaff = _mapper.Map<User>(CreateManagerDTO);
-                newStaff.Status = "Active";
+                newStaff.Status = UserStatusEnum.Active;
                 newStaff.RoleId = 2;
 
                 var createdUser = await _userRepo.CreateUser(newStaff);
@@ -197,7 +199,7 @@ namespace BusinessObject.Service
                 user.DateOfBirth = updateProfileDTO.DateOfBirth;
                 if (!string.IsNullOrEmpty(updateProfileDTO.NewPassword))
                 {
-                    user.Password = updateProfileDTO.NewPassword;
+                    user.PasswordHash = updateProfileDTO.NewPassword;
                 }
                 var updateUser = await _userRepo.UpdateProfile(id, user);
                 if (updateUser != null)
@@ -243,7 +245,7 @@ namespace BusinessObject.Service
                 }
 
                 // Thay đổi trạng thái của người dùng thành "Unactive"
-                user.Status = "Disable";
+                user.Status = UserStatusEnum.Disable;
                 var result = await _userRepo.UpdateUser(id, user);
 
                 if (result != null)
@@ -289,7 +291,7 @@ namespace BusinessObject.Service
                     return res;
                 }
 
-                user.Status = "Active";
+                user.Status = UserStatusEnum.Active;
                 var result = await _userRepo.UpdateUser(id, user);
 
                 if (result != null)
@@ -375,7 +377,7 @@ namespace BusinessObject.Service
                 var mapp = _mapper.Map<IEnumerable<ResponseUserDTO>>(users);
                 if (mapp.Any())
                 {
-                    var paginationModel = await Pagination.GetPaginationEnum(mapp, page, pageSize);
+                    var paginationModel = await Utils.Pagination.GetPaginationEnum(mapp, page, pageSize);
                     res.Success = true;
                     res.Message = "Get Users successfully";
                     res.Data = paginationModel;
@@ -411,20 +413,21 @@ namespace BusinessObject.Service
             return res;
         }
 
-        public async Task<ServiceResponseFormat<User>> LoginUser(string email, string pass)
+        public async Task<ServiceResponseFormat<ResponseUserDTO>> LoginUser(string email, string pass)
         {
-            var res = new ServiceResponseFormat<User>();
+            var res = new ServiceResponseFormat<ResponseUserDTO>();
             try
             {
-                var user = await _userRepo.Login(email, pass);
-                if (user == null)
+                var user = await _userRepo.GetByEmail(email);
+                bool veri = Utils.Util.VerifyPassword(pass, user.PasswordHash, _configuration["PasswordSalt"]);
+                if (veri == null || user==null)
                 {
                     res.Success = false;
                     res.Message = "Invalid email or password.";
                     return res;
                 }
 
-                var responseUser = _mapper.Map<User>(user);
+                var responseUser = _mapper.Map<ResponseUserDTO>(user);
                 res.Success = true;
                 res.Message = "Login successful.";
                 res.Data = responseUser;
@@ -472,7 +475,7 @@ namespace BusinessObject.Service
 
                 user.Name = !string.IsNullOrWhiteSpace(updateUserDTO.Name) ? updateUserDTO.Name : user.Name;
                 user.Email = !string.IsNullOrWhiteSpace(updateUserDTO.Email) ? updateUserDTO.Email : user.Email;
-                user.Password = !string.IsNullOrWhiteSpace(updateUserDTO.Password) ? updateUserDTO.Password : user.Password;
+                user.PasswordHash = !string.IsNullOrWhiteSpace(updateUserDTO.Password) ? updateUserDTO.Password : user.PasswordHash;
                 user.Phone = !string.IsNullOrWhiteSpace(updateUserDTO.Phone) ? updateUserDTO.Phone : user.Phone;
                 user.DateOfBirth = updateUserDTO.DateOfBirth;
 
@@ -506,7 +509,7 @@ namespace BusinessObject.Service
                 return false;
             }
 
-            return user.Password == oldPassword;
+            return user.PasswordHash == oldPassword;
         }
         public async Task<bool> GeneratePasswordResetToken(string email)
         {
@@ -544,11 +547,34 @@ namespace BusinessObject.Service
             var user = await _userRepo.GetByEmail(resetToken.Email);
             if (user == null) return false;
 
-            user.Password = newPassword; // Bảo mật: Bạn cần mã hóa password
+            user.PasswordHash = newPassword; // Bảo mật: Bạn cần mã hóa password
             //await _userRepo.UpdateUser(user); // Cập nhật mật khẩu cho người dùng
 
             await _userRepo.DeletePasswordResetToken(token); // Xóa token sau khi sử dụng
             return true;
+        }
+
+        public async Task<ServiceResponseFormat<ResponseUserDTO>> GetUserByEmail(string email)
+        {
+            try
+            {
+                var res = new ServiceResponseFormat<ResponseUserDTO>();
+                var user = await _userRepo.GetByEmail(email);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "User not found.";
+                    return res;
+                }
+
+                res.Success = true;
+                res.Data = _mapper.Map<ResponseUserDTO>(user);
+                return res;
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
         }
     }
 }

@@ -75,7 +75,7 @@ namespace DataAccess.Repo
         }
         public async Task<User> Login(string email, string password)
         {
-            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(e => e.Email == email && e.Password == password);
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(e => e.Email == email && e.PasswordHash == password);
             if (user == null)
             {
                 throw new Exception("Invalid email or password");
@@ -89,7 +89,7 @@ namespace DataAccess.Repo
             {
                 exist.Email = user.Email;
                 exist.Name = user.Name;
-                exist.Password = user.Password;
+                exist.PasswordHash = user.PasswordHash;
                 exist.Phone = user.Phone;
                 exist.DateOfBirth = user.DateOfBirth;
                 _context.Update(exist);
@@ -110,7 +110,7 @@ namespace DataAccess.Repo
                 exist.Email = newUser.Email;
                 exist.Name = newUser.Name;
                 exist.RoleId = newUser.RoleId;
-                exist.Password = newUser.Password;
+                exist.PasswordHash = newUser.PasswordHash;
                 exist.Phone = newUser.Phone;
                 exist.DateOfBirth = newUser.DateOfBirth;
                 _context.Update(exist);

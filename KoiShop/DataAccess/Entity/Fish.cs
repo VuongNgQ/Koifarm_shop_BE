@@ -1,9 +1,4 @@
 ﻿using DataAccess.Enum;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.Entity
 {
@@ -12,7 +7,7 @@ namespace DataAccess.Entity
         public int FishId { get; set; }
         public string? Name { get; set; }
         public int? Age { get; set; }
-        public string? Gender { get; set; }
+        public FishGenderEnum Gender { get; set; }
         public decimal? Size { get; set; }
         public string? Description { get; set; }
         public int? CategoryId { get; set; }
@@ -27,5 +22,12 @@ namespace DataAccess.Entity
         public ICollection<CartItem>? CartItems { get; set; }
         public ICollection<Feedback>? Feedbacks { get; set; }
         public ICollection<FishConsignment>? Consignments { get; set; }
+    }
+
+    public enum FishGenderEnum
+    {
+        Male,
+        Female,
+        Unknown
     }
 }
