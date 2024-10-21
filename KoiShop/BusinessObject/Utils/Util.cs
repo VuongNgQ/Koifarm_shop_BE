@@ -8,12 +8,10 @@ namespace BusinessObject.Utils
 {
     public class Util
     {
-        public static string HashPassword(string password)
+        public static string HashPassword(string password, string configSalt)
         {
-            // Hàm mã hóa mật khẩu
-            using (var hmac = new System.Security.Cryptography.HMACSHA512())
+            using (var hmac = new System.Security.Cryptography.HMACSHA512(Encoding.UTF8.GetBytes(configSalt)))
             {
-                var salt = hmac.Key;
                 var hash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
                 return Convert.ToBase64String(hash);
             }

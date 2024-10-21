@@ -2,8 +2,10 @@
 using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
+using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.IRepo;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 namespace BusinessObject.Service
@@ -38,28 +40,27 @@ namespace BusinessObject.Service
                     res.Message = "User with this email already exists.";
                     return res;
                 }
-                else if (phoneExist != null)
+                if (phoneExist != null)
                 {
                     res.Success = false;
                     res.Message = "User with this phone already exists.";
                     return res;
                 }
-                var mapp = _mapper.Map<User>(userDTO);
-                mapp.Status = UserStatusEnum.Active;
-                mapp.RoleId = 4;
-                await _userRepo.CreateUser(mapp);
+                var passwordHash = Util.HashPassword(userDTO.Password,_configuration["PasswordSalt"]);
+                var newUser = _mapper.Map<User>(userDTO);
+                newUser.PasswordHash = passwordHash;
+                newUser.Status = UserStatusEnum.Active;
+                newUser.RoleId = 4;
+                await _userRepo.CreateUser(newUser);
 
-                if (mapp.RoleId ==4)
+                CreateCartDTO userCart = new CreateCartDTO()
                 {
-                    CreateCartDTO userCart = new CreateCartDTO()
-                    {
-                        UserId=mapp.UserId,
-                    };
-                    var cartmapp = _mapper.Map<UserCart>(userCart);
-                    await _cartRepo.AddAsync(cartmapp);
-                }
+                    UserId=newUser.UserId,
+                };
+                var cartmapp = _mapper.Map<UserCart>(userCart);
+                await _cartRepo.AddAsync(cartmapp);
 
-                var result = _mapper.Map<ResponseUserDTO>(mapp);
+                var result = _mapper.Map<ResponseUserDTO>(newUser);
                 res.Success = true;
                 res.Message = "Created successfully";
                 res.Data = result;
@@ -91,8 +92,9 @@ namespace BusinessObject.Service
                     res.Message = "User with this phone already exists.";
                     return res;
                 }
-
+                var passwordHash = Util.HashPassword(CreateStaffDTO.Password, _configuration["PasswordSalt"]);
                 var newStaff = _mapper.Map<User>(CreateStaffDTO);
+                newStaff.PasswordHash = passwordHash;
                 newStaff.Status = UserStatusEnum.Active;
                 newStaff.RoleId = 3;
 
@@ -137,8 +139,9 @@ namespace BusinessObject.Service
                     res.Message = "User with this phone already exists.";
                     return res;
                 }
-
+                var passwordHash = Util.HashPassword(CreateManagerDTO.Password, _configuration["PasswordSalt"]);
                 var newStaff = _mapper.Map<User>(CreateManagerDTO);
+                newStaff.PasswordHash = passwordHash;
                 newStaff.Status = UserStatusEnum.Active;
                 newStaff.RoleId = 2;
 
@@ -165,9 +168,9 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<UpdateUserDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO)
+        public async Task<ServiceResponseFormat<ResponseUserDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO)
         {
-            var res = new ServiceResponseFormat<UpdateUserDTO>();
+            var res = new ServiceResponseFormat<ResponseUserDTO>();
             try
             {
                 var user = await _userRepo.GetById(id);
@@ -197,16 +200,43 @@ namespace BusinessObject.Service
                 user.Email = !string.IsNullOrWhiteSpace(updateProfileDTO.Email) ? updateProfileDTO.Email : user.Email;
                 user.Phone = !string.IsNullOrWhiteSpace(updateProfileDTO.Phone) ? updateProfileDTO.Phone : user.Phone;
                 user.DateOfBirth = updateProfileDTO.DateOfBirth;
-                if (!string.IsNullOrEmpty(updateProfileDTO.NewPassword))
+                if (updateProfileDTO.ChangePassword)
                 {
-                    user.PasswordHash = updateProfileDTO.NewPassword;
+                    if (string.IsNullOrEmpty(updateProfileDTO.CurrentPassword) ||
+                        string.IsNullOrEmpty(updateProfileDTO.NewPassword) ||
+                        string.IsNullOrEmpty(updateProfileDTO.ConfirmPassword))
+                    {
+                        res.Success = false;
+                        res.Message = "Please provide current password, new password, and confirm password.";
+                        return res;
+                    }
+
+                    var isCurrentPasswordValid = Util.VerifyPassword(updateProfileDTO.CurrentPassword, user.PasswordHash, _configuration["PasswordSalt"]);
+                    if (!isCurrentPasswordValid)
+                    {
+                        res.Success = false;
+                        res.Message = "Current password is incorrect.";
+                        return res;
+                    }
+
+                    if (updateProfileDTO.NewPassword != updateProfileDTO.ConfirmPassword)
+                    {
+                        res.Success = false;
+                        res.Message = "New password and confirm password do not match.";
+                        return res;
+                    }
+
+                    user.PasswordHash = Util.HashPassword(updateProfileDTO.NewPassword, _configuration["PasswordSalt"]);
                 }
-                var updateUser = await _userRepo.UpdateProfile(id, user);
-                if (updateUser != null)
+
+                //_mapper.Map(updateProfileDTO, user);
+                var updateUser = await _userRepo.UpdateProfile(user);
+                if (updateUser)
                 {
+                    var userResponse = _mapper.Map<ResponseUserDTO>(user);
                     res.Success = true;
                     res.Message = "Updated Successfully.";
-                    res.Data = _mapper.Map<UpdateUserDTO>(user);
+                    res.Data = userResponse;
                     return res;
                 }
                 else
@@ -236,7 +266,6 @@ namespace BusinessObject.Service
                     return res;
                 }
 
-                // Kiểm tra nếu người dùng là Manager thì không được phép xóa
                 if (user.RoleId == 1)
                 {
                     res.Success = false;
@@ -244,7 +273,6 @@ namespace BusinessObject.Service
                     return res;
                 }
 
-                // Thay đổi trạng thái của người dùng thành "Unactive"
                 user.Status = UserStatusEnum.Disable;
                 var result = await _userRepo.UpdateUser(id, user);
 
@@ -386,7 +414,7 @@ namespace BusinessObject.Service
                 else
                 {
                     res.Success = false;
-                    res.Message = "No User";
+                    res.Message = "No User Found.";
                     return res;
                 }
             }
@@ -397,20 +425,17 @@ namespace BusinessObject.Service
             }
             return res;
         }
-        public async Task<ServiceResponseFormat<CreateUserDTO>> GetUserById(int userId)
+        public async Task<ResponseUserDTO> GetUserProfile(int userId)
         {
-            var res = new ServiceResponseFormat<CreateUserDTO>();
             var user = await _userRepo.GetById(userId);
+
             if (user == null)
             {
-                res.Success = false;
-                res.Message = "User not found.";
-                return res;
+                throw new Exception("User not found.");
             }
 
-            res.Success = true;
-            res.Data = _mapper.Map<CreateUserDTO>(user);
-            return res;
+            var userDTO = _mapper.Map<ResponseUserDTO>(user);
+            return userDTO;
         }
 
         public async Task<ServiceResponseFormat<ResponseUserDTO>> LoginUser(string email, string pass)
@@ -419,15 +444,28 @@ namespace BusinessObject.Service
             try
             {
                 var user = await _userRepo.GetByEmail(email);
-                bool veri = Utils.Util.VerifyPassword(pass, user.PasswordHash, _configuration["PasswordSalt"]);
-                if (veri == null || user==null)
+                if (user==null)
                 {
                     res.Success = false;
-                    res.Message = "Invalid email or password.";
+                    res.Message = "Email Not Found";
+                    return res;
+                }
+                bool veri = Utils.Util.VerifyPassword(pass, user.PasswordHash, _configuration["PasswordSalt"]);
+                if (!veri || user == null)
+                {
+                    res.Success = false;
+                    res.Message = "Invalid password.";
+                    return res;
+                }
+                if (user.Status != UserStatusEnum.Active)
+                {
+                    res.Success = false;
+                    res.Message = "Your account is being blocked.";
                     return res;
                 }
 
                 var responseUser = _mapper.Map<ResponseUserDTO>(user);
+                responseUser.RoleName = user.Role?.RoleName;
                 res.Success = true;
                 res.Message = "Login successful.";
                 res.Data = responseUser;
@@ -440,9 +478,9 @@ namespace BusinessObject.Service
                 return res;
             }
         }
-        public async Task<ServiceResponseFormat<UpdateUserDTO>> UpdateUser(int id, UpdateUserDTO updateUserDTO)
+        public async Task<ServiceResponseFormat<ResponseUserDTO>> UpdateUser(int id, UpdateUserDTO updateUserDTO)
         {
-            var res = new ServiceResponseFormat<UpdateUserDTO>();
+            var res = new ServiceResponseFormat<ResponseUserDTO>();
             try
             {
                 var user = await _userRepo.GetById(id);
@@ -484,7 +522,7 @@ namespace BusinessObject.Service
                 {
                     res.Success = true;
                     res.Message = "User Updated Successfully";
-                    res.Data = _mapper.Map<UpdateUserDTO>(user); ;
+                    res.Data = _mapper.Map<ResponseUserDTO>(user); ;
                     return res;
                 }
                 else
@@ -501,65 +539,65 @@ namespace BusinessObject.Service
                 return res;
             }
         }
-        public async Task<bool> ValidateOldPassword(int userId, string oldPassword)
+        
+        public async Task<ServiceResponseFormat<string>> ForgotPassword(RequestPasswordResetDTO request)
         {
-            var user = await _userRepo.GetByIdAsync(userId);
-            if (user == null)
-            {
-                return false;
-            }
-
-            return user.PasswordHash == oldPassword;
-        }
-        public async Task<bool> GeneratePasswordResetToken(string email)
-        {
-            var user = await _userRepo.GetByEmail(email);
-            if (user == null) return false;
-
-            var token = Guid.NewGuid().ToString();
-            var expirationTime = DateTime.UtcNow.AddHours(1); // Token có hiệu lực 1 giờ
-
-            var resetToken = new PasswordResetToken
-            {
-                Token = token,
-                Email = email,
-                ExpirationTime = expirationTime
-            };
-
-            if (await _userRepo.SavePasswordResetToken(resetToken))
-            {
-                // Gửi email cho người dùng với token
-                //await _emailService.SendPasswordResetEmail(email, token);
-                return true;
-            }
-
-            return false;
-        }
-
-        public async Task<bool> ResetPassword(string token, string newPassword)
-        {
-            var resetToken = await _userRepo.GetPasswordResetToken(token);
-            if (resetToken == null || resetToken.ExpirationTime < DateTime.UtcNow)
-            {
-                return false; // Token không hợp lệ hoặc đã hết hạn
-            }
-
-            var user = await _userRepo.GetByEmail(resetToken.Email);
-            if (user == null) return false;
-
-            user.PasswordHash = newPassword; // Bảo mật: Bạn cần mã hóa password
-            //await _userRepo.UpdateUser(user); // Cập nhật mật khẩu cho người dùng
-
-            await _userRepo.DeletePasswordResetToken(token); // Xóa token sau khi sử dụng
-            return true;
-        }
-
-        public async Task<ServiceResponseFormat<ResponseUserDTO>> GetUserByEmail(string email)
-        {
+            var res = new ServiceResponseFormat<string>();
             try
             {
-                var res = new ServiceResponseFormat<ResponseUserDTO>();
-                var user = await _userRepo.GetByEmail(email);
+                var user = await _userRepo.GetByEmail(request.Email);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "If the email is registered, a reset link will be sent.";
+                    return res;
+                }
+
+                var token = Guid.NewGuid().ToString();
+                var passwordResetToken = new PasswordResetToken
+                {
+                    UserId = user.UserId,
+                    Email = user.Email,
+                    Token = token,
+                    ExpirationTime = DateTime.UtcNow.AddMinutes(10)
+                };
+
+                await _userRepo.AddToken(passwordResetToken);
+                var resetLink = $"{_configuration["FrontendUrl"]}/reset-password?token={token}";
+                await _emailService.SendResetPasswordEmail(user.Email, token);
+
+                res.Success = true;
+                res.Message = "If the email is registered, a reset link will be sent.";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Error processing request: {ex.Message}";
+            }
+            return res;
+        }
+        public async Task<ServiceResponseFormat<string>> ResetPassword(ResetPasswordDTO request)
+        {
+            var res = new ServiceResponseFormat<string>();
+            try
+            {
+                if (request.NewPassword != request.ConfirmPassword)
+                {
+                    res.Success = false;
+                    res.Message = "New password and confirm password do not match.";
+                    return res;
+                }
+
+                var token = await _userRepo.GetToken(request.Token);
+                if (token == null || token.ExpirationTime < DateTime.UtcNow)
+                {
+                    res.Success = false;
+                    res.Message = "Invalid or expired token.";
+                    return res;
+                }
+
+                var user = await _userRepo.GetById(token.UserId);
                 if (user == null)
                 {
                     res.Success = false;
@@ -567,14 +605,28 @@ namespace BusinessObject.Service
                     return res;
                 }
 
+                user.PasswordHash = Util.HashPassword(request.NewPassword, _configuration["PasswordSalt"]);
+                var updateResult = await _userRepo.UpdateProfile(user);
+                if (!updateResult)
+                {
+                    res.Success = false;
+                    res.Message = "Failed to update the password.";
+                    return res;
+                }
+
+                await _userRepo.RemoveToken(token.Id);
+
                 res.Success = true;
-                res.Data = _mapper.Map<ResponseUserDTO>(user);
+                res.Message = "Password has been reset successfully.";
                 return res;
             }
-            catch(Exception e)
+            catch (Exception ex)
             {
-                return null;
+                res.Success = false;
+                res.Message = $"Error resetting password: {ex.Message}";
             }
+            return res;
         }
+
     }
 }

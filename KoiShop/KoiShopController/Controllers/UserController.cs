@@ -1,5 +1,7 @@
-﻿using BusinessObject.IService;
+﻿using BusinessObject;
+using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
+using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -38,45 +40,37 @@ namespace KoiShopController.Controllers
             }
         }
 
-        [HttpGet("{userId}")]
+        [HttpGet("profile")]
         [Authorize(Roles = "Admin, Manager, Staff, Customer")]
-        public async Task<IActionResult> GetUserById(int userId)
+        public async Task<IActionResult> GetUserProfile()
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
+            try
             {
-                return Unauthorized("User ID not found in token.");
-            }
-            if (!int.TryParse(userIdClaim, out var currentUserId))
-            {
-                return Unauthorized("Invalid user ID format in token.");
-            }
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            if (string.IsNullOrEmpty(currentUserRole))
-            {
-                return Unauthorized("User role not found in token.");
-            }
+                var userProfile = await _userService.GetUserProfile(userId);
 
-            if (currentUserRole == "Customer" && currentUserId != userId)
-            {
-                return StatusCode(403, new { message = "You are not authorized to view other users' information." });
+                return Ok(new ServiceResponseFormat<ResponseUserDTO>
+                {
+                    Success = true,
+                    Data = userProfile,
+                    Message = "User profile fetched successfully."
+                });
             }
-
-            var result = await _userService.GetUserById(userId);
-            if (!result.Success)
+            catch (Exception ex)
             {
-                return NotFound(result.Message);
+                return BadRequest(new ServiceResponseFormat<ResponseUserDTO>
+                {
+                    Success = false,
+                    Message = $"Failed to fetch user profile: {ex.Message}"
+                });
             }
-
-            return Ok(result);
         }
 
         [HttpPost("createAccount")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateUser(CreateUserDTO newUser)
         {
-            newUser.Password = Util.HashPassword(newUser.Password);
             var result = await _userService.CreateUser(newUser);
             if (result.Success)
             {
@@ -120,37 +114,31 @@ namespace KoiShopController.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
         {
-            // Gọi phương thức LoginUser từ service
             var loginResult = await _userService.LoginUser(loginRequest.Email, loginRequest.Password);
 
-            // Kiểm tra xem đăng nhập có thành công hay không
             if (!loginResult.Success)
             {
                 return BadRequest(new { Message = loginResult.Message });
             }
 
-            // Lấy thông tin user sau khi đăng nhập thành công
             var user = loginResult.Data;
 
-            // Tạo danh sách claim
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-        new Claim(ClaimTypes.Name, user.Name),
-        new Claim(JwtRegisteredClaimNames.Email, user.Email),
-        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-        new Claim(ClaimTypes.Role, user.RoleId.ToString()) // Nếu Role là tên, đổi lại cho phù hợp
-    };
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Name, user.Name),
+                new Claim(JwtRegisteredClaimNames.Email, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Role, user.RoleName)
+            };
 
-            // Tạo token
             var token = CreateToken(claims);
 
-            // Trả về kết quả đăng nhập thành công
             return Ok(new
             {
                 Token = token,
-                UserId = user.UserId,
-                Role = user.RoleId,
+                UserName = user.Name,
+                Role = user.RoleName,
                 Message = loginResult.Message
             });
         }
@@ -171,12 +159,12 @@ namespace KoiShopController.Controllers
             }
         }
 
-        [HttpPost("request-password-reset")]
+        [HttpPost("forgot-password")]
         [AllowAnonymous]
-        public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetDTO request)
+        public async Task<IActionResult> ForgotPassword([FromBody] RequestPasswordResetDTO request)
         {
-            var result = await _userService.GeneratePasswordResetToken(request.Email);
-            if (!result)
+            var result = await _userService.ForgotPassword(request);
+            if (result == null)
             {
                 return BadRequest("Invalid email address.");
             }
@@ -188,8 +176,8 @@ namespace KoiShopController.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDto)
         {
-            var result = await _userService.ResetPassword(resetPasswordDto.Token, resetPasswordDto.NewPassword);
-            if (!result)
+            var result = await _userService.ResetPassword(resetPasswordDto);
+            if (result == null)
             {
                 return BadRequest("Invalid or expired token.");
             }
@@ -197,44 +185,16 @@ namespace KoiShopController.Controllers
             return Ok("Password has been reset successfully.");
         }
 
-        [HttpPut("updateProfile/{userId}")]
+        [HttpPut("profile")]
         [Authorize(Roles = "Admin, Manager, Staff, Customer")]
-        public async Task<IActionResult> UpdateProfile(int userId, [FromBody] UpdateProfileDTO updateProfileDTO)
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDTO updateProfileDTO)
         {
-            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userIdClaim))
+            if (!ModelState.IsValid)
             {
-                return Unauthorized("User ID not found in token.");
+                return BadRequest(ModelState);
             }
-            if (!int.TryParse(userIdClaim, out var currentUserId))
-            {
-                return Unauthorized("Invalid user ID format in token.");
-            }
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
 
-            var currentUserRole = User.FindFirst(ClaimTypes.Role)?.Value;
-            if (string.IsNullOrEmpty(currentUserRole))
-            {
-                return Unauthorized("User role not found in token.");
-            }
-
-            if (currentUserRole == "Customer" && currentUserId != userId)
-            {
-                return StatusCode(403, new { message = "You are not authorized to view other users' information." });
-            }
-
-            if (!string.IsNullOrEmpty(updateProfileDTO.NewPassword))
-            {
-                if (updateProfileDTO.NewPassword != updateProfileDTO.ConfirmPassword)
-                {
-                    return BadRequest("New Password and Confirm Password do not match.");
-                }
-
-                var isOldPasswordValid = await _userService.ValidateOldPassword(userId, updateProfileDTO.OldPassword);
-                if (!isOldPasswordValid)
-                {
-                    return BadRequest("Old Password is incorrect.");
-                }
-            }
             var result = await _userService.UpdateProfile(userId, updateProfileDTO);
             if (!result.Success)
             {
