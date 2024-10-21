@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
+using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using DataAccess.Entity;
@@ -29,9 +30,34 @@ namespace BusinessObject.Service
             var res = new ServiceResponseFormat<ResponseFishPackageDTO>();
             try
             {
+                // Handle image upload (either local or from a link)
+                var imageService = new CloudinaryService();
+                string uploadedImageUrl = string.Empty;
 
+                if (package.ImageFile != null)
+                {
+                    // Image is a local file uploaded via a form
+                    using (var stream = package.ImageFile.OpenReadStream())
+                    {
+                        uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageFile.FileName);
+                    }
+                }
+                else if (!string.IsNullOrEmpty(package.ImageURL) && Uri.IsWellFormedUriString(package.ImageURL.ToString(), UriKind.Absolute))
+                {
+                    // Image is an online URL
+                    uploadedImageUrl = await imageService.UploadImageFromUrlAsync(package.ImageURL.ToString());
+                }
+                
                 var mapp=_mapper.Map<FishPackage>(package);
                 mapp.Status = ProductStatusEnum.AVAILABLE;
+                if (package.ImageFile != null)
+                {
+                    mapp.ImageUrl = package.ImageFile.FileName;
+                }
+                else if (!string.IsNullOrEmpty(package.ImageURL))
+                {
+                    mapp.ImageUrl = package.ImageURL.ToString();
+                }
                 await _repo.CreatePackage(mapp);
                 var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
                 res.Success = true;
@@ -148,26 +174,52 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<ResponseFishPackageDTO>> UpdatePackage(int id, ResponseFishPackageDTO fishPackage)
+        public async Task<ServiceResponseFormat<ResponseFishPackageDTO>> UpdatePackage(int id, UpdatePackageDTO package)
         {
             var res = new ServiceResponseFormat<ResponseFishPackageDTO>();
             try
             {
-                var mapp = _mapper.Map<FishPackage>(fishPackage);
-                if(ProductStatusEnum.AVAILABLE.Equals(fishPackage.Status.ToUpper().Trim()))
+                // Handle image upload (either local or from a link)
+                var imageService = new CloudinaryService();
+                string uploadedImageUrl = string.Empty;
+
+                if (package.ImageFile != null)
+                {
+                    // Image is a local file uploaded via a form
+                    using (var stream = package.ImageFile.OpenReadStream())
+                    {
+                        uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageFile.FileName.ToString());
+                    }
+                }
+                else if (!string.IsNullOrEmpty(package.ImageURL) && Uri.IsWellFormedUriString(package.ImageURL, UriKind.Absolute))
+                {
+                    // Image is an online URL
+                    uploadedImageUrl = await imageService.UploadImageFromUrlAsync(package.ImageURL.ToString());
+                }
+                var mapp = _mapper.Map<FishPackage>(package);
+                if(ProductStatusEnum.AVAILABLE.Equals(package.Status.ToUpper().Trim()))
                 {
                     mapp.Status = ProductStatusEnum.AVAILABLE;
                 }
-                if (ProductStatusEnum.UNAVAILABLE.Equals(fishPackage.Status.ToUpper().Trim()))
+                if (ProductStatusEnum.UNAVAILABLE.Equals(package.Status.ToUpper().Trim()))
                 {
                     mapp.Status = ProductStatusEnum.UNAVAILABLE;
+                }
+                if (package.ImageFile != null)
+                {
+                    mapp.ImageUrl = package.ImageFile.FileName;
+                }
+                else if (!string.IsNullOrEmpty(package.ImageURL))
+                {
+                    mapp.ImageUrl = package.ImageURL.ToString();
                 }
                 var update = await _repo.UpdatePackage(id, mapp);
                 if (update != null)
                 {
+                    var result = _mapper.Map<ResponseFishPackageDTO>(package);
                     res.Success = true;
                     res.Message = "Package Updated Successfully";
-                    res.Data = fishPackage;
+                    res.Data = result;
                     return res;
                 }
                 else

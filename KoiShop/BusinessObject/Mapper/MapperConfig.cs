@@ -28,6 +28,7 @@ namespace BusinessObject.Mapper
             //Package Mapping
             CreateMap<FishPackage, CreateFishPackageDTO>().ReverseMap();
             CreateMap<FishPackage, ResponseFishPackageDTO>().ReverseMap();
+            CreateMap<FishPackage, UpdatePackageDTO>().ReverseMap();
             //Consignment Type Mapping
             CreateMap<ConsignmentType, CreateConsignmentTypeDTO>().ReverseMap();
             CreateMap<ConsignmentType, ResponseConsignmentTypeDTO>().ReverseMap();

@@ -1,5 +1,6 @@
 ﻿using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
+using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
 using BusinessObject.Model.ResponseDTO;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -27,7 +28,7 @@ namespace KoiShopController.Controllers
             return Ok(result);
         }
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetPackageById(int id)
+        public async Task<IActionResult> GetPackageById([FromRoute] int id)
         {
             var result = await _service.GetFishPackage(id);
             if( result == null )
@@ -37,7 +38,7 @@ namespace KoiShopController.Controllers
             return Ok(result);
         }
         [HttpPost]
-        public async Task<IActionResult> CreatePackage(CreateFishPackageDTO packageDTO)
+        public async Task<IActionResult> CreatePackage([FromForm]CreateFishPackageDTO packageDTO)
         {
             var result=await _service.CreatePackage(packageDTO);
             if( !result.Success)
@@ -47,7 +48,7 @@ namespace KoiShopController.Controllers
             return Ok(result);
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePackage(int id)
+        public async Task<IActionResult> DeletePackage([FromRoute]int id)
         {
             var result = await _service.DeletePackage(id);
             if(result.Success)
@@ -57,7 +58,7 @@ namespace KoiShopController.Controllers
             return BadRequest(result.Message);
         }
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePackage(int id, ResponseFishPackageDTO packageDTO)
+        public async Task<IActionResult> UpdatePackage([FromRoute] int id, [FromForm] UpdatePackageDTO packageDTO)
         {
             var result = await _service.UpdatePackage(id, packageDTO);
             if (result.Success)
