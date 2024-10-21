@@ -39,16 +39,25 @@ namespace BusinessObject.Service
                     // Image is a local file uploaded via a form
                     using (var stream = package.ImageFile.OpenReadStream())
                     {
-                        uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageFile.FileName.ToString());
+                        uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageFile.FileName);
                     }
                 }
-                else if (!string.IsNullOrEmpty(package.ImageURL) && Uri.IsWellFormedUriString(package.ImageURL, UriKind.Absolute))
+                else if (!string.IsNullOrEmpty(package.ImageURL) && Uri.IsWellFormedUriString(package.ImageURL.ToString(), UriKind.Absolute))
                 {
                     // Image is an online URL
                     uploadedImageUrl = await imageService.UploadImageFromUrlAsync(package.ImageURL.ToString());
                 }
+                
                 var mapp=_mapper.Map<FishPackage>(package);
                 mapp.Status = ProductStatusEnum.AVAILABLE;
+                if (package.ImageFile != null)
+                {
+                    mapp.ImageUrl = package.ImageFile.FileName;
+                }
+                else if (!string.IsNullOrEmpty(package.ImageURL))
+                {
+                    mapp.ImageUrl = package.ImageURL.ToString();
+                }
                 await _repo.CreatePackage(mapp);
                 var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
                 res.Success = true;
@@ -195,6 +204,14 @@ namespace BusinessObject.Service
                 if (ProductStatusEnum.UNAVAILABLE.Equals(package.Status.ToUpper().Trim()))
                 {
                     mapp.Status = ProductStatusEnum.UNAVAILABLE;
+                }
+                if (package.ImageFile != null)
+                {
+                    mapp.ImageUrl = package.ImageFile.FileName;
+                }
+                else if (!string.IsNullOrEmpty(package.ImageURL))
+                {
+                    mapp.ImageUrl = package.ImageURL.ToString();
                 }
                 var update = await _repo.UpdatePackage(id, mapp);
                 if (update != null)
