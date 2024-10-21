@@ -68,6 +68,8 @@ builder.Services.AddAuthentication(x =>
         ClockSkew = TimeSpan.Zero,
     };
 });
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
 builder.Services.AddTransient<IEmailService, EmailService>();
 
 

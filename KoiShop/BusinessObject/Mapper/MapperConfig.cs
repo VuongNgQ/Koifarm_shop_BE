@@ -17,8 +17,10 @@ namespace BusinessObject.Mapper
             //User Mapping
             CreateMap<User, CreateUserDTO>().ReverseMap();
             CreateMap<User, ResponseUserDTO>()
+                .ForMember(u => u.RoleName, w => w.MapFrom(src => src.Role != null ? src.Role.RoleName : null))
                 .ForMember(u=>u.Addresses, w=>w.MapFrom(src=>src.UserAddresses.Select(ua => ua.Address)))
                 .ReverseMap();
+            CreateMap<User, UserResponseDTO>().ReverseMap();
             CreateMap<User, UpdateUserDTO> ().ReverseMap();
             CreateMap<User, UpdateProfileDTO>().ReverseMap();
             //Role Mapping

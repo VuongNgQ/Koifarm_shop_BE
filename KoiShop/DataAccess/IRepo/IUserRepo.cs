@@ -10,9 +10,8 @@ namespace DataAccess.IRepo
     public interface IUserRepo:IBaseRepo<User>
     {
         Task<User> CreateUser(User user);
-        Task<User> CreateStaff(User user);
         Task<User> UpdateUser(int id, User newUser);
-        Task<User> UpdateProfile(int id, User user);
+        Task<bool> UpdateProfile(User user);
         Task<bool> DeleteUser(int id);
         Task<User?> GetById(int id);
         Task<User> GetManager();
@@ -22,9 +21,9 @@ namespace DataAccess.IRepo
         Task<IEnumerable<User>> GetAllUser();
         Task<User> Login(string email, string password);
         Task<User?> GetByPhone(string phone);
-        Task<bool> SavePasswordResetToken(PasswordResetToken token);
-        Task<PasswordResetToken> GetPasswordResetToken(string token);
-        Task<bool> DeletePasswordResetToken(string token);
+        Task AddToken(PasswordResetToken token);
+        Task<PasswordResetToken> GetToken(string token);
+        Task RemoveToken(int tokenId);
 
     }
 }

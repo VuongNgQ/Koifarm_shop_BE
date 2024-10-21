@@ -16,13 +16,7 @@ namespace DataAccess.Repo
         {
             await _context.Set<User>().AddAsync(user);
             await _context.SaveChangesAsync();
-            return user;
-        }
-        public async Task<User> CreateStaff(User user)
-        {
-            _context.Set<User>().Add(user);
-            await _context.SaveChangesAsync();
-            return user;
+            return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.UserId == user.UserId);
         }
 
         public async Task<bool> DeleteUser(int id)
@@ -42,7 +36,7 @@ namespace DataAccess.Repo
 
         public async Task<IEnumerable<User>> GetAllUser()
         {
-            return await _context.Set<User>().Include(u=>u.UserCarts).Include(u=>u.UserAddresses).ThenInclude(u=>u.Address).ToListAsync();
+            return await _context.Set<User>().Include(u => u.Role).Include(u=>u.UserCarts).Include(u=>u.UserAddresses).ThenInclude(u=>u.Address).ToListAsync();
         }
         public async Task<User> GetManager()
         {
@@ -51,12 +45,12 @@ namespace DataAccess.Repo
         }
         public async Task<User?> GetByEmail(string email)
         {
-            return await _context.Set<User>().FirstOrDefaultAsync(e=>e.Email.Equals(email));
+            return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(e=>e.Email.Equals(email));
         }
 
         public async Task<User?> GetById(int id)
         {
-            return await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId.Equals(id));
+            return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(e => e.UserId.Equals(id));
         }
 
         public async Task<User?> GetByName(string name)
@@ -75,16 +69,16 @@ namespace DataAccess.Repo
         }
         public async Task<User> Login(string email, string password)
         {
-            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(e => e.Email == email && e.PasswordHash == password);
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(e => e.Email == email);
             if (user == null)
             {
                 throw new Exception("Invalid email or password");
             }
             return user;
         }
-        public async Task<User> UpdateProfile(int id, User user)
+        public async Task<bool> UpdateProfile(User user)
         {
-            var exist = await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId == id);
+            var exist = await _context.Set<User>().FirstOrDefaultAsync(e => e.UserId == user.UserId);
             if (exist != null)
             {
                 exist.Email = user.Email;
@@ -94,11 +88,11 @@ namespace DataAccess.Repo
                 exist.DateOfBirth = user.DateOfBirth;
                 _context.Update(exist);
                 await _context.SaveChangesAsync();
-                return user;
+                return true;
             }
             else
             {
-                throw new Exception("User not found");
+                return false;
             }
         }
         public async Task<User> UpdateUser(int id, User newUser)
@@ -122,26 +116,27 @@ namespace DataAccess.Repo
                 throw new Exception("User not found");
             }
         }
-        public async Task<bool> SavePasswordResetToken(PasswordResetToken token)
+
+        public async Task<PasswordResetToken> GetToken(string token)
         {
-            _context.PasswordResetTokens.Add(token);
-            return await _context.SaveChangesAsync() > 0;
-        }
-        public async Task<PasswordResetToken> GetPasswordResetToken(string token)
-        {
-            return await _context.PasswordResetTokens.FirstOrDefaultAsync(t => t.Token == token);
+            return await _context.PasswordResetTokens
+                .FirstOrDefaultAsync(t => t.Token == token && t.ExpirationTime > DateTime.UtcNow);
         }
 
-        public async Task<bool> DeletePasswordResetToken(string token)
+        public async Task AddToken(PasswordResetToken token)
         {
-            var resetToken = await GetPasswordResetToken(token);
-            if (resetToken != null)
+            await _context.PasswordResetTokens.AddAsync(token);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveToken(int tokenId)
+        {
+            var token = await _context.PasswordResetTokens.FindAsync(tokenId);
+            if (token != null)
             {
-                _context.PasswordResetTokens.Remove(resetToken);
-                return await _context.SaveChangesAsync() > 0;
+                _context.PasswordResetTokens.Remove(token);
+                await _context.SaveChangesAsync();
             }
-            return false;
         }
-
     }
 }

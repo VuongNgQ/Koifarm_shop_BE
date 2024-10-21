@@ -19,26 +19,33 @@ namespace BusinessObject.Service
             _configuration = configuration;
         }
 
-        public async Task SendEmailAsync(string toEmail, string subject, string message)
+        public async Task SendResetPasswordEmail(string email, string token)
         {
-            var smtpClient = new SmtpClient(_configuration["EmailSettings:SmtpServer"])
+            var smtpClient = new SmtpClient
             {
+                Host = _configuration["EmailSettings:SmtpServer"],
                 Port = int.Parse(_configuration["EmailSettings:Port"]),
-                Credentials = new NetworkCredential(_configuration["EmailSettings:Username"], _configuration["EmailSettings:Password"]),
                 EnableSsl = true,
+                Credentials = new NetworkCredential(
+                    _configuration["EmailSettings:Username"],
+                    _configuration["EmailSettings:Password"])
             };
 
             var mailMessage = new MailMessage
             {
                 From = new MailAddress(_configuration["EmailSettings:FromEmail"]),
-                Subject = subject,
-                Body = message,
-                IsBodyHtml = true,
+                Subject = "Reset Your Password",
+                //Body = $"Please reset your password using the following link: <a href='{resetLink}'>Reset Password</a>",
+                Body = $"Your password reset token is: <strong>{token}</strong>. " +
+               "Please use this token to reset your password.",
+                IsBodyHtml = true
             };
-            mailMessage.To.Add(toEmail);
+
+            mailMessage.To.Add(email);
 
             await smtpClient.SendMailAsync(mailMessage);
         }
     }
+
 
 }

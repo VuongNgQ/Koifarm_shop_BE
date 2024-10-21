@@ -13,8 +13,13 @@ namespace BusinessObject.Model.ResponseDTO
         public string Email { get; set; }
         public DateTime DateOfBirth { get; set; }
         public string Phone { get; set; }
-        public int RoleId { get; set; }
+        public String RoleName { get; set; }
         public string Status { get; set; }
         public List<ResponseAddressDTO> Addresses { get; set; }
+    }
+
+    public class UserResponseDTO
+    {
+       
     }
 }

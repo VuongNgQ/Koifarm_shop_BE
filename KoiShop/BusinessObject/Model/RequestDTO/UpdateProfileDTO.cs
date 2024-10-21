@@ -18,7 +18,8 @@ namespace BusinessObject.Model.RequestDTO
     {
         public string? Name { get; set; }
         public string? Email { get; set; }
-        public string? OldPassword { get; set; }
+        public bool ChangePassword { get; set; }
+        public string? CurrentPassword { get; set; }
         public string? NewPassword { get; set; }
         public string? ConfirmPassword { get; set; }
         public string? Phone { get; set; }

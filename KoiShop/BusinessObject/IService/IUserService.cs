@@ -16,16 +16,14 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<ResponseUserDTO>> CreateManager(CreateUserDTO createUserDTO);
         Task<ServiceResponseFormat<PaginationModel<ResponseUserDTO>>> GetAllUser(int page, int pageSize,
             string search, string sort);
-        Task<ServiceResponseFormat<CreateUserDTO>> GetUserById(int id);
-        Task<ServiceResponseFormat<ResponseUserDTO>> GetUserByEmail(string email);
-        Task<ServiceResponseFormat<UpdateUserDTO>> UpdateUser(int id, UpdateUserDTO updateUserDTO);
-        Task<ServiceResponseFormat<UpdateUserDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO);
-        Task<bool> ValidateOldPassword(int userId, string oldPassword);
+        Task<ResponseUserDTO> GetUserProfile(int id);
+        Task<ServiceResponseFormat<ResponseUserDTO>> UpdateUser(int id, UpdateUserDTO updateUserDTO);
+        Task<ServiceResponseFormat<ResponseUserDTO>> UpdateProfile(int id, UpdateProfileDTO updateProfileDTO);
         Task<ServiceResponseFormat<bool>> RemoveUser(int id);
         Task<ServiceResponseFormat<bool>> DeleteUser(int id);
         Task<ServiceResponseFormat<bool>> RestoreUser(int id);
         Task<ServiceResponseFormat<ResponseUserDTO>> LoginUser(string email, string pass);
-        Task<bool> GeneratePasswordResetToken(string email);
-        Task<bool> ResetPassword(string token, string newPassword);
+        Task<ServiceResponseFormat<string>> ForgotPassword(RequestPasswordResetDTO request);
+        Task<ServiceResponseFormat<string>> ResetPassword(ResetPasswordDTO request);
     }
 }

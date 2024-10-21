@@ -8,7 +8,14 @@ namespace BusinessObject.IService
 {
     public interface IEmailService
     {
-        Task SendEmailAsync(string toEmail, string subject, string message);
+        Task SendResetPasswordEmail(string email, string resetLink);
+        //public async Task SendResetPasswordEmail(string email, string token)
+        //{
+        //    var resetLink = $"https://yourfrontend.com/reset-password?token={token}";
+        //    var message = $"Please click the link to reset your password: {resetLink}";
+
+        //    // Gửi email logic
+        //}
     }
 
 }
