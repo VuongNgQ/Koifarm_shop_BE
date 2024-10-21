@@ -1,4 +1,5 @@
 ﻿using BusinessObject.Model.RequestDTO;
+using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
 using BusinessObject.Model.ResponseDTO;
 using DataAccess.Entity;
 using System;
@@ -15,7 +16,7 @@ namespace BusinessObject.IService
             string? search, string sort);
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> GetFishPackage(int id);
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> CreatePackage(CreateFishPackageDTO package);
-        Task<ServiceResponseFormat<ResponseFishPackageDTO>> UpdatePackage(int id, ResponseFishPackageDTO fishPackage);
+        Task<ServiceResponseFormat<ResponseFishPackageDTO>> UpdatePackage(int id, UpdatePackageDTO package);
         Task<ServiceResponseFormat<bool>> DeletePackage(int id);
     }
 }
