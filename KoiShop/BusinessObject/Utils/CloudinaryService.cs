@@ -15,9 +15,9 @@ namespace BusinessObject.Utils
         {
             // Provide Cloudinary credentials (get from your Cloudinary dashboard)
             var account = new Account(
-                "dwdph9tsd",    // Your Cloudinary cloud name
-                "391774853411878",       // Your Cloudinary API key
-                "nl_AONvwUc0Ap81iI__vzj6l5uQ"     // Your Cloudinary API secret
+                "dmefon9dj",    // Your Cloudinary cloud name
+                "526853627351913",       // Your Cloudinary API key
+                "DYqDengswHa1gDoSMuem0LD87jI"     // Your Cloudinary API secret
             );
 
             _cloudinary = new Cloudinary(account);
