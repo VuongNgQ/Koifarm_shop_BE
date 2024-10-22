@@ -9,21 +9,18 @@ namespace BusinessObject.Model.RequestDTO.UpdateReq.Entity
 {
     public class UpdatePackageDTO
     {
-        public string Name { get; set; }
-        public int Age { get; set; }
-        public string Gender { get; set; }
-        public decimal Size { get; set; }
-        public string Description { get; set; }
+        public string? Name { get; set; }
+        public int? Age { get; set; }
+        public string? Gender { get; set; }
+        public decimal? Size { get; set; }
+        public string? Description { get; set; }
 
-        public decimal TotalPrice { get; set; }
-        public decimal DailyFood { get; set; }
+        public decimal? TotalPrice { get; set; }
+        public decimal? DailyFood { get; set; }
         // Use IFormFile for local file uploads
         public IFormFile? ImageFile { get; set; }
+        public int? NumberOfFish { get; set; }
 
-        // Use this for image URL uploads
-        public string? ImageURL { get; set; }
-        public int NumberOfFish { get; set; }
-
-        public string Status { get; set; }
+        public string? Status { get; set; }
     }
 }
