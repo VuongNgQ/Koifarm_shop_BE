@@ -31,6 +31,13 @@ namespace BusinessObject.Service
             try
             {
                 // Handle image upload (either local or from a link)
+                var nameExist = await _repo.FindAsync(p=>p.Name==package.Name);
+                if(nameExist.Any())
+                {
+                    res.Success = false;
+                    res.Message = "Name exist";
+                    return res;
+                }
                 var imageService = new CloudinaryService();
                 string uploadedImageUrl = string.Empty;
 
@@ -42,22 +49,9 @@ namespace BusinessObject.Service
                         uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageFile.FileName);
                     }
                 }
-                else if (!string.IsNullOrEmpty(package.ImageURL) && Uri.IsWellFormedUriString(package.ImageURL.ToString(), UriKind.Absolute))
-                {
-                    // Image is an online URL
-                    uploadedImageUrl = await imageService.UploadImageFromUrlAsync(package.ImageURL.ToString());
-                }
-                
                 var mapp=_mapper.Map<FishPackage>(package);
                 mapp.Status = ProductStatusEnum.AVAILABLE;
-                if (package.ImageFile != null)
-                {
-                    mapp.ImageUrl = package.ImageFile.FileName;
-                }
-                else if (!string.IsNullOrEmpty(package.ImageURL))
-                {
-                    mapp.ImageUrl = package.ImageURL.ToString();
-                }
+                mapp.ImageUrl = package.ImageFile.FileName;
                 await _repo.CreatePackage(mapp);
                 var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
                 res.Success = true;
@@ -179,6 +173,18 @@ namespace BusinessObject.Service
             var res = new ServiceResponseFormat<ResponseFishPackageDTO>();
             try
             {
+                // Fetch the existing package from the database
+                var existingPackage = await _repo.GetByIdAsync(id);
+
+                if (existingPackage == null)
+                {
+                    res.Success = false;
+                    res.Message = "Package not found";
+                    return res;
+                }
+
+                bool isUpdated = false;
+
                 // Handle image upload (either local or from a link)
                 var imageService = new CloudinaryService();
                 string uploadedImageUrl = string.Empty;
@@ -189,50 +195,93 @@ namespace BusinessObject.Service
                     using (var stream = package.ImageFile.OpenReadStream())
                     {
                         uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageFile.FileName.ToString());
+                        if (!string.IsNullOrEmpty(uploadedImageUrl))
+                        {
+                            existingPackage.ImageUrl = uploadedImageUrl;
+                            isUpdated = true;
+                        }
                     }
                 }
-                else if (!string.IsNullOrEmpty(package.ImageURL) && Uri.IsWellFormedUriString(package.ImageURL, UriKind.Absolute))
+
+                // Check for changes in other fields and update if necessary
+                if (!string.IsNullOrEmpty(package.Name) && package.Name != existingPackage.Name)
                 {
-                    // Image is an online URL
-                    uploadedImageUrl = await imageService.UploadImageFromUrlAsync(package.ImageURL.ToString());
+                    existingPackage.Name = package.Name;
+                    isUpdated = true;
                 }
-                var mapp = _mapper.Map<FishPackage>(package);
-                if(ProductStatusEnum.AVAILABLE.Equals(package.Status.ToUpper().Trim()))
+
+                if (package.Age.HasValue && package.Age != existingPackage.Age)
                 {
-                    mapp.Status = ProductStatusEnum.AVAILABLE;
+                    existingPackage.Age = package.Age.Value;
+                    isUpdated = true;
                 }
-                if (ProductStatusEnum.UNAVAILABLE.Equals(package.Status.ToUpper().Trim()))
+
+                if (!string.IsNullOrEmpty(package.Gender) && package.Gender != existingPackage.Gender)
                 {
-                    mapp.Status = ProductStatusEnum.UNAVAILABLE;
+                    existingPackage.Gender = package.Gender;
+                    isUpdated = true;
                 }
-                if (package.ImageFile != null)
+
+                if (package.Size.HasValue && package.Size != existingPackage.Size)
                 {
-                    mapp.ImageUrl = package.ImageFile.FileName;
+                    existingPackage.Size = package.Size.Value;
+                    isUpdated = true;
                 }
-                else if (!string.IsNullOrEmpty(package.ImageURL))
+
+                if (!string.IsNullOrEmpty(package.Description) && package.Description != existingPackage.Description)
                 {
-                    mapp.ImageUrl = package.ImageURL.ToString();
+                    existingPackage.Description = package.Description;
+                    isUpdated = true;
                 }
-                var update = await _repo.UpdatePackage(id, mapp);
-                if (update != null)
+
+                if (package.TotalPrice.HasValue && package.TotalPrice != existingPackage.TotalPrice)
                 {
-                    var result = _mapper.Map<ResponseFishPackageDTO>(package);
-                    res.Success = true;
-                    res.Message = "Package Updated Successfully";
-                    res.Data = result;
-                    return res;
+                    existingPackage.TotalPrice = package.TotalPrice.Value;
+                    isUpdated = true;
                 }
-                else
+
+                if (package.DailyFood.HasValue && package.DailyFood != existingPackage.DailyFood)
+                {
+                    existingPackage.DailyFood = package.DailyFood.Value;
+                    isUpdated = true;
+                }
+
+                if (!string.IsNullOrEmpty(package.Status))
+                {
+                    var statusEnum = package.Status.ToUpper().Trim();
+                    if (ProductStatusEnum.AVAILABLE.Equals(statusEnum) && existingPackage.Status != ProductStatusEnum.AVAILABLE)
+                    {
+                        existingPackage.Status = ProductStatusEnum.AVAILABLE;
+                        isUpdated = true;
+                    }
+                    else if (ProductStatusEnum.UNAVAILABLE.Equals(statusEnum) && existingPackage.Status != ProductStatusEnum.UNAVAILABLE)
+                    {
+                        existingPackage.Status = ProductStatusEnum.UNAVAILABLE;
+                        isUpdated = true;
+                    }
+                }
+
+                // If no changes were made, return a message indicating no update
+                if (!isUpdated)
                 {
                     res.Success = false;
-                    res.Message = "No Package Found or got error at Repo";
+                    res.Message = "No changes detected. Package was not updated.";
                     return res;
                 }
+
+                // Perform the update only if changes were made
+                await _repo.UpdatePackage(id, existingPackage);
+
+                var result = _mapper.Map<ResponseFishPackageDTO>(existingPackage);
+                res.Success = true;
+                res.Data = result;
+                res.Message = "Package updated successfully";
+                return res;
             }
             catch (Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to update Package:{ex.Message}";
+                res.Message = $"Failed to update Package: {ex.Message}";
                 return res;
             }
         }
