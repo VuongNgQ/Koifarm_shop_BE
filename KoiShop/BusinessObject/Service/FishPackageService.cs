@@ -51,7 +51,7 @@ namespace BusinessObject.Service
                 }
                 var mapp=_mapper.Map<FishPackage>(package);
                 mapp.Status = ProductStatusEnum.AVAILABLE;
-                mapp.ImageUrl = package.ImageFile.FileName;
+                mapp.ImageUrl = uploadedImageUrl;
                 await _repo.CreatePackage(mapp);
                 var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
                 res.Success = true;
