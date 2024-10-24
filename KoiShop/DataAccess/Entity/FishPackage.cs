@@ -28,5 +28,7 @@ namespace DataAccess.Entity
         public ICollection<CartItem>? CartItems { get; set; }
         public ICollection<PackageConsignment>? Consignments { get; set; }
         public ICollection<Feedback>? Feedbacks { get; set; }
+        public ICollection<SubImage> SubImages { get; set; }
+
     }
 }
