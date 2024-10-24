@@ -35,7 +35,9 @@ namespace BusinessObject
             //Order
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepo, OrderRepo>();
-            
+            //SubImage
+            services.AddScoped<ISubImageRepo, SubImageRepo>();
+            services.AddScoped<ISubImageService, SubImageService>();
             //Address
             services.AddScoped<IAddressRepo, AddressRepo>();
             //Payment Method
