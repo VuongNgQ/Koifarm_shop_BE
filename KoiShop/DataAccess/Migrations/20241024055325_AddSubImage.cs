@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class HotFixToMigrate : Migration
+    public partial class AddSubImage : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -206,6 +206,31 @@ namespace DataAccess.Migrations
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "RoleId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubImage",
+                columns: table => new
+                {
+                    SubImageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubImageURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FishId = table.Column<int>(type: "int", nullable: true),
+                    FishPackageId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubImage", x => x.SubImageId);
+                    table.ForeignKey(
+                        name: "FK_SubImage_FishPackages_FishPackageId",
+                        column: x => x.FishPackageId,
+                        principalTable: "FishPackages",
+                        principalColumn: "FishPackageId");
+                    table.ForeignKey(
+                        name: "FK_SubImage_Fish_FishId",
+                        column: x => x.FishId,
+                        principalTable: "Fish",
+                        principalColumn: "FishId");
                 });
 
             migrationBuilder.CreateTable(
@@ -599,6 +624,16 @@ namespace DataAccess.Migrations
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SubImage_FishId",
+                table: "SubImage",
+                column: "FishId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubImage_FishPackageId",
+                table: "SubImage",
+                column: "FishPackageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserAddresses_AddressId",
                 table: "UserAddresses",
                 column: "AddressId");
@@ -645,13 +680,13 @@ namespace DataAccess.Migrations
                 name: "RolePermissions");
 
             migrationBuilder.DropTable(
+                name: "SubImage");
+
+            migrationBuilder.DropTable(
                 name: "UserAddresses");
 
             migrationBuilder.DropTable(
                 name: "UserCarts");
-
-            migrationBuilder.DropTable(
-                name: "Fish");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -660,13 +695,13 @@ namespace DataAccess.Migrations
                 name: "ConsignmentTypes");
 
             migrationBuilder.DropTable(
-                name: "FishPackages");
-
-            migrationBuilder.DropTable(
                 name: "Permissions");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "FishPackages");
+
+            migrationBuilder.DropTable(
+                name: "Fish");
 
             migrationBuilder.DropTable(
                 name: "Addresses");
@@ -676,6 +711,9 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Roles");
