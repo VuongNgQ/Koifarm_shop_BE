@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241024055325_AddSubImage")]
-    partial class AddSubImage
+    [Migration("20241024121338_AddSomeMissing")]
+    partial class AddSomeMissing
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -573,7 +573,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("FishPackageId");
 
-                    b.ToTable("SubImage");
+                    b.ToTable("SubImages");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.User", b =>

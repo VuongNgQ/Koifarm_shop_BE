@@ -570,7 +570,7 @@ namespace DataAccess.Migrations
 
                     b.HasIndex("FishPackageId");
 
-                    b.ToTable("SubImage");
+                    b.ToTable("SubImages");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.User", b =>
