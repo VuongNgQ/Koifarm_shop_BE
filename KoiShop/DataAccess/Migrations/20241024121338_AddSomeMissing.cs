@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class RemoveStatusEntity : Migration
+    public partial class AddSomeMissing : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -140,7 +140,7 @@ namespace DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Age = table.Column<int>(type: "int", nullable: true),
-                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<int>(type: "int", nullable: false),
                     Size = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CategoryId = table.Column<int>(type: "int", nullable: true),
@@ -192,11 +192,11 @@ namespace DataAccess.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     RoleId = table.Column<int>(type: "int", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -206,6 +206,31 @@ namespace DataAccess.Migrations
                         column: x => x.RoleId,
                         principalTable: "Roles",
                         principalColumn: "RoleId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SubImages",
+                columns: table => new
+                {
+                    SubImageId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubImageURL = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FishId = table.Column<int>(type: "int", nullable: true),
+                    FishPackageId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubImages", x => x.SubImageId);
+                    table.ForeignKey(
+                        name: "FK_SubImages_FishPackages_FishPackageId",
+                        column: x => x.FishPackageId,
+                        principalTable: "FishPackages",
+                        principalColumn: "FishPackageId");
+                    table.ForeignKey(
+                        name: "FK_SubImages_Fish_FishId",
+                        column: x => x.FishId,
+                        principalTable: "Fish",
+                        principalColumn: "FishId");
                 });
 
             migrationBuilder.CreateTable(
@@ -305,7 +330,6 @@ namespace DataAccess.Migrations
                     UserId = table.Column<int>(type: "int", nullable: true),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     AddressId = table.Column<int>(type: "int", nullable: true),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
                     PaymentMethodId = table.Column<int>(type: "int", nullable: true),
@@ -600,6 +624,16 @@ namespace DataAccess.Migrations
                 column: "PermissionId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SubImages_FishId",
+                table: "SubImages",
+                column: "FishId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubImages_FishPackageId",
+                table: "SubImages",
+                column: "FishPackageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserAddresses_AddressId",
                 table: "UserAddresses",
                 column: "AddressId");
@@ -646,13 +680,13 @@ namespace DataAccess.Migrations
                 name: "RolePermissions");
 
             migrationBuilder.DropTable(
+                name: "SubImages");
+
+            migrationBuilder.DropTable(
                 name: "UserAddresses");
 
             migrationBuilder.DropTable(
                 name: "UserCarts");
-
-            migrationBuilder.DropTable(
-                name: "Fish");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -661,13 +695,13 @@ namespace DataAccess.Migrations
                 name: "ConsignmentTypes");
 
             migrationBuilder.DropTable(
-                name: "FishPackages");
-
-            migrationBuilder.DropTable(
                 name: "Permissions");
 
             migrationBuilder.DropTable(
-                name: "Categories");
+                name: "FishPackages");
+
+            migrationBuilder.DropTable(
+                name: "Fish");
 
             migrationBuilder.DropTable(
                 name: "Addresses");
@@ -677,6 +711,9 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Categories");
 
             migrationBuilder.DropTable(
                 name: "Roles");

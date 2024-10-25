@@ -546,6 +546,33 @@ namespace DataAccess.Migrations
                     b.ToTable("RolePermissions");
                 });
 
+            modelBuilder.Entity("DataAccess.Entity.SubImage", b =>
+                {
+                    b.Property<int>("SubImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubImageId"));
+
+                    b.Property<int?>("FishId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("FishPackageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SubImageURL")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("SubImageId");
+
+                    b.HasIndex("FishId");
+
+                    b.HasIndex("FishPackageId");
+
+                    b.ToTable("SubImages");
+                });
+
             modelBuilder.Entity("DataAccess.Entity.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -794,6 +821,21 @@ namespace DataAccess.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("DataAccess.Entity.SubImage", b =>
+                {
+                    b.HasOne("DataAccess.Entity.Fish", "Fish")
+                        .WithMany("SubImages")
+                        .HasForeignKey("FishId");
+
+                    b.HasOne("DataAccess.Entity.FishPackage", "FishPackage")
+                        .WithMany("SubImages")
+                        .HasForeignKey("FishPackageId");
+
+                    b.Navigation("Fish");
+
+                    b.Navigation("FishPackage");
+                });
+
             modelBuilder.Entity("DataAccess.Entity.User", b =>
                 {
                     b.HasOne("DataAccess.Entity.Role", "Role")
@@ -859,6 +901,8 @@ namespace DataAccess.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("OrderItems");
+
+                    b.Navigation("SubImages");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.FishPackage", b =>
@@ -870,6 +914,8 @@ namespace DataAccess.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("OrderItems");
+
+                    b.Navigation("SubImages");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Order", b =>

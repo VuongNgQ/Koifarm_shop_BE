@@ -9,7 +9,16 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:5000")  // Allow any domain (you can restrict this to specific domains)
+                   .AllowAnyHeader()  // Allow any headers
+                   .AllowAnyMethod(); // Allow any HTTP methods
+        });
+});
 // Add services to the container.
 var config = builder.Configuration;
 builder.Services.AddControllers();
@@ -79,12 +88,28 @@ await SeedData.SeedDataAsync(app.Services);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseDeveloperExceptionPage();
 }
+app.UseSwagger();
 
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "KoiShop V1");
+});
+app.UseRouting();
 app.UseAuthorization();
 app.UseAuthentication();
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/swagger/index.html", true);
+        return; // Exit middleware
+    }
+    await next();
+});
+app.UseCors("AllowAllOrigins");
+
 app.MapControllers();
 
 app.Run();

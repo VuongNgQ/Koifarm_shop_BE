@@ -57,6 +57,10 @@ namespace BusinessObject.Mapper
             CreateMap<OrderItem, CreateFishItemDTO>().ReverseMap();
             CreateMap<OrderItem, CreateOrderPackageItemDTO>().ReverseMap();
             CreateMap<OrderItem, ResponseOrderItemDTO>().ReverseMap();
+            //Sub Image
+            CreateMap<SubImage, CreateFishSubImageDTO>().ReverseMap();
+            CreateMap<SubImage, CreatePackageSubImageDTO>().ReverseMap();
+            CreateMap<SubImage, ResponseSubImageDTO>().ReverseMap();
         }
     }
 }

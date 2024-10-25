@@ -37,7 +37,7 @@ namespace DataAccess
         public DbSet<ConsignmentType> ConsignmentTypes { get; set; }
         
         public DbSet<Feedback> Feedbacks { get; set; }
-        
+        public DbSet<SubImage> SubImages { get; set; }
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<UserAddress> UserAddresses { get; set; }
