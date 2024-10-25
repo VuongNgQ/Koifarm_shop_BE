@@ -57,7 +57,7 @@ namespace KoiShopController.Controllers
             }
             return BadRequest(result.Message);
         }
-        [HttpDelete("{id}")]
+        /*[HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var result = await _service.DeleteOrderItemById(id);
@@ -66,8 +66,8 @@ namespace KoiShopController.Controllers
                 return Ok(result);
             }
             return BadRequest(result.Message);
-        }
-        [HttpPut("FishSingle/{id}&&{quantity}")]
+        }*/
+        /*[HttpPut("FishSingle/{id}&&{quantity}")]
         public async Task<IActionResult> UpdateFishQuantity(int id, int quantity)
         {
             var result = await _service.UpdateFishQuantity(id, quantity);
@@ -76,6 +76,6 @@ namespace KoiShopController.Controllers
                 return Ok(result);
             }
             return BadRequest(result.Message);
-        }
+        }*/
     }
 }

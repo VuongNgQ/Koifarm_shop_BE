@@ -23,6 +23,11 @@ namespace BusinessObject.Mapper
             CreateMap<User, UserResponseDTO>().ReverseMap();
             CreateMap<User, UpdateUserDTO> ().ReverseMap();
             CreateMap<User, UpdateProfileDTO>().ReverseMap();
+            //Cart
+            CreateMap<UserCart, ResponseCartDTO>()
+                .ForMember(c=>c.CartItems, i=>i.MapFrom(src=>src.CartItems))
+                .ForMember(u=>u.UserName, c=>c.MapFrom(src=>src.User.Name))
+                .ReverseMap();
             //Role Mapping
             CreateMap<Role, CreateRoleDTO>().ReverseMap();
             //Package Mapping
@@ -45,7 +50,8 @@ namespace BusinessObject.Mapper
                 .ReverseMap();
             CreateMap<Order, ResponseOrderDTO>()
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.UserId))
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems))
                 .ReverseMap();
             //Payment Method

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241025065348_FixCategory")]
-    partial class FixCategory
+    [Migration("20241025144619_UpdateCartItem")]
+    partial class UpdateCartItem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,6 +87,9 @@ namespace DataAccess.Migrations
 
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<decimal?>("TotalPricePerItem")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int?>("UserCartId")
                         .HasColumnType("int");

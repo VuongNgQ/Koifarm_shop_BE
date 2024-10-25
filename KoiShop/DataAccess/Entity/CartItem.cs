@@ -13,6 +13,7 @@ namespace DataAccess.Entity
         public int? FishId { get; set; }
         public int? PackageId { get; set; }
         public int? Quantity { get; set; }
+        public decimal? TotalPricePerItem { get; set; }
         public UserCart? UserCart { get; set; }
         public Fish? Fish { get; set; }
         public FishPackage? Package { get; set; }
