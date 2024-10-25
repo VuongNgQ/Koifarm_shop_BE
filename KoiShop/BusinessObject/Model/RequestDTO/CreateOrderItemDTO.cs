@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BusinessObject.Model.RequestDTO
 {
-    public class CreateOrderPackageItemDTO
+    public class CreateOrderItemDTO
     {
         public int OrderId { get; set; }
         public int UserCartId { get; set; }

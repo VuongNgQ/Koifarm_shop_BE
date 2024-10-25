@@ -1,5 +1,6 @@
 ﻿using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -35,6 +36,7 @@ namespace KoiShopController.Controllers
             return NotFound(result.Message);
         }
         [HttpPost("Fish")]
+        [Authorize(Roles = "Manager, Staff")]
         public async Task<IActionResult> CreateForFish([FromForm] CreateFishSubImageDTO imageDTO)
         {
             var result = await _service.CreateFishSubImage(imageDTO);
@@ -45,6 +47,7 @@ namespace KoiShopController.Controllers
             return BadRequest(result.Message);
         }
         [HttpPost("Package")]
+        [Authorize(Roles = "Manager, Staff")]
         public async Task<IActionResult> CreateForPackage([FromForm] CreatePackageSubImageDTO imageDTO)
         {
             var result = await _service.CreatePackageSubImage(imageDTO);
@@ -55,6 +58,7 @@ namespace KoiShopController.Controllers
             return BadRequest(result.Message);
         }
         [HttpPut("{imageId}")]
+        [Authorize(Roles = "Manager, Staff")]
         public async Task<IActionResult> ChangeImage([FromRoute]int imageId, [FromForm]IFormFile image)
         {
             var result = await _service.ChangeSubImage(imageId, image);
@@ -65,6 +69,7 @@ namespace KoiShopController.Controllers
             return BadRequest(result.Message);
         }
         [HttpDelete("{imageId}")]
+        [Authorize(Roles = "Manager, Staff")]
         public async Task<IActionResult> DeleteImage([FromRoute]int imageId)
         {
             var result=await _service.DeleteSubImage(imageId);
