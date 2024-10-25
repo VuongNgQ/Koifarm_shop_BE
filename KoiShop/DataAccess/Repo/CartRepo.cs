@@ -1,5 +1,6 @@
 ﻿using DataAccess.Entity;
 using DataAccess.IRepo;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,5 +17,9 @@ namespace DataAccess.Repo
             _context = context;
         }
 
+        public async Task<IEnumerable<UserCart>> GetAll()
+        {
+            return await _context.Set<UserCart>().Include(c=>c.User).Include(c=>c.CartItems).ToListAsync();
+        }
     }
 }

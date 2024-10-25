@@ -78,6 +78,8 @@ namespace BusinessObject.Service
                         };
                         await _repo.AddAsync(newItem);
                         await _cartItemService.DeleteCartItemById(item.CartItemId);
+                        orderExist.TotalPrice += newItem.Price;
+                        _orderRepo.Update(orderExist);
                     }
                 }
                 res.Success = true;
@@ -129,10 +131,12 @@ namespace BusinessObject.Service
                             OrderId = itemDTO.OrderId,
                             PackageId = item.PackageId,
                             Quantity = item.Quantity,
-                            Price = item.Package?.TotalPrice
+                            Price = item.TotalPricePerItem,
                         };
                         await _repo.AddAsync(newItem);
                         await _cartItemService.DeleteCartItemById(item.CartItemId);
+                        orderExist.TotalPrice += newItem.Price;
+                        _orderRepo.Update(orderExist);
                     }
                 }
                 res.Success = true;

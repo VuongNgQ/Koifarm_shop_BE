@@ -23,15 +23,17 @@ namespace BusinessObject.Service
         private readonly IMapper _mapper;
         private readonly IUserAddressRepo _uaRepo;
         private readonly IUserRepo _userRepo;
+        private readonly IOrderItemRepo _itemRepo;
         public OrderService(IOrderRepo repo, 
             IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo
-            , IUserRepo userRepo)
+            , IUserRepo userRepo, IOrderItemRepo itemRepo)
         {
             _repo = repo;
             _mapper = mapper;
             _addressRepo = addressRepo;
             _uaRepo = uaRepo;
             _userRepo = userRepo;
+            _itemRepo = itemRepo;
         }
 
         public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
@@ -72,8 +74,10 @@ namespace BusinessObject.Service
             try
             {
                 var mapp = _mapper.Map<Order>(orderDTO);
+                
                 mapp.Status = OrderStatusEnum.PENDING;
                 mapp.OrderDate = DateTime.Now;
+                
                 var addressMap=_mapper.Map<Address>(orderDTO.CreateAddressDTO);
                 await _addressRepo.AddAsync(addressMap);
                 var userExist = await _userRepo.GetByIdAsync(orderDTO.UserId);

@@ -14,7 +14,7 @@ namespace KoiShopController.Controllers
         {
             _service = service;
         }
-        [HttpGet]
+        /*[HttpGet]
         public async Task<IActionResult>GetAllItems(int page = 1, int pageSize = 10,
             string search = "", string sort = "")
         {
@@ -27,7 +27,7 @@ namespace KoiShopController.Controllers
             {
                 return NotFound(result.Message);
             }
-        }
+        }*/
         [HttpGet("Cart/{id}")]
         public async Task<IActionResult>GetByCartId(int id)
         {

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BusinessObject.Model.ResponseDTO;
+using DataAccess.Entity;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,6 @@ namespace BusinessObject.IService
 {
     public interface ICartService
     {
+        Task<ServiceResponseFormat<ResponseCartDTO>> GetCartByUserId(int id);
     }
 }

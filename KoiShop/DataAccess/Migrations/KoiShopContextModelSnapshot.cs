@@ -85,6 +85,9 @@ namespace DataAccess.Migrations
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("TotalPricePerItem")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("UserCartId")
                         .HasColumnType("int");
 

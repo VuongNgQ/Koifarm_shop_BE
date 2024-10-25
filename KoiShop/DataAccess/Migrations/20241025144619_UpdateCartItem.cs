@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class FixCategory : Migration
+    public partial class UpdateCartItem : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -494,7 +494,8 @@ namespace DataAccess.Migrations
                     UserCartId = table.Column<int>(type: "int", nullable: true),
                     FishId = table.Column<int>(type: "int", nullable: true),
                     PackageId = table.Column<int>(type: "int", nullable: true),
-                    Quantity = table.Column<int>(type: "int", nullable: true)
+                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    TotalPricePerItem = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {

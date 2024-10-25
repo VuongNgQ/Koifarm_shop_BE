@@ -9,5 +9,6 @@ namespace DataAccess.IRepo
 {
     public interface ICartRepo:IBaseRepo<UserCart>
     {
+        Task<IEnumerable<UserCart>> GetAll();
     }
 }
