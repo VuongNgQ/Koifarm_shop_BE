@@ -29,6 +29,10 @@ namespace BusinessObject.Mapper
             CreateMap<FishPackage, CreateFishPackageDTO>().ReverseMap();
             CreateMap<FishPackage, ResponseFishPackageDTO>().ReverseMap();
             CreateMap<FishPackage, UpdatePackageDTO>().ReverseMap();
+            //Category
+            CreateMap<Category, CreateCategoryDTO>().ReverseMap();
+            CreateMap<Category, ResponseCategoryDTO>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
             //Consignment Type Mapping
             CreateMap<ConsignmentType, CreateConsignmentTypeDTO>().ReverseMap();
             CreateMap<ConsignmentType, ResponseConsignmentTypeDTO>().ReverseMap();
@@ -55,7 +59,7 @@ namespace BusinessObject.Mapper
             CreateMap<CartItem, ResponseCartItemDTO>().ReverseMap();
 
             CreateMap<OrderItem, CreateFishItemDTO>().ReverseMap();
-            CreateMap<OrderItem, CreateOrderPackageItemDTO>().ReverseMap();
+            CreateMap<OrderItem, CreateOrderItemDTO>().ReverseMap();
             CreateMap<OrderItem, ResponseOrderItemDTO>().ReverseMap();
             //Sub Image
             CreateMap<SubImage, CreateFishSubImageDTO>().ReverseMap();

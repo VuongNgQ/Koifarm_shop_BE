@@ -10,8 +10,8 @@ namespace BusinessObject.IService
 {
     public interface IOrderItemService
     {
-        Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreateFishItem(CreateFishItemDTO itemDTO);
-        Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreatePackageItem(CreateOrderPackageItemDTO itemDTO);
+        Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreateFishItem(CreateOrderItemDTO itemDTO);
+        Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreatePackageItem(CreateOrderItemDTO itemDTO);
         Task<ServiceResponseFormat<PaginationModel<ResponseOrderItemDTO>>> GetAllItem(int page, int pageSize, string sort);
         Task<ServiceResponseFormat<bool>> DeleteOrderItemById(int id);
         Task<ServiceResponseFormat<bool>> UpdateFishQuantity(int id, int quantity);

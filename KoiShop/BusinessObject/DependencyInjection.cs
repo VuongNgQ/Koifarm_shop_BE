@@ -25,7 +25,9 @@ namespace BusinessObject
             //Role
             services.AddScoped<IRoleRepo, RoleRepo>();
             services.AddScoped<IRoleService, RoleService>();
-           
+            //Category
+            services.AddScoped<ICategoryRepo, CategoryRepo>();
+            services.AddScoped<ICategoryService, CategoryService>();
             //Fish Package
             services.AddScoped<IFishPackageService, FishPackageService>();
             services.AddScoped<IFishPackageRepo, FishPackageRepo>();

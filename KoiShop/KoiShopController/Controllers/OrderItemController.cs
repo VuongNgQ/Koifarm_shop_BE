@@ -38,7 +38,7 @@ namespace KoiShopController.Controllers
             return NotFound(result.Message);
         }
         [HttpPost("FishSingle")]
-        public async Task<IActionResult> CreateFishItem(CreateFishItemDTO itemDTO)
+        public async Task<IActionResult> CreateFishItem(CreateOrderItemDTO itemDTO)
         {
             var result = await _service.CreateFishItem(itemDTO);
             if (result.Success)
@@ -48,7 +48,7 @@ namespace KoiShopController.Controllers
             return BadRequest(result.Message);
         }
         [HttpPost("FishPackage")]
-        public async Task<IActionResult> CreatePackageItem(CreateOrderPackageItemDTO itemDTO)
+        public async Task<IActionResult> CreatePackageItem(CreateOrderItemDTO itemDTO)
         {
             var result = await _service.CreatePackageItem(itemDTO);
             if (result.Success)

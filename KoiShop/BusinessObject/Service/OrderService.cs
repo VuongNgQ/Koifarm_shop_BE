@@ -34,6 +34,38 @@ namespace BusinessObject.Service
             _userRepo = userRepo;
         }
 
+        public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var exist =await _repo.GetByIdAsync(id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Order found";
+                    return res;
+                }
+                if (OrderStatusEnum.PENDING.Equals(status.ToUpper().Trim()))
+                {
+                    exist.Status = OrderStatusEnum.PENDING;
+                }
+                if (OrderStatusEnum.COMPLETED.Equals(status.ToUpper().Trim()))
+                {
+                    exist.Status = OrderStatusEnum.COMPLETED;
+                }
+                _repo.Update(exist);
+                res.Success = true;
+                res.Message = "Order Updated Successfully";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change Status:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrder(CreateOrderDTO orderDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderDTO>();
@@ -177,7 +209,7 @@ namespace BusinessObject.Service
             try
             {
                 var orders = await _repo.GetAllOrder();
-                var exist = orders.FirstOrDefault(x=>x.OrderId==id);
+                var exist = orders.FirstOrDefault(x=>x.OrderId==id&&x.Status == OrderStatusEnum.PENDING);
                 if (exist != null)
                 {
                     var mapp = _mapper.Map<Order>(orderDTO);
