@@ -12,5 +12,15 @@ namespace KoiShopController.Controllers
         {
             _service = service;
         }
+        [HttpGet("User/{id}")]
+        public async Task<IActionResult> GetByUserId(int id)
+        {
+            var result=await _service.GetCartByUserId(id);
+            if(result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result.Message);
+        }
     }
 }

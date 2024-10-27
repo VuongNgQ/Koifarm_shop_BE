@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241024121338_AddSomeMissing")]
-    partial class AddSomeMissing
+    [Migration("20241025144619_UpdateCartItem")]
+    partial class UpdateCartItem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,6 +88,9 @@ namespace DataAccess.Migrations
                     b.Property<int?>("Quantity")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("TotalPricePerItem")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int?>("UserCartId")
                         .HasColumnType("int");
 
@@ -110,9 +113,6 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CategoryId"));
 
-                    b.Property<string>("CategoryStatus")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -124,9 +124,6 @@ namespace DataAccess.Migrations
 
                     b.Property<string>("OriginCountry")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Size")
-                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("CategoryId");
 

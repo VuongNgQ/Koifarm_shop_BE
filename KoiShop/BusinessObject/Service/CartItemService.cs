@@ -48,7 +48,15 @@ namespace BusinessObject.Service
                     res.Message = "No fish with this Id";
                     return res;
                 }
+                var cartExist = await _cartRepo.GetByIdAsync(itemDTO.CartId);
+                if (cartExist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Cart with this Id";
+                    return res;
+                }
                 var mapp = _mapper.Map<CartItem>(itemDTO);
+                mapp.TotalPricePerItem = exist.Price*itemDTO.Quantity;
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 result.TotalPricePerItem=exist.Price*itemDTO.Quantity;
@@ -93,9 +101,9 @@ namespace BusinessObject.Service
                 }
                 var mapp = _mapper.Map<CartItem>(itemDTO);
                 mapp.Quantity = 1;
+                mapp.TotalPricePerItem = exist.TotalPrice;
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
-                result.TotalPricePerItem = exist.TotalPrice;
                 res.Success = true;
                 res.Message = "Create Item Successfully";
                 res.Data = result;

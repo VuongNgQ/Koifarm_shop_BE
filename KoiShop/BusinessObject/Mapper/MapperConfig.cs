@@ -23,12 +23,21 @@ namespace BusinessObject.Mapper
             CreateMap<User, UserResponseDTO>().ReverseMap();
             CreateMap<User, UpdateUserDTO> ().ReverseMap();
             CreateMap<User, UpdateProfileDTO>().ReverseMap();
+            //Cart
+            CreateMap<UserCart, ResponseCartDTO>()
+                .ForMember(c=>c.CartItems, i=>i.MapFrom(src=>src.CartItems))
+                .ForMember(u=>u.UserName, c=>c.MapFrom(src=>src.User.Name))
+                .ReverseMap();
             //Role Mapping
             CreateMap<Role, CreateRoleDTO>().ReverseMap();
             //Package Mapping
             CreateMap<FishPackage, CreateFishPackageDTO>().ReverseMap();
             CreateMap<FishPackage, ResponseFishPackageDTO>().ReverseMap();
             CreateMap<FishPackage, UpdatePackageDTO>().ReverseMap();
+            //Category
+            CreateMap<Category, CreateCategoryDTO>().ReverseMap();
+            CreateMap<Category, ResponseCategoryDTO>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
             //Consignment Type Mapping
             CreateMap<ConsignmentType, CreateConsignmentTypeDTO>().ReverseMap();
             CreateMap<ConsignmentType, ResponseConsignmentTypeDTO>().ReverseMap();
@@ -41,7 +50,8 @@ namespace BusinessObject.Mapper
                 .ReverseMap();
             CreateMap<Order, ResponseOrderDTO>()
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.UserId))
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems))
                 .ReverseMap();
             //Payment Method
@@ -55,7 +65,7 @@ namespace BusinessObject.Mapper
             CreateMap<CartItem, ResponseCartItemDTO>().ReverseMap();
 
             CreateMap<OrderItem, CreateFishItemDTO>().ReverseMap();
-            CreateMap<OrderItem, CreateOrderPackageItemDTO>().ReverseMap();
+            CreateMap<OrderItem, CreateOrderItemDTO>().ReverseMap();
             CreateMap<OrderItem, ResponseOrderItemDTO>().ReverseMap();
             //Sub Image
             CreateMap<SubImage, CreateFishSubImageDTO>().ReverseMap();

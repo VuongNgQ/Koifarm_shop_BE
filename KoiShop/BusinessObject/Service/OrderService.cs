@@ -23,25 +23,61 @@ namespace BusinessObject.Service
         private readonly IMapper _mapper;
         private readonly IUserAddressRepo _uaRepo;
         private readonly IUserRepo _userRepo;
+        private readonly IOrderItemRepo _itemRepo;
         public OrderService(IOrderRepo repo, 
             IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo
-            , IUserRepo userRepo)
+            , IUserRepo userRepo, IOrderItemRepo itemRepo)
         {
             _repo = repo;
             _mapper = mapper;
             _addressRepo = addressRepo;
             _uaRepo = uaRepo;
             _userRepo = userRepo;
+            _itemRepo = itemRepo;
         }
 
+        public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var exist =await _repo.GetByIdAsync(id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Order found";
+                    return res;
+                }
+                if (OrderStatusEnum.PENDING.Equals(status.ToUpper().Trim()))
+                {
+                    exist.Status = OrderStatusEnum.PENDING;
+                }
+                if (OrderStatusEnum.COMPLETED.Equals(status.ToUpper().Trim()))
+                {
+                    exist.Status = OrderStatusEnum.COMPLETED;
+                }
+                _repo.Update(exist);
+                res.Success = true;
+                res.Message = "Order Updated Successfully";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change Status:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrder(CreateOrderDTO orderDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderDTO>();
             try
             {
                 var mapp = _mapper.Map<Order>(orderDTO);
+                
                 mapp.Status = OrderStatusEnum.PENDING;
                 mapp.OrderDate = DateTime.Now;
+                
                 var addressMap=_mapper.Map<Address>(orderDTO.CreateAddressDTO);
                 await _addressRepo.AddAsync(addressMap);
                 var userExist = await _userRepo.GetByIdAsync(orderDTO.UserId);
@@ -177,7 +213,7 @@ namespace BusinessObject.Service
             try
             {
                 var orders = await _repo.GetAllOrder();
-                var exist = orders.FirstOrDefault(x=>x.OrderId==id);
+                var exist = orders.FirstOrDefault(x=>x.OrderId==id&&x.Status == OrderStatusEnum.PENDING);
                 if (exist != null)
                 {
                     var mapp = _mapper.Map<Order>(orderDTO);

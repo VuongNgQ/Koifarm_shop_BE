@@ -62,56 +62,56 @@ namespace DataAccess
         new Category
         {
             Name = "Kohaku",
-            Size = 60,
+            
             Description = "Cá Koi Kohaku là một trong những loại phổ biến nhất, với nền trắng và các mảng đỏ.",
             ImageUrl = "https://drive.google.com/uc?export=view&id=1mNbQ4ysvXLkx6wmPqD1hvyY6Zi8gXxZc",
             OriginCountry = "Japan",
-            CategoryStatus = "Active"
+            
         },
         new Category
         {
             Name = "Taisho Sanshoku",
-            Size = 50,
+            
             Description = "Loại cá này có màu nền trắng với các mảng đỏ và đen.",
             ImageUrl = "url_to_image_of_taisho_sanshoku",
             OriginCountry = "Japan",
-            CategoryStatus = "Active"
+           
         },
         new Category
         {
             Name = "Shiro Utsuri",
-            Size = 55,
+            
             Description = "Cá Koi Shiro Utsuri có nền trắng với các đốm đen.",
             ImageUrl = "url_to_image_of_shiro_utsuri",
             OriginCountry = "Japan",
-            CategoryStatus = "Active"
+            
         },
         new Category
         {
             Name = "Showa Sanshoku",
-            Size = 60,
+            
             Description = "Loại cá này có màu nền đen với các mảng đỏ và trắng.",
             ImageUrl = "url_to_image_of_showa_sanshoku",
             OriginCountry = "Japan",
-            CategoryStatus = "Active"
+            
         },
         new Category
         {
             Name = "Goshiki",
-            Size = 50,
+            
             Description = "Cá Koi Goshiki có nền xanh hoặc trắng với các mảng đỏ.",
             ImageUrl = "url_to_image_of_goshiki",
             OriginCountry = "Japan",
-            CategoryStatus = "Active"
+            
         },
         new Category
         {
             Name = "Aka Matsuba",
-            Size = 45,
+            
             Description = "Cá Koi Aka Matsuba có nền đỏ với các đốm vàng.",
             ImageUrl = "url_to_image_of_aka_matsuba",
             OriginCountry = "Japan",
-            CategoryStatus = "Active"
+            
         }
         //+++
     });

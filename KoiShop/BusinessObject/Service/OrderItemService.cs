@@ -38,33 +38,52 @@ namespace BusinessObject.Service
             _cartItemService = cartItemService;
         }
 
-        public async Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreateFishItem(CreateFishItemDTO itemDTO)
+        public async Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreateFishItem(CreateOrderItemDTO itemDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderItemDTO>();
             try
             {
-                var items = await _repo.GetAllAsync();
-                if (items.Any(i => i.FishId == itemDTO.FishId))
+                var orderExist = await _orderRepo.GetByIdAsync(itemDTO.OrderId);
+                if (orderExist == null)
                 {
                     res.Success = false;
-                    res.Message = "You haved added this Fish before, now you can only update Quantity inside";
+                    res.Message = "No Order with this Id";
                     return res;
                 }
-                var exist = await _fishRepo.GetFishByIdAsync(itemDTO.FishId);
-                if (exist == null)
+                var cartExist = await _cartRepo.GetByIdAsync(itemDTO.UserCartId);
+                if (cartExist == null)
                 {
                     res.Success = false;
-                    res.Message = "No fish with this Id";
+                    res.Message = "No Cart with this Id";
                     return res;
                 }
-                var mapp = _mapper.Map<OrderItem>(itemDTO);
-                await _repo.AddAsync(mapp);
-                mapp.Price = exist.Price * itemDTO.Quantity;
-                var result = _mapper.Map<ResponseOrderItemDTO>(mapp);
-                
+                else
+                {
+                    var items = await _cartItemRepo.GetAllAsync();
+                    var fishInCart = items.Where(i => i.UserCartId == itemDTO.UserCartId && i.FishId != null).ToList();
+                    if (fishInCart.Count == 0)
+                    {
+                        res.Success = false;
+                        res.Message = "No Fish in cart";
+                        return res;
+                    }
+                    foreach (var item in fishInCart)
+                    {
+                        OrderItem newItem = new OrderItem()
+                        {
+                            OrderId = itemDTO.OrderId,
+                            FishId = item.FishId,
+                            Quantity = item.Quantity,
+                            Price = item.Fish?.Price*item.Quantity
+                        };
+                        await _repo.AddAsync(newItem);
+                        await _cartItemService.DeleteCartItemById(item.CartItemId);
+                        orderExist.TotalPrice += newItem.Price;
+                        _orderRepo.Update(orderExist);
+                    }
+                }
                 res.Success = true;
                 res.Message = "Create Item Successfully";
-                res.Data = result;
                 return res;
             }
             catch (Exception ex)
@@ -75,7 +94,7 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreatePackageItem(CreateOrderPackageItemDTO itemDTO)
+        public async Task<ServiceResponseFormat<ResponseOrderItemDTO>> CreatePackageItem(CreateOrderItemDTO itemDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderItemDTO>();
             try
@@ -98,7 +117,7 @@ namespace BusinessObject.Service
                 {
                     var items=await _cartItemRepo.GetAllAsync();
                     var packageInCart = items.Where(i => i.UserCartId == itemDTO.UserCartId&&i.PackageId!=null).ToList();
-                    if (!packageInCart.Any())
+                    if (packageInCart.Count == 0)
                     {
                         res.Success = false;
                         res.Message = "No Package in cart";
@@ -112,10 +131,12 @@ namespace BusinessObject.Service
                             OrderId = itemDTO.OrderId,
                             PackageId = item.PackageId,
                             Quantity = item.Quantity,
-                            Price = item.Package?.TotalPrice
+                            Price = item.TotalPricePerItem,
                         };
                         await _repo.AddAsync(newItem);
                         await _cartItemService.DeleteCartItemById(item.CartItemId);
+                        orderExist.TotalPrice += newItem.Price;
+                        _orderRepo.Update(orderExist);
                     }
                 }
                 res.Success = true;
