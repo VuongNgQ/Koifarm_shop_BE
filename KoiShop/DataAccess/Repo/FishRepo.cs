@@ -18,21 +18,19 @@ namespace DataAccess.Repo
             _context = context;
         }
 
-        public async Task<IEnumerable<Fish>> GetAllFishesAsync()
+        public async Task<IEnumerable<Fish>> GetAllAsync()
         {
             return await _context.Fish.Include(f => f.Category).ToListAsync();
         }
 
         public async Task<Fish?> GetFishByIdAsync(int fishId)
         {
-            var fish = await _context.Fish.FirstOrDefaultAsync(f => f.FishId == fishId);
-            if (fish == null)
-            {
-                throw new KeyNotFoundException($"Fish with ID {fishId} not found.");
-            }
-            return fish;
+            return await _context.Fish.Include(f => f.Category).FirstOrDefaultAsync(f => f.FishId == fishId);
         }
-
+        public async Task<bool> CategoryExists(int categoryId)
+        {
+            return await _context.Categories.AnyAsync(c => c.CategoryId == categoryId);
+        }
         public async Task AddFishAsync(Fish fish)
         {
             await _context.Fish.AddAsync(fish);
@@ -45,17 +43,10 @@ namespace DataAccess.Repo
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteFishAsync(int fishId)
+        public async Task DeleteFishAsync(Fish fish)
         {
-            var fish = await _context.Fish.FindAsync(fishId);
-            if (fish != null)
-            {
-                _context.Fish.Remove(fish);
-                await _context.SaveChangesAsync();
-            }else
-            {
-                throw new KeyNotFoundException("Fish not found");
-            }
+            _context.Fish.Remove(fish);
+            await _context.SaveChangesAsync();
         }
     }
 

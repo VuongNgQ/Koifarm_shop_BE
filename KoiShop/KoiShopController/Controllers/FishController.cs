@@ -1,4 +1,6 @@
-﻿using DataAccess.Entity;
+﻿using BusinessObject.IService;
+using BusinessObject.Model.RequestDTO;
+using DataAccess.Entity;
 using DataAccess.IRepo;
 using DataAccess.Repo;
 using Microsoft.AspNetCore.Http;
@@ -6,64 +8,70 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KoiShopController.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class FishController : ControllerBase
     {
-        private readonly IFishRepo _fishRepo;
+        private readonly IFishService _fishService;
 
-        public FishController(IFishRepo fishRepository)
+        public FishController(IFishService fishService)
         {
-            _fishRepo = fishRepository;
+            _fishService = fishService;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetAllFishes()
         {
-            var fishes = await _fishRepo.GetAllFishesAsync();
-            return Ok(fishes);
+            var result = await _fishService.GetAllFishes();
+            if (result.Success)
+            {
+                return Ok(result.Data);
+            }
+            return NotFound(result.Message);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetFishById(int id)
+        public async Task<IActionResult> GetFishById(int fishId)
         {
-            var fish = await _fishRepo.GetFishByIdAsync(id);
-            if (fish == null)
+            var result = await _fishService.GetFishById(fishId);
+            if (result.Success)
             {
-                return NotFound();
+                return Ok(result.Data);
             }
-            return Ok(fish);
+            return NotFound(result.Message);
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateFish([FromBody] Fish fish)
+        public async Task<IActionResult> CreateFish([FromBody] CreateFishDTO fish)
         {
-            if (!ModelState.IsValid)
+            var result = await _fishService.CreateFish(fish);
+            if (result.Success)
             {
-                return BadRequest(ModelState);
+                return Ok(result.Data);
             }
-
-            await _fishRepo.AddFishAsync(fish);
-            return CreatedAtAction(nameof(GetFishById), new { id = fish.FishId }, fish);
+            return BadRequest(result.Message);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateFish(int id, [FromBody] Fish fish)
+        public async Task<IActionResult> UpdateFish(int fishId, [FromBody] UpdateFishDTO updateFishDto)
         {
-            if (id != fish.FishId || !ModelState.IsValid)
+            var result = await _fishService.UpdateFish(fishId, updateFishDto);
+            if (result.Success)
             {
-                return BadRequest();
+                return Ok(result.Data);
             }
-
-            await _fishRepo.UpdateFishAsync(fish);
-            return NoContent();
+            return BadRequest(result.Message);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteFish(int id)
+        [HttpDelete("{fishId}")]
+        public async Task<IActionResult> DeleteFish(int fishId)
         {
-            await _fishRepo.DeleteFishAsync(id);
-            return NoContent();
+            var result = await _fishService.DeleteFish(fishId);
+            if (result.Success)
+            {
+                return Ok(result.Message);
+            }
+            return NotFound(result.Message);
         }
     }
 

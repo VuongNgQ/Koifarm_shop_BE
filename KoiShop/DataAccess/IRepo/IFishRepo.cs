@@ -10,10 +10,11 @@ namespace DataAccess.IRepo
 
     public interface IFishRepo
     {
-        Task<IEnumerable<Fish>> GetAllFishesAsync();
+        Task<IEnumerable<Fish>> GetAllAsync();
         Task<Fish> GetFishByIdAsync(int fishId);
+        Task<bool> CategoryExists(int categoryId);
         Task AddFishAsync(Fish fish);
         Task UpdateFishAsync(Fish fish);
-        Task DeleteFishAsync(int fishId);
+        Task DeleteFishAsync(Fish fish);
     }
 }
