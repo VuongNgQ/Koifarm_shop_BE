@@ -47,6 +47,7 @@ namespace BusinessObject
             services.AddScoped<IPaymentMethodService, PaymentMethodService>();
             //Fish 
             services.AddScoped<IFishRepo, FishRepository>();
+            services.AddScoped<IFishService, FishService>();
             //Cart
             services.AddScoped<ICartRepo, CartRepo>();
             services.AddScoped<ICartService, CartService>();
