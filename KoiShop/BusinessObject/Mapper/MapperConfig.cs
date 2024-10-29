@@ -39,10 +39,10 @@ namespace BusinessObject.Mapper
             CreateMap<Category, ResponseCategoryDTO>().ReverseMap();
             CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
             //Fish
-            CreateMap<Fish, CreateFishDTO>();
+            CreateMap<Fish, CreateFishDTO>().ReverseMap();
             CreateMap<Fish, ResponseFishDTO>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null));
-            CreateMap<Fish, UpdateFishDTO>();
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null)).ReverseMap();
+            CreateMap<Fish, UpdateFishDTO>().ReverseMap();
             //Consignment Type Mapping
             CreateMap<ConsignmentType, CreateConsignmentTypeDTO>().ReverseMap();
             CreateMap<ConsignmentType, ResponseConsignmentTypeDTO>().ReverseMap();
