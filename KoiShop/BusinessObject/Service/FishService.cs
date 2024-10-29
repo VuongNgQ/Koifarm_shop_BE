@@ -2,6 +2,7 @@
 using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
+using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.IRepo;
 using DataAccess.Repo;
@@ -57,9 +58,20 @@ namespace BusinessObject.Service
                 response.Message = "Category does not exist.";
                 return response;
             }
+            var imageService = new CloudinaryService();
+            string uploadedImageUrl = string.Empty;
 
+            if (createFishDto.ImageUrl != null)
+            {
+                // Image is a local file uploaded via a form
+                using (var stream = createFishDto.ImageUrl.OpenReadStream())
+                {
+                    uploadedImageUrl = await imageService.UploadImageAsync(stream, createFishDto.ImageUrl.FileName);
+                }
+            }
             // Tạo mới cá
             var newFish = _mapper.Map<Fish>(createFishDto);
+            newFish.ImageUrl = uploadedImageUrl;
             await _fishRepository.AddFishAsync(newFish);
 
             response.Data = _mapper.Map<ResponseFishDTO>(newFish);
@@ -77,8 +89,19 @@ namespace BusinessObject.Service
                 response.Message = "Fish not found";
                 return response;
             }
+            var imageService = new CloudinaryService();
+            string uploadedImageUrl = string.Empty;
 
+            if (updateFishDto.ImageUrl != null)
+            {
+                // Image is a local file uploaded via a form
+                using (var stream = updateFishDto.ImageUrl.OpenReadStream())
+                {
+                    uploadedImageUrl = await imageService.UploadImageAsync(stream, updateFishDto.ImageUrl.FileName);
+                }
+            }
             _mapper.Map(updateFishDto, fish); // Cập nhật thông tin cá
+
             await _fishRepository.UpdateFishAsync(fish);
 
             response.Data = _mapper.Map<ResponseFishDTO>(fish);
