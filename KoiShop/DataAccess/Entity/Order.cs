@@ -12,6 +12,7 @@ namespace DataAccess.Entity
         public int OrderId { get; set; }
         public int? UserId { get; set; }
         public DateTime? OrderDate { get; set; }
+        public DateTime? CompleteDate { get; set; }
         public int? AddressId { get; set; }
         public decimal? TotalPrice { get; set; }
         public OrderStatusEnum Status { get; set; }
