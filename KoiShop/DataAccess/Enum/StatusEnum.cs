@@ -10,6 +10,7 @@ namespace DataAccess.Enum
     {
         AVAILABLE,
         UNAVAILABLE,
+        SOLDOUT
     }
     public enum FishStatusEnum
     {
