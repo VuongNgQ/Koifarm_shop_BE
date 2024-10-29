@@ -182,7 +182,13 @@ namespace BusinessObject.Service
                     res.Message = "Package not found";
                     return res;
                 }
-
+                var nameExist = await _repo.FindAsync(p => p.Name == package.Name);
+                if (nameExist.Any())
+                {
+                    res.Success = false;
+                    res.Message = "Name exist";
+                    return res;
+                }
                 bool isUpdated = false;
 
                 // Handle image upload (either local or from a link)
