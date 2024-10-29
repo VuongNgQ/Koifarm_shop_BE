@@ -22,7 +22,12 @@ namespace DataAccess.Repo
         {
             return await _context.Fish.Include(f => f.Category).ToListAsync();
         }
-
+        public async Task<List<Fish>> GetByCategoryIdAsync(int categoryId)
+        {
+            return await _context.Fish
+                .Where(f => f.CategoryId == categoryId)
+                .ToListAsync();
+        }
         public async Task<Fish?> GetFishByIdAsync(int fishId)
         {
             return await _context.Fish.Include(f => f.Category).FirstOrDefaultAsync(f => f.FishId == fishId);

@@ -33,12 +33,29 @@ namespace KoiShopController.Controllers
             }
             return NotFound(result.Message);
         }
+
+        /// <summary>
+        /// Get a list of all fishes belonging to a specific categoryID.
+        /// </summary>
+        /// <param name="categoryId">ID of category to retrieve fish.</param>
+        /// <returns>List of fish belonging to category. If category is not found or there are no fish, return error message.</returns>
+        [HttpGet("byCategory/{categoryId}")]
+        public async Task<IActionResult> GetFishByCategoryId(int categoryId)
+        {
+            var result = await _fishService.GetFishByCategoryId(categoryId);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return NotFound(result.Message);
+        }
+
         /// <summary>
         /// Get details of a specific fish by ID.
         /// </summary>
-        /// <param name="id">ID of the fish to retrieve.</param>
+        /// <param name="fishId">ID of the fish to retrieve.</param>
         /// <returns>Details of the specified fish.</returns>
-        [HttpGet("{id}")]
+        [HttpGet("{fishId}")]
         public async Task<IActionResult> GetFishById(int fishId)
         {
             var result = await _fishService.GetFishById(fishId);
@@ -68,10 +85,10 @@ namespace KoiShopController.Controllers
         /// <summary>
         /// Update an existing fish by ID.
         /// </summary>
-        /// <param name="id">ID of the fish to update.</param>
-        /// <param name="fish">Updated fish object.</param>
+        /// <param name="fishId">ID of the fish to update.</param>
+        /// <param name="updateFishDto">Updated fish object.</param>
         /// <returns>The updated fish object.</returns>
-        [HttpPut("{id}")]
+        [HttpPut("{fishId}")]
         public async Task<IActionResult> UpdateFish(int fishId,[FromForm] UpdateFishDTO updateFishDto)
         {
             var result = await _fishService.UpdateFish(fishId, updateFishDto);

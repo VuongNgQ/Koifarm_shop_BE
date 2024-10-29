@@ -17,11 +17,13 @@ namespace BusinessObject.Service
     public class FishService : IFishService
     {
         private readonly IFishRepo _fishRepository;
+        private readonly ICategoryRepo _categoryRepo;
         private readonly IMapper _mapper;
 
-        public FishService(IFishRepo fishRepository, IMapper mapper)
+        public FishService(IFishRepo fishRepository, ICategoryRepo categoryRepository, IMapper mapper)
         {
             _fishRepository = fishRepository;
+            _categoryRepo = categoryRepository;
             _mapper = mapper;
         }
         public async Task<ServiceResponseFormat<List<ResponseFishDTO>>> GetAllFishes()
@@ -30,6 +32,34 @@ namespace BusinessObject.Service
             var fishes = await _fishRepository.GetAllAsync();
             response.Data = _mapper.Map<List<ResponseFishDTO>>(fishes);
             response.Success = true;
+            return response;
+        }
+        public async Task<ServiceResponseFormat<List<ResponseFishDTO>>> GetFishByCategoryId(int categoryId)
+        {
+            var response = new ServiceResponseFormat<List<ResponseFishDTO>>();
+
+            var category = await _categoryRepo.GetByIdAsync(categoryId);
+            if (category == null)
+            {
+                response.Success = false;
+                response.Message = "Category không tồn tại.";
+                return response;
+            }
+
+            var fishes = await _fishRepository.GetByCategoryIdAsync(categoryId);
+
+            if (fishes == null || !fishes.Any())
+            {
+                response.Success = false;
+                response.Message = "Không có cá nào thuộc category này.";
+                return response;
+            }
+
+            // Map dữ liệu từ Entity sang DTO
+            response.Data = _mapper.Map<List<ResponseFishDTO>>(fishes);
+            response.Success = true;
+            response.Message = $"Có {fishes.Count} cá thuộc category {category.Name}.";
+
             return response;
         }
         public async Task<ServiceResponseFormat<ResponseFishDTO>> GetFishById(int fishId)

@@ -11,6 +11,7 @@ namespace DataAccess.IRepo
     public interface IFishRepo
     {
         Task<IEnumerable<Fish>> GetAllAsync();
+        Task<List<Fish>> GetByCategoryIdAsync(int categoryId);
         Task<Fish> GetFishByIdAsync(int fishId);
         Task<bool> CategoryExists(int categoryId);
         Task AddFishAsync(Fish fish);
