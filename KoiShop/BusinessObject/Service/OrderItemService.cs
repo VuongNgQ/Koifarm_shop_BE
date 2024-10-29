@@ -67,6 +67,7 @@ namespace BusinessObject.Service
                         res.Message = "No Fish in cart";
                         return res;
                     }
+                    decimal totalPrice = 0;
                     foreach (var item in fishInCart)
                     {
                         OrderItem newItem = new OrderItem()
@@ -74,13 +75,14 @@ namespace BusinessObject.Service
                             OrderId = itemDTO.OrderId,
                             FishId = item.FishId,
                             Quantity = item.Quantity,
-                            Price = item.Fish?.Price*item.Quantity
+                            Price = item.TotalPricePerItem
                         };
                         await _repo.AddAsync(newItem);
                         await _cartItemService.DeleteCartItemById(item.CartItemId);
-                        orderExist.TotalPrice += newItem.Price;
-                        _orderRepo.Update(orderExist);
+                        totalPrice += newItem.Price ?? 0;
                     }
+                    orderExist.TotalPrice += totalPrice;
+                    _orderRepo.Update(orderExist);
                 }
                 res.Success = true;
                 res.Message = "Create Item Successfully";
@@ -123,9 +125,9 @@ namespace BusinessObject.Service
                         res.Message = "No Package in cart";
                         return res;
                     }
+                    decimal totalPrice = 0;
                     foreach (var item in packageInCart)
                     {
-
                         OrderItem newItem = new OrderItem()
                         {
                             OrderId = itemDTO.OrderId,
@@ -135,9 +137,10 @@ namespace BusinessObject.Service
                         };
                         await _repo.AddAsync(newItem);
                         await _cartItemService.DeleteCartItemById(item.CartItemId);
-                        orderExist.TotalPrice += newItem.Price;
-                        _orderRepo.Update(orderExist);
+                        totalPrice += newItem.Price ?? 0;
                     }
+                    orderExist.TotalPrice += totalPrice;
+                    _orderRepo.Update(orderExist);
                 }
                 res.Success = true;
                 res.Message = "Create Item Successfully";
