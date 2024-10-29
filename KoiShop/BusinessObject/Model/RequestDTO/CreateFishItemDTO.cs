@@ -8,7 +8,7 @@ namespace BusinessObject.Model.RequestDTO
 {
     public class CreateFishItemDTO
     {
-        public int CartId { get; set; }
+        public int UserCartId { get; set; }
         public int FishId { get; set; }
         public int Quantity { get; set; }
 

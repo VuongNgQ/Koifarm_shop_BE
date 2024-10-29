@@ -55,7 +55,7 @@ namespace KoiShopController.Controllers
         /// <param name="fish">Fish object containing fish details.</param>
         /// <returns>The created fish object.</returns>
         [HttpPost]
-        public async Task<IActionResult> CreateFish([FromBody] CreateFishDTO fish)
+        public async Task<IActionResult> CreateFish([FromForm] CreateFishDTO fish)
         {
             var result = await _fishService.CreateFish(fish);
             if (result.Success)
@@ -72,7 +72,7 @@ namespace KoiShopController.Controllers
         /// <param name="fish">Updated fish object.</param>
         /// <returns>The updated fish object.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateFish(int fishId, [FromBody] UpdateFishDTO updateFishDto)
+        public async Task<IActionResult> UpdateFish(int fishId,[FromForm] UpdateFishDTO updateFishDto)
         {
             var result = await _fishService.UpdateFish(fishId, updateFishDto);
             if (result.Success)

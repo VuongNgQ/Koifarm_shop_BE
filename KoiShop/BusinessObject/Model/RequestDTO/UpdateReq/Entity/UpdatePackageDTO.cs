@@ -18,7 +18,7 @@ namespace BusinessObject.Model.RequestDTO.UpdateReq.Entity
         public decimal? TotalPrice { get; set; }
         public decimal? DailyFood { get; set; }
         // Use IFormFile for local file uploads
-        public IFormFile? ImageFile { get; set; }
+        public IFormFile? ImageUrl { get; set; }
         public int? NumberOfFish { get; set; }
 
         public string? Status { get; set; }

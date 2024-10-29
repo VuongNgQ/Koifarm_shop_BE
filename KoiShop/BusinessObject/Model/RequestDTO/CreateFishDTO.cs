@@ -1,5 +1,6 @@
 ﻿using DataAccess.Entity;
 using DataAccess.Enum;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace BusinessObject.Model.RequestDTO
         public int CategoryId { get; set; }
         public decimal? Price { get; set; }
         public decimal? DailyFood { get; set; }
-        public string? ImageUrl { get; set; }
+        public IFormFile? ImageUrl { get; set; }
         public int? QuantityInStock { get; set; }
         public ProductStatusEnum Status { get; set; }
     }
@@ -32,7 +33,7 @@ namespace BusinessObject.Model.RequestDTO
         public int CategoryId { get; set; }
         public decimal? Price { get; set; }
         public decimal? DailyFood { get; set; }
-        public string? ImageUrl { get; set; }
+        public IFormFile? ImageUrl { get; set; }
         public int? QuantityInStock { get; set; }
         public ProductStatusEnum Status { get; set; }
     }
