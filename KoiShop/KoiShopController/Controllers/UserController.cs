@@ -23,7 +23,16 @@ namespace KoiShopController.Controllers
             _userService = service;
             _configuration = configuration;
         }
-
+        /// <summary>
+        /// Get a list of users with pagination.
+        /// </summary>
+        /// <param name="page">Current page.</param>
+        /// <param name="pageSize">Number of users per page.</param>
+        /// <param name="search">Search keyword.</param>
+        /// <param name="sort">Sort criteria.</param>
+        /// <returns>List of users with pagination.</returns>
+        /// <response code="200">Returns a list of users.</response>
+        /// <response code="404">No users found.</response>
         [HttpGet]
         [Authorize(Roles = "Admin, Manager, Staff")]
         public async Task<IActionResult> GetUser(int page = 1, int pageSize = 10,
@@ -39,7 +48,12 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
-
+        /// <summary>
+        /// Get the user details.
+        /// </summary>
+        /// <returns>The user's information.</returns>
+        /// <response code="200">Returns the user information.</response>
+        /// <response code="404">No user with the given ID was found.</response>
         [HttpGet("profile")]
         [Authorize(Roles = "Admin, Manager, Staff, Customer")]
         public async Task<IActionResult> GetUserProfile()
@@ -66,7 +80,13 @@ namespace KoiShopController.Controllers
                 });
             }
         }
-
+        /// <summary>
+        /// Create a new user account.
+        /// </summary>
+        /// <param name="newUser">Details of the user to create.</param>
+        /// <returns>Information of the user just created.</returns>
+        /// <response code="200">Returns the user that was successfully created.</response>
+        /// <response code="400">Invalid user creation request.</response>
         [HttpPost("createAccount")]
         [AllowAnonymous]
         public async Task<IActionResult> CreateUser(CreateUserDTO newUser)
@@ -81,7 +101,13 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
-
+        /// <summary>
+        /// Create an account for an staff.
+        /// </summary>
+        /// <param name="newStaff">Details of the staff to create.</param>
+        /// <returns>Information of the staff just created.</returns>
+        /// <response code="200">Returns the staff just created successfully.</response>
+        /// <response code="400">Invalid staff creation request.</response>
         [HttpPost("createStaff")]
         [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> CreateStaff(CreateUserDTO newStaff)
@@ -95,7 +121,13 @@ namespace KoiShopController.Controllers
 
             return Ok(result);
         }
-
+        /// <summary>
+        /// Create an account for a manager.
+        /// </summary>
+        /// <param name="newManager">Details of the manager to create.</param>
+        /// <returns>Information of the manager just created.</returns>
+        /// <response code="200">Returns the manager just created successfully.</response>
+        /// <response code="400">Invalid request to create manager.</response>
         [HttpPost("createManager")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateManager(CreateUserDTO newManager)
@@ -109,7 +141,13 @@ namespace KoiShopController.Controllers
 
             return Ok(result);
         }
-
+        /// <summary>
+        /// Log in to the user account.
+        /// </summary>
+        /// <param name="loginRequest">Credentials of the user.</param>
+        /// <returns>The user's authentication information.</returns>
+        /// <response code="200">Returns the user's authentication information.</response>
+        /// <response code="401">The email or password is incorrect.</response>
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO loginRequest)
@@ -143,7 +181,14 @@ namespace KoiShopController.Controllers
             });
         }
 
-
+        /// <summary>
+        /// Update user information.
+        /// </summary>
+        /// <param name="userId">ID of the user to update.</param>
+        /// <param name="userDTO">New user information.</param>
+        /// <returns>User information after update.</returns>
+        /// <response code="200">Returns the user that was successfully updated.</response>
+        /// <response code="404">No user with the given ID was found.</response>
         [HttpPut("updateUser/{userId}")]
         [Authorize(Roles = "Admin, Manager, Staff")]
         public async Task<IActionResult>UpdateUser(int userId, UpdateUserDTO userDTO)
@@ -158,7 +203,13 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
-
+        /// <summary>
+        /// Password reset request (forgot password).
+        /// </summary>
+        /// <param name="request">Password reset request information, including user email.</param>
+        /// <returns>Password reset request confirmation message.</returns>
+        /// <response code="200">Password reset request successful.</response>
+        /// <response code="404">No user with the provided email found.</response>
         [HttpPost("forgot-password")]
         [AllowAnonymous]
         public async Task<IActionResult> ForgotPassword([FromBody] RequestPasswordResetDTO request)
@@ -171,7 +222,13 @@ namespace KoiShopController.Controllers
 
             return Ok("Password reset email has been sent.");
         }
-
+        /// <summary>
+        /// Reset the user's password based on the token sent via email.
+        /// </summary>
+        /// <param name="resetPasswordDto">Password reset information, including confirmation token and new password.</param>
+        /// <returns>Password reset confirmation message.</returns>
+        /// <response code="200">Password reset successful.</response>
+        /// <response code="400">Invalid token or invalid password reset request.</response>
         [HttpPost("reset-password")]
         [AllowAnonymous]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO resetPasswordDto)
@@ -184,7 +241,13 @@ namespace KoiShopController.Controllers
 
             return Ok("Password has been reset successfully.");
         }
-
+        /// <summary>
+        /// Update the user's profile.
+        /// </summary>
+        /// <param name="updateProfileDTO">The profile information to update.</param>
+        /// <returns>The profile information after updating.</returns>
+        /// <response code="200">Returns the profile that was successfully updated.</response>
+        /// <response code="404">No user with the given ID was found.</response>
         [HttpPut("profile")]
         [Authorize(Roles = "Admin, Manager, Staff, Customer")]
         public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDTO updateProfileDTO)
@@ -202,7 +265,13 @@ namespace KoiShopController.Controllers
             }
             return Ok(result);
         }
-
+        /// <summary>
+        /// Mark the user as removed.
+        /// </summary>
+        /// <param name="userId">The ID of the user to be removed.</param>
+        /// <returns>Confirm the user deletion.</returns>
+        /// <response code="200">Returns confirmation that the user has been deleted.</response>
+        /// <response code="404">No user with the given ID was found.</response>
         [HttpPut("deleteUser/{userId}")]
         [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> DeleteUser(int userId)
@@ -214,7 +283,13 @@ namespace KoiShopController.Controllers
             }
             return Ok(result);
         }
-
+        /// <summary>
+        /// Restore a deleted user account.
+        /// </summary>
+        /// <param name="userId">ID of the user to restore.</param>
+        /// <returns>Confirm user account restoration.</returns>
+        /// <response code="200">User restored successfully.</response>
+        /// <response code="404">No user found with the given ID.</response>
         [HttpPut("restoreUser/{userId}")]
         [Authorize(Roles = "Admin, Manager")]
         public async Task<IActionResult> RestoreUser(int userId)
