@@ -41,12 +41,12 @@ namespace BusinessObject.Service
                 var imageService = new CloudinaryService();
                 string uploadedImageUrl = string.Empty;
 
-                if (package.ImageFile != null)
+                if (package.ImageUrl != null)
                 {
                     // Image is a local file uploaded via a form
-                    using (var stream = package.ImageFile.OpenReadStream())
+                    using (var stream = package.ImageUrl.OpenReadStream())
                     {
-                        uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageFile.FileName);
+                        uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageUrl.FileName);
                     }
                 }
                 var mapp=_mapper.Map<FishPackage>(package);
@@ -195,12 +195,12 @@ namespace BusinessObject.Service
                 var imageService = new CloudinaryService();
                 string uploadedImageUrl = string.Empty;
 
-                if (package.ImageFile != null)
+                if (package.ImageUrl != null)
                 {
                     // Image is a local file uploaded via a form
-                    using (var stream = package.ImageFile.OpenReadStream())
+                    using (var stream = package.ImageUrl.OpenReadStream())
                     {
-                        uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageFile.FileName.ToString());
+                        uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageUrl.FileName.ToString());
                         if (!string.IsNullOrEmpty(uploadedImageUrl))
                         {
                             existingPackage.ImageUrl = uploadedImageUrl;
@@ -266,7 +266,6 @@ namespace BusinessObject.Service
                         isUpdated = true;
                     }
                 }
-
                 // If no changes were made, return a message indicating no update
                 if (!isUpdated)
                 {
@@ -274,7 +273,6 @@ namespace BusinessObject.Service
                     res.Message = "No changes detected. Package was not updated.";
                     return res;
                 }
-
                 // Perform the update only if changes were made
                 await _repo.UpdatePackage(id, existingPackage);
 

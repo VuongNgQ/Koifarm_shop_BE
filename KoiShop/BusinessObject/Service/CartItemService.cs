@@ -48,7 +48,7 @@ namespace BusinessObject.Service
                     res.Message = "No fish with this Id";
                     return res;
                 }
-                var cartExist = await _cartRepo.GetByIdAsync(itemDTO.CartId);
+                var cartExist = await _cartRepo.GetByIdAsync(itemDTO.UserCartId);
                 if (cartExist == null)
                 {
                     res.Success = false;
@@ -203,7 +203,7 @@ namespace BusinessObject.Service
                     res.Message = "No Cart with this Id";
                     return res;
                 }
-                if (itemCart.Any())
+                if (itemCart.Count != 0)
                 {
                     var mapp = _mapper.Map<IEnumerable<ResponseCartItemDTO>>(itemCart);
                     res.Success = true;
@@ -241,6 +241,7 @@ namespace BusinessObject.Service
                         return res;
                     }
                     exist.Quantity = quantity;
+                    exist.TotalPricePerItem = quantity * exist.Fish?.Price;
                     _repo.Update(exist);
                     res.Success = true;
                     res.Message = "Quantity Updated Successfully";

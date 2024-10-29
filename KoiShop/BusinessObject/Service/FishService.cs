@@ -58,9 +58,10 @@ namespace BusinessObject.Service
                 response.Message = "Category does not exist.";
                 return response;
             }
+            
             var imageService = new CloudinaryService();
             string uploadedImageUrl = string.Empty;
-
+            
             if (createFishDto.ImageUrl != null)
             {
                 // Image is a local file uploaded via a form
@@ -73,7 +74,6 @@ namespace BusinessObject.Service
             var newFish = _mapper.Map<Fish>(createFishDto);
             newFish.ImageUrl = uploadedImageUrl;
             await _fishRepository.AddFishAsync(newFish);
-
             response.Data = _mapper.Map<ResponseFishDTO>(newFish);
             response.Success = true;
             response.Message = "Fish created successfully.";
