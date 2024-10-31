@@ -38,19 +38,7 @@ namespace BusinessObject.Service
                     res.Message = "Name exist";
                     return res;
                 }
-                var imageService = new CloudinaryService();
-                string uploadedImageUrl = string.Empty;
-
-                if (categoryDTO.ImageUrl != null)
-                {
-                    // Image is a local file uploaded via a form
-                    using (var stream = categoryDTO.ImageUrl.OpenReadStream())
-                    {
-                        uploadedImageUrl = await imageService.UploadImageAsync(stream, categoryDTO.ImageUrl.FileName);
-                    }
-                }
                 var mapp = _mapper.Map<Category>(categoryDTO);
-                mapp.ImageUrl = uploadedImageUrl;
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCategoryDTO>(mapp);
                 res.Success = true;
@@ -150,23 +138,6 @@ namespace BusinessObject.Service
 
                 bool isUpdated = false;
 
-                // Handle image upload (either local or from a link)
-                var imageService = new CloudinaryService();
-                string uploadedImageUrl = string.Empty;
-
-                if (categoryDTO.ImageUrl != null)
-                {
-                    // Image is a local file uploaded via a form
-                    using (var stream = categoryDTO.ImageUrl.OpenReadStream())
-                    {
-                        uploadedImageUrl = await imageService.UploadImageAsync(stream, categoryDTO.ImageUrl.FileName.ToString());
-                        if (!string.IsNullOrEmpty(uploadedImageUrl))
-                        {
-                            existCategory.ImageUrl = uploadedImageUrl;
-                            isUpdated = true;
-                        }
-                    }
-                }
 
                 // Check for changes in other fields and update if necessary
                 if (!string.IsNullOrEmpty(categoryDTO.Name) && categoryDTO.Name != existCategory.Name)

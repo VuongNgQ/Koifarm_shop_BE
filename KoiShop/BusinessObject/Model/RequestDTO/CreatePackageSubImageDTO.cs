@@ -9,7 +9,7 @@ namespace BusinessObject.Model.RequestDTO
 {
     public class CreatePackageSubImageDTO
     {
-        public IFormFile SubImageFile { get; set; }
+        public IEnumerable<IFormFile> SubImageFile { get; set; }
         public int FishPackageId { get; set; }
     }
 }

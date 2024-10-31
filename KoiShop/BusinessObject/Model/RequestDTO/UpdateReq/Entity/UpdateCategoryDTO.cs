@@ -11,7 +11,6 @@ namespace BusinessObject.Model.RequestDTO.UpdateReq.Entity
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        public IFormFile ImageUrl { get; set; }
         public string OriginCountry { get; set; }
     }
 }

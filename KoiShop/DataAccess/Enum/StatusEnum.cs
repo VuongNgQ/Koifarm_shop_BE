@@ -6,6 +6,11 @@ using System.Threading.Tasks;
 
 namespace DataAccess.Enum
 {
+    public enum GenderEnum
+    {
+        MALE,
+        FEMALE
+    }
     public enum ProductStatusEnum
     {
         AVAILABLE,
