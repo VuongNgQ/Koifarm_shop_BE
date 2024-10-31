@@ -48,13 +48,30 @@ namespace BusinessObject.Service
                     res.Message = "No Order found";
                     return res;
                 }
-                if (OrderStatusEnum.PENDING.Equals(status.ToUpper().Trim()))
+                if(exist.Status==OrderStatusEnum.COMPLETED||
+                    exist.Status == OrderStatusEnum.CANCELLED)
+                {
+                    res.Success = false;
+                    res.Message = "This Order is Done so you can't change it anymore";
+                    return res;
+                }
+                if (OrderStatusEnum.CANCELLED.Equals(status.ToUpper().Trim()))
+                {
+                    exist.Status = OrderStatusEnum.CANCELLED;
+                }
+                else if (OrderStatusEnum.COMPLETED.Equals(status.ToUpper().Trim()))
+                {
+                    exist.Status = OrderStatusEnum.COMPLETED;
+                }
+                else if (OrderStatusEnum.PENDING.Equals(status.ToUpper().Trim()))
                 {
                     exist.Status = OrderStatusEnum.PENDING;
                 }
-                if (OrderStatusEnum.COMPLETED.Equals(status.ToUpper().Trim()))
+                else
                 {
-                    exist.Status = OrderStatusEnum.COMPLETED;
+                    res.Success = false;
+                    res.Message = "Invalid Status";
+                    return res;
                 }
                 _repo.Update(exist);
                 res.Success = true;

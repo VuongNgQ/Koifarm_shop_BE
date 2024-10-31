@@ -42,7 +42,7 @@ namespace KoiShopController.Controllers
         /// <param name="orderDTO"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> CreateOrder(CreateOrderDTO orderDTO)
+        public async Task<IActionResult> CreateOrder([FromForm]CreateOrderDTO orderDTO)
         {
             var result = await _service.CreateOrder(orderDTO);
             if (result.Success)
