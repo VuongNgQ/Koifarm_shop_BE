@@ -4,6 +4,7 @@ using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using DataAccess.Entity;
+using DataAccess.Enum;
 using DataAccess.IRepo;
 using System;
 using System.Collections.Generic;

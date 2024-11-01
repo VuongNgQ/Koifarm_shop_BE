@@ -1,4 +1,5 @@
 using BusinessObject;
+using BusinessObject.Configuration;
 using BusinessObject.IService;
 using BusinessObject.Service;
 using DataAccess;
@@ -23,6 +24,7 @@ builder.Services.AddCors(options =>
 // Add services to the container.
 var config = builder.Configuration;
 builder.Services.AddControllers();
+builder.Services.AddHttpClient();
 builder.Services.AddDbContext<KoiShopContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DatabaseConnection")));
 
@@ -82,6 +84,7 @@ builder.Services.AddAuthentication(x =>
     };
 });
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<ZaloPayConfig>(builder.Configuration.GetSection("ZaloPaySettings"));
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 

@@ -1,8 +1,10 @@
-﻿using BusinessObject.IService;
+﻿using BusinessObject.Configuration;
+using BusinessObject.IService;
 using BusinessObject.Service;
 using DataAccess;
 using DataAccess.IRepo;
 using DataAccess.Repo;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -57,6 +59,8 @@ namespace BusinessObject
             //Order Item
             services.AddScoped<IOrderItemRepo, OrderItemRepo>();
             services.AddScoped<IOrderItemService, OrderItemService>();
+            //Zalo
+            services.AddScoped<IZaloPayService, ZaloPayService>();
             return services;
         }
     }

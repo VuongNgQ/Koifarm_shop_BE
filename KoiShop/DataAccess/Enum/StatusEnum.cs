@@ -31,7 +31,10 @@ namespace DataAccess.Enum
     }
     public enum ConsignmentStatusEnum
     {
-
+        Pending,
+        Approved,
+        Rejected,
+        Completed
     }
     public enum UserStatusEnum
     {

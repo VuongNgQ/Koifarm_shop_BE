@@ -10,4 +10,17 @@ namespace BusinessObject.Model.RequestDTO
     {
         public string Name { get; set; }
     }
+    public class CreateConsignmentDTO
+    {
+        public int? UserId { get; set; }
+        public int? FishId { get; set; }
+        public int? ConsignmentTypeId { get; set; }
+        public decimal? Price { get; set; }
+        public DateTime? TransferDate { get; set; }
+        public DateTime? ReceiveDate { get; set; }
+        public string? ConditionDescription { get; set; }
+        public List<string>? ImageUrls { get; set; }
+        public string? VideoUrl { get; set; }
+    }
+
 }
