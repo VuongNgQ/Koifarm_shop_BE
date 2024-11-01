@@ -9,7 +9,7 @@ namespace DataAccess.Enum
     public enum ProductStatusEnum
     {
         AVAILABLE,
-        UNAVAILABLE,
+        UNAVAILABLE
     }
     public enum FishStatusEnum
     {
@@ -25,7 +25,10 @@ namespace DataAccess.Enum
     }
     public enum ConsignmentStatusEnum
     {
-
+        Pending,
+        Approved,
+        Rejected,
+        Completed
     }
     public enum UserStatusEnum
     {

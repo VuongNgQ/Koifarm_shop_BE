@@ -8,8 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace KoiShopController.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class FishController : ControllerBase
     {
         private readonly IFishService _fishService;
