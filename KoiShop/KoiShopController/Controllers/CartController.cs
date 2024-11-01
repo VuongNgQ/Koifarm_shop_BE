@@ -12,6 +12,11 @@ namespace KoiShopController.Controllers
         {
             _service = service;
         }
+        /// <summary>
+        /// Get Cart By User ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>A Cart For User with the ID</returns>
         [HttpGet("User/{id}")]
         public async Task<IActionResult> GetByUserId(int id)
         {

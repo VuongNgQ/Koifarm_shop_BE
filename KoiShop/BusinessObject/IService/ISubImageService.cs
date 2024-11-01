@@ -11,8 +11,8 @@ namespace BusinessObject.IService
 {
     public interface ISubImageService
     {
-        Task<ServiceResponseFormat<ResponseSubImageDTO>> CreateFishSubImage(CreateFishSubImageDTO subImageDTO);
-        Task<ServiceResponseFormat<ResponseSubImageDTO>> CreatePackageSubImage(CreatePackageSubImageDTO subImageDTO);
+        Task<ServiceResponseFormat<List<ResponseSubImageDTO>>> CreateFishSubImage(CreateFishSubImageDTO subImageDTO);
+        Task<ServiceResponseFormat<List<ResponseSubImageDTO>>> CreatePackageSubImage(CreatePackageSubImageDTO subImageDTO);
         Task<ServiceResponseFormat<bool>> DeleteSubImage(int id);
         Task<ServiceResponseFormat<IEnumerable<ResponseSubImageDTO>>> GetSubImageByFishId(int id);
         Task<ServiceResponseFormat<IEnumerable<ResponseSubImageDTO>>> GetSubImageByPackageId(int id);

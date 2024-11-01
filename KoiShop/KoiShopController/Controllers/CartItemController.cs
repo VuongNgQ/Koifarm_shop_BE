@@ -28,6 +28,11 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }*/
+        /// <summary>
+        /// Get Item by Cart ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>A list of Item in the Cart</returns>
         [HttpGet("Cart/{id}")]
         public async Task<IActionResult>GetByCartId(int id)
         {
@@ -38,6 +43,11 @@ namespace KoiShopController.Controllers
             }
             return NotFound(result.Message);
         }
+        /// <summary>
+        /// Create Fish Item 
+        /// </summary>
+        /// <param name="itemDTO"></param>
+        /// <returns>Fish Item in Cart</returns>
         [HttpPost("FishSingle")]
         public async Task<IActionResult>CreateFishItem(CreateFishItemDTO itemDTO)
         {
@@ -48,6 +58,11 @@ namespace KoiShopController.Controllers
             }
             return BadRequest(result.Message);
         }
+        /// <summary>
+        /// Create Package Item
+        /// </summary>
+        /// <param name="itemDTO"></param>
+        /// <returns>Package Item in Cart</returns>
         [HttpPost("FishPackage")]
         public async Task<IActionResult>CreatePackageItem(CreatePackageItemDTO itemDTO)
         {
@@ -58,6 +73,11 @@ namespace KoiShopController.Controllers
             }
             return BadRequest(result.Message);
         }
+        /// <summary>
+        /// Delete Item with Item ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
@@ -68,6 +88,12 @@ namespace KoiShopController.Controllers
             }
             return BadRequest(result.Message);
         }
+        /// <summary>
+        /// Update Quantity for Fish Item
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="quantity"></param>
+        /// <returns></returns>
         [HttpPut("FishSingle/{id}&&{quantity}")]
         public async Task<IActionResult> UpdateFishQuantity(int id, int quantity)
         {

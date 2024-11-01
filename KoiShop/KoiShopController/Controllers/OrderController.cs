@@ -15,6 +15,14 @@ namespace KoiShopController.Controllers
         {
             _service = service;
         }
+        /// <summary>
+        /// Get all Orders
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="search"></param>
+        /// <param name="sort"></param>
+        /// <returns>A list of Order</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllOrder(int page = 1, int pageSize = 10, string? search = "", string sort = "")
         {
@@ -28,8 +36,13 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
+        /// <summary>
+        /// Create Order
+        /// </summary>
+        /// <param name="orderDTO"></param>
+        /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> CreateOrder(CreateOrderDTO orderDTO)
+        public async Task<IActionResult> CreateOrder([FromForm]CreateOrderDTO orderDTO)
         {
             var result = await _service.CreateOrder(orderDTO);
             if (result.Success)
@@ -38,6 +51,11 @@ namespace KoiShopController.Controllers
             }
             else { return BadRequest(result.Message); }
         }
+        /// <summary>
+        /// Get Order by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -51,6 +69,11 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
+        /// <summary>
+        /// Delete Order by Order ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Manager")]
         public async Task<IActionResult> DeleteById(int id)
@@ -65,6 +88,12 @@ namespace KoiShopController.Controllers
                 return BadRequest(result.Message);
             }
         }
+        /// <summary>
+        /// Update Order 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="orderDTO">Only update Address, ...Can't Update Item</param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         [Authorize(Roles = "Customer")]
         public async Task<IActionResult> UpdateById([FromRoute]int id, [FromForm]UpdateOrderDTO orderDTO)
@@ -79,6 +108,12 @@ namespace KoiShopController.Controllers
                 return BadRequest(result.Message);
             }
         }
+        /// <summary>
+        /// Change status of Order
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="status">COMPLETE or CANCEL</param>
+        /// <returns></returns>
         [HttpPatch("ChangeStatus/{id}&&{status}")]
         [Authorize(Roles = "Manager, Staff")]
         public async Task<IActionResult> ChangeStatus([FromRoute] int id, string status)

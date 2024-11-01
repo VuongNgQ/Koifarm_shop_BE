@@ -14,6 +14,13 @@ namespace KoiShopController.Controllers
         {
             _service = service;
         }
+        /// <summary>
+        /// Get All Items from All Orders
+        /// </summary>
+        /// <param name="page"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="sort"></param>
+        /// <returns></returns>
         [HttpGet]
         public async Task<IActionResult> GetAllItems(int page = 1, int pageSize = 10, string sort = "")
         {
@@ -27,6 +34,11 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
+        /// <summary>
+        /// Get Items in a Order
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("Order/{id}")]
         public async Task<IActionResult> GetByOrderId(int id)
         {
@@ -37,6 +49,11 @@ namespace KoiShopController.Controllers
             }
             return NotFound(result.Message);
         }
+        /// <summary>
+        /// Create Fish items by bringing all Fish items in Cart to Order
+        /// </summary>
+        /// <param name="itemDTO"></param>
+        /// <returns></returns>
         [HttpPost("FishSingle")]
         public async Task<IActionResult> CreateFishItem(CreateOrderItemDTO itemDTO)
         {
@@ -47,6 +64,11 @@ namespace KoiShopController.Controllers
             }
             return BadRequest(result.Message);
         }
+        /// <summary>
+        /// Create Package items by bringing all Package items in Cart to Order
+        /// </summary>
+        /// <param name="itemDTO"></param>
+        /// <returns></returns>
         [HttpPost("FishPackage")]
         public async Task<IActionResult> CreatePackageItem(CreateOrderItemDTO itemDTO)
         {

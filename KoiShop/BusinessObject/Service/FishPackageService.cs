@@ -49,7 +49,18 @@ namespace BusinessObject.Service
                         uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageUrl.FileName);
                     }
                 }
+                
                 var mapp=_mapper.Map<FishPackage>(package);
+                var genderEnum = package.Gender.ToUpper().Trim();
+                if (GenderEnum.MALE.Equals(genderEnum))
+                {
+                    mapp.Gender = GenderEnum.MALE.ToString();
+                    
+                }
+                else if (GenderEnum.FEMALE.Equals(genderEnum))
+                {
+                    mapp.Gender = GenderEnum.FEMALE.ToString();
+                }
                 mapp.Status = ProductStatusEnum.AVAILABLE;
                 mapp.ImageUrl = uploadedImageUrl;
                 await _repo.CreatePackage(mapp);
@@ -182,13 +193,13 @@ namespace BusinessObject.Service
                     res.Message = "Package not found";
                     return res;
                 }
-                var nameExist = await _repo.FindAsync(p => p.Name == package.Name);
-                if (nameExist.Any())
+                /*var nameExist = await _repo.FindAsync(p => p.Name == package.Name && p.FishPackageId != id);
+                if (nameExist != null)
                 {
                     res.Success = false;
-                    res.Message = "Name exist";
+                    res.Message = "Another package with the same name already exists.";
                     return res;
-                }
+                }*/
                 bool isUpdated = false;
 
                 // Handle image upload (either local or from a link)
@@ -212,6 +223,14 @@ namespace BusinessObject.Service
                 // Check for changes in other fields and update if necessary
                 if (!string.IsNullOrEmpty(package.Name) && package.Name != existingPackage.Name)
                 {
+                    var list=await _repo.GetAllAsync();
+                    var exc = list.Where(i => i.FishPackageId != id);
+                    if(exc.Any(n=>n.Name==package.Name))
+                    {
+                        res.Success = false;
+                        res.Message = "Name Existed";
+                        return res;
+                    }
                     existingPackage.Name = package.Name;
                     isUpdated = true;
                 }
@@ -251,7 +270,22 @@ namespace BusinessObject.Service
                     existingPackage.DailyFood = package.DailyFood.Value;
                     isUpdated = true;
                 }
+                if (!string.IsNullOrEmpty(package.Gender))
+                {
+                    var genderEnum = package.Gender.ToUpper().Trim();
+                    if (GenderEnum.MALE.Equals(genderEnum))
+                    {
+                        existingPackage.Gender = GenderEnum.MALE.ToString();
+                        isUpdated = true;
 
+                    }
+                    else if (GenderEnum.FEMALE.Equals(genderEnum))
+                    {
+                        existingPackage.Gender = GenderEnum.FEMALE.ToString();
+                        isUpdated = true;
+                    }
+                }
+                
                 if (!string.IsNullOrEmpty(package.Status))
                 {
                     var statusEnum = package.Status.ToUpper().Trim();

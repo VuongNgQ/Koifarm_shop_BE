@@ -79,13 +79,14 @@ namespace BusinessObject.Service
             }
         }
 
-        
 
-        public async Task<ServiceResponseFormat<ResponseSubImageDTO>> CreateFishSubImage(CreateFishSubImageDTO subImageDTO)
+
+        public async Task<ServiceResponseFormat<List<ResponseSubImageDTO>>> CreateFishSubImage(CreateFishSubImageDTO subImageDTO)
         {
-            var res = new ServiceResponseFormat<ResponseSubImageDTO>();
+            var res = new ServiceResponseFormat<List<ResponseSubImageDTO>>();
             try
             {
+                // Check if the fish exists
                 var fishExist = await _fishRepo.GetFishByIdAsync(subImageDTO.FishId);
                 if (fishExist == null)
                 {
@@ -93,85 +94,133 @@ namespace BusinessObject.Service
                     res.Message = "No Fish with this Id";
                     return res;
                 }
-                var subImages=await _repo.GetAllAsync();
-                if (subImages.Where(s => s.FishId == subImageDTO.FishId).Count() > 5)
+
+                // Get all existing sub-images for this fish
+                var subImages = await _repo.GetAllAsync();
+                int existingImageCount = subImages.Count(s => s.FishId == subImageDTO.FishId);
+
+                // Check if adding the new images would exceed the limit of 5
+                if (existingImageCount + subImageDTO.SubImageFile.Count() > 5)
                 {
                     res.Success = false;
                     res.Message = "You reached Max Images";
                     return res;
                 }
-                string uploadedImageUrl = string.Empty;
+
                 var imageService = new CloudinaryService();
-                if (subImageDTO.SubImageFile != null)
+                var uploadedSubImages = new List<ResponseSubImageDTO>();
+
+                // Loop through each image file and upload
+                foreach (var imageFile in subImageDTO.SubImageFile)
                 {
-                    // Image is a local file uploaded via a form
-                    using (var stream = subImageDTO.SubImageFile.OpenReadStream())
+                    string uploadedImageUrl = string.Empty;
+
+                    // Upload image if it's a valid file
+                    if (imageFile != null)
                     {
-                        uploadedImageUrl = await imageService.UploadImageAsync(stream, subImageDTO.SubImageFile.FileName);
+                        using (var stream = imageFile.OpenReadStream())
+                        {
+                            uploadedImageUrl = await imageService.UploadImageAsync(stream, imageFile.FileName);
+                        }
+
+                        // Map DTO to SubImage entity and save URL
+                        var newSubImage = new SubImage
+                        {
+                            FishId = subImageDTO.FishId,
+                            SubImageURL = uploadedImageUrl
+                        };
+
+                        await _repo.AddAsync(newSubImage);
+
+                        // Map to response DTO and add to the result list
+                        var result = _mapper.Map<ResponseSubImageDTO>(newSubImage);
+                        uploadedSubImages.Add(result);
                     }
                 }
-                var mapp = _mapper.Map<SubImage>(subImageDTO);
-                mapp.SubImageURL = uploadedImageUrl;
-                await _repo.AddAsync(mapp);
-                var result = _mapper.Map<ResponseSubImageDTO>(mapp);
+
                 res.Success = true;
-                res.Message = "Sub Image Created Successfully";
-                res.Data = result;
+                res.Message = "Sub Images Created Successfully";
+                res.Data = uploadedSubImages;
                 return res;
             }
             catch (Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to create Sub Image:{ex.Message}";
+                res.Message = $"Fail to create Sub Images: {ex.Message}";
                 return res;
             }
         }
 
-        public async Task<ServiceResponseFormat<ResponseSubImageDTO>> CreatePackageSubImage(CreatePackageSubImageDTO subImageDTO)
+        public async Task<ServiceResponseFormat<List<ResponseSubImageDTO>>> CreatePackageSubImage(CreatePackageSubImageDTO subImageDTO)
         {
-            var res = new ServiceResponseFormat<ResponseSubImageDTO>();
+            var res = new ServiceResponseFormat<List<ResponseSubImageDTO>>();
             try
             {
-                var fishExist = await _fishPackageRepo.GetFishPackage(subImageDTO.FishPackageId);
-                if (fishExist == null)
+                // Check if the fish package exists
+                var fishPackageExist = await _fishPackageRepo.GetFishPackage(subImageDTO.FishPackageId);
+                if (fishPackageExist == null)
                 {
                     res.Success = false;
                     res.Message = "No Package with this Id";
                     return res;
                 }
+
+                // Get all existing sub-images for this package
                 var subImages = await _repo.GetAllAsync();
-                if (subImages.Where(s => s.FishPackageId == subImageDTO.FishPackageId).Count() > 5)
+                int existingImageCount = subImages.Count(s => s.FishPackageId == subImageDTO.FishPackageId);
+
+                // Check if adding the new images would exceed the limit of 5
+                if (existingImageCount + subImageDTO.SubImageFile.Count() > 5)
                 {
                     res.Success = false;
                     res.Message = "You reached Max Images";
                     return res;
                 }
-                string uploadedImageUrl = string.Empty;
+
                 var imageService = new CloudinaryService();
-                if (subImageDTO.SubImageFile != null)
+                var uploadedSubImages = new List<ResponseSubImageDTO>();
+
+                // Loop through each image file and upload
+                foreach (var imageFile in subImageDTO.SubImageFile)
                 {
-                    // Image is a local file uploaded via a form
-                    using (var stream = subImageDTO.SubImageFile.OpenReadStream())
+                    string uploadedImageUrl = string.Empty;
+
+                    // Upload image if it's a valid file
+                    if (imageFile != null)
                     {
-                        uploadedImageUrl = await imageService.UploadImageAsync(stream, subImageDTO.SubImageFile.FileName);
+                        using (var stream = imageFile.OpenReadStream())
+                        {
+                            uploadedImageUrl = await imageService.UploadImageAsync(stream, imageFile.FileName);
+                        }
+
+                        // Map DTO to SubImage entity and save URL
+                        var newSubImage = new SubImage
+                        {
+                            FishPackageId = subImageDTO.FishPackageId,
+                            SubImageURL = uploadedImageUrl
+                        };
+
+                        await _repo.AddAsync(newSubImage);
+
+                        // Map to response DTO and add to the result list
+                        var result = _mapper.Map<ResponseSubImageDTO>(newSubImage);
+                        uploadedSubImages.Add(result);
                     }
                 }
-                var mapp = _mapper.Map<SubImage>(subImageDTO);
-                mapp.SubImageURL = uploadedImageUrl;
-                await _repo.AddAsync(mapp);
-                var result = _mapper.Map<ResponseSubImageDTO>(mapp);
+
                 res.Success = true;
-                res.Message = "Sub Image Created Successfully";
-                res.Data = result;
+                res.Message = "Sub Images Created Successfully";
+                res.Data = uploadedSubImages;
                 return res;
             }
             catch (Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to create Sub Image:{ex.Message}";
+                res.Message = $"Fail to create Sub Images: {ex.Message}";
                 return res;
             }
         }
+
 
         public async Task<ServiceResponseFormat<bool>> DeleteSubImage(int id)
         {
