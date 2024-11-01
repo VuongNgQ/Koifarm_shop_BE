@@ -23,5 +23,11 @@ namespace DataAccess.Repo
                 .Include(c => c.OrderItems)
                 .ThenInclude(ci => ci.Package).ToListAsync();
         }
+        public async Task<Order> GetByIdWithItemsAsync(int id)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems) // Includes OrderItems for the specified Order
+                .FirstOrDefaultAsync(o => o.OrderId == id);
+        }
     }
 }

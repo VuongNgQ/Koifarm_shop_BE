@@ -68,12 +68,19 @@ namespace BusinessObject.Mapper
             //Item
             CreateMap<CartItem, CreateFishItemDTO>().ReverseMap();
             CreateMap<CartItem, CreatePackageItemDTO>().ReverseMap();
-            CreateMap<CartItem, ResponseCartItemDTO>().ReverseMap();
+            CreateMap<CartItem, ResponseCartItemDTO>()
+                .ForMember(dest => dest.FishName, opt => opt.MapFrom(src => src.Fish.Name))
+                .ForMember(dest => dest.FishImage, opt => opt.MapFrom(src => src.Fish.ImageUrl))
+                .ForMember(dest => dest.PackageImage, opt => opt.MapFrom(src => src.Package.ImageUrl))
+                .ForMember(dest => dest.PackageName, opt => opt.MapFrom(src => src.Package.Name))
+                .ReverseMap();
 
             CreateMap<OrderItem, CreateFishItemDTO>().ReverseMap();
             CreateMap<OrderItem, CreateOrderItemDTO>().ReverseMap();
             CreateMap<OrderItem, ResponseOrderItemDTO>()
                 .ForMember(dest => dest.FishName, opt => opt.MapFrom(src => src.Fish.Name))
+                .ForMember(dest => dest.FishImage, opt => opt.MapFrom(src => src.Fish.ImageUrl))
+                .ForMember(dest => dest.PackageImage, opt => opt.MapFrom(src => src.Package.ImageUrl))
                 .ForMember(dest => dest.PackageName, opt => opt.MapFrom(src => src.Package.Name))
                 .ReverseMap();
             //Sub Image

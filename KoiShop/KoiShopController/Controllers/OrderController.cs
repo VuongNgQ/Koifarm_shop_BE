@@ -75,7 +75,7 @@ namespace KoiShopController.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Manager")]
+        
         public async Task<IActionResult> DeleteById(int id)
         {
             var result=await _service.DeleteOrder(id);
@@ -95,7 +95,7 @@ namespace KoiShopController.Controllers
         /// <param name="orderDTO">Only update Address, ...Can't Update Item</param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        [Authorize(Roles = "Customer")]
+        
         public async Task<IActionResult> UpdateById([FromRoute]int id, [FromForm]UpdateOrderDTO orderDTO)
         {
             var result = await _service.UpdateOrder(id, orderDTO);
@@ -115,7 +115,7 @@ namespace KoiShopController.Controllers
         /// <param name="status">COMPLETE or CANCEL</param>
         /// <returns></returns>
         [HttpPatch("ChangeStatus/{id}&&{status}")]
-        [Authorize(Roles = "Manager, Staff")]
+        
         public async Task<IActionResult> ChangeStatus([FromRoute] int id, string status)
         {
             var result = await _service.ChangeStatus(id, status);

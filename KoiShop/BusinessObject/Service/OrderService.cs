@@ -165,28 +165,44 @@ namespace BusinessObject.Service
             var res = new ServiceResponseFormat<bool>();
             try
             {
-                var exist = await _repo.GetByIdAsync(id);
+                
+                var exist = await _repo.GetByIdWithItemsAsync(id); 
                 if (exist != null)
                 {
+                    if(exist.Status!=OrderStatusEnum.PENDING&&
+                        exist.Status != OrderStatusEnum.CANCELLED)
+                    {
+                        res.Success = false;
+                        res.Message = "You can't delete the COMPLETE or ONPORT Orders";
+                        res.Data = false;
+                    }
+                    if (exist.OrderItems != null && exist.OrderItems.Any())
+                    {
+                        _itemRepo.RemoveRange(exist.OrderItems);
+                    }
                     _repo.Remove(exist);
+                    
                     res.Success = true;
-                    res.Message = "Delete Order Successfully";
-                    return res;
+                    res.Message = "Order and associated items deleted successfully";
+                    res.Data = true;
                 }
                 else
                 {
                     res.Success = false;
-                    res.Message = "No Order";
-                    return res;
+                    res.Message = "No order found with the given ID";
+                    res.Data = false;
                 }
             }
             catch (Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to delete Order:{ex.Message}";
-                return res;
+                res.Message = $"Failed to delete order: {ex.Message}";
+                res.Data = false;
             }
+
+            return res;
         }
+
 
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> GetOrderById(int id)
         {
