@@ -19,7 +19,9 @@ namespace DataAccess.Repo
 
         public async Task<IEnumerable<Order>> GetAllOrder()
         {
-            return await _context.Set<Order>().Include(a=>a.Address).Include(u=>u.User).Include(o=>o.OrderItems).ToListAsync();
+            return await _context.Set<Order>().Include(a=>a.Address).Include(u=>u.User).Include(o=>o.OrderItems).ThenInclude(c => c.Fish)
+                .Include(c => c.OrderItems)
+                .ThenInclude(ci => ci.Package).ToListAsync();
         }
     }
 }

@@ -30,14 +30,6 @@ namespace BusinessObject.Service
             var res = new ServiceResponseFormat<ResponseFishPackageDTO>();
             try
             {
-                // Handle image upload (either local or from a link)
-                var nameExist = await _repo.FindAsync(p=>p.Name==package.Name);
-                if(nameExist.Any())
-                {
-                    res.Success = false;
-                    res.Message = "Name exist";
-                    return res;
-                }
                 var imageService = new CloudinaryService();
                 string uploadedImageUrl = string.Empty;
 
@@ -51,15 +43,16 @@ namespace BusinessObject.Service
                 }
                 
                 var mapp=_mapper.Map<FishPackage>(package);
-                var genderEnum = package.Gender.ToUpper().Trim();
-                if (GenderEnum.MALE.Equals(genderEnum))
+                // Gender validation and conversion
+                if (Enum.TryParse<GenderEnum>(package.Gender.ToUpper().Trim(), out var parsedGender))
                 {
-                    mapp.Gender = GenderEnum.MALE.ToString();
-                    
+                    mapp.Gender = parsedGender.ToString();
                 }
-                else if (GenderEnum.FEMALE.Equals(genderEnum))
+                else
                 {
-                    mapp.Gender = GenderEnum.FEMALE.ToString();
+                    res.Success = false;
+                    res.Message = "Invalid Gender";
+                    return res;
                 }
                 mapp.Status = ProductStatusEnum.AVAILABLE;
                 mapp.ImageUrl = uploadedImageUrl;
@@ -223,14 +216,6 @@ namespace BusinessObject.Service
                 // Check for changes in other fields and update if necessary
                 if (!string.IsNullOrEmpty(package.Name) && package.Name != existingPackage.Name)
                 {
-                    var list=await _repo.GetAllAsync();
-                    var exc = list.Where(i => i.FishPackageId != id);
-                    if(exc.Any(n=>n.Name==package.Name))
-                    {
-                        res.Success = false;
-                        res.Message = "Name Existed";
-                        return res;
-                    }
                     existingPackage.Name = package.Name;
                     isUpdated = true;
                 }
