@@ -10,8 +10,8 @@ namespace BusinessObject.IService
 {
     public interface IZaloPayService
     {
-        Task<ZaloPayCreateOrderResponseDTO> CreateOrder(decimal amount, string orderId, string description);
+        Task<ZaloPayCreateOrderResponseDTO> CreateOrder(ZaloPayRequestDTO request);
         Task<string> RefundOrder(string zpTransId, decimal amount, string description);
-        bool VerifyCallback(ZaloPayCallbackRequestDTO request);
+        Task<bool> HandleCallbackAsync(ZaloPayCallbackRequestDTO request);
     }
 }
