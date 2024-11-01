@@ -1,5 +1,6 @@
 ﻿using DataAccess.Entity;
 using DataAccess.IRepo;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,11 @@ namespace DataAccess.Repo
         public OrderItemRepo(KoiShopContext context):base(context) 
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<OrderItem>> GetItemsByOrderId(int orderId)
+        {
+            return await _context.OrderItems.Where(c => c.OrderId == orderId).ToListAsync();
         }
     }
 }
