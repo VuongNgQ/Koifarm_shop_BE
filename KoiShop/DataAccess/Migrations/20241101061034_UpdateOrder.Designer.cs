@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241025144619_UpdateCartItem")]
-    partial class UpdateCartItem
+    [Migration("20241101061034_UpdateOrder")]
+    partial class UpdateOrder
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -253,6 +253,9 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FishConsignmentId"));
 
+                    b.Property<string>("ConditionDescription")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("ConsignmentStatusId")
                         .HasColumnType("int");
 
@@ -268,6 +271,9 @@ namespace DataAccess.Migrations
                     b.Property<int?>("FishStatusId")
                         .HasColumnType("int");
 
+                    b.Property<string>("ImageUrls")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -279,6 +285,9 @@ namespace DataAccess.Migrations
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
+
+                    b.Property<string>("VideoUrl")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("FishConsignmentId");
 
@@ -344,6 +353,9 @@ namespace DataAccess.Migrations
 
                     b.Property<int?>("AddressId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("CompleteDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool?>("IsSent")
                         .HasColumnType("bit");

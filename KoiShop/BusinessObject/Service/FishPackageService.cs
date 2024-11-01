@@ -51,15 +51,16 @@ namespace BusinessObject.Service
                 }
                 
                 var mapp=_mapper.Map<FishPackage>(package);
-                var genderEnum = package.Gender.ToUpper().Trim();
-                if (GenderEnum.MALE.Equals(genderEnum))
+                // Gender validation and conversion
+                if (Enum.TryParse<GenderEnum>(package.Gender.ToUpper().Trim(), out var parsedGender))
                 {
-                    mapp.Gender = GenderEnum.MALE.ToString();
-                    
+                    mapp.Gender = parsedGender.ToString();
                 }
-                else if (GenderEnum.FEMALE.Equals(genderEnum))
+                else
                 {
-                    mapp.Gender = GenderEnum.FEMALE.ToString();
+                    res.Success = false;
+                    res.Message = "Invalid Gender";
+                    return res;
                 }
                 mapp.Status = ProductStatusEnum.AVAILABLE;
                 mapp.ImageUrl = uploadedImageUrl;
