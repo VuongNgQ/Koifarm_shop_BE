@@ -35,7 +35,40 @@ namespace BusinessObject.Service
             _userRepo = userRepo;
             _itemRepo = itemRepo;
         }
-
+        public async Task<ServiceResponseFormat<bool>> FinishOrder(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var exist=await _repo.GetByIdAsync(id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Order found";
+                    return res;
+                }
+                else if(exist.Status==OrderStatusEnum.ONPORT)
+                {
+                    exist.Status = OrderStatusEnum.COMPLETED;
+                    _repo.Update(exist);
+                    res.Success = true;
+                    res.Message = "Order Updated Successfully";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Order may have COMPLETED/CANCELED";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to Update Order:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
         {
             var res = new ServiceResponseFormat<bool>();
@@ -219,7 +252,7 @@ namespace BusinessObject.Service
             catch (Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to get User:{ex.Message}";
+                res.Message = $"Fail to get Order:{ex.Message}";
             }
             return res;
         }

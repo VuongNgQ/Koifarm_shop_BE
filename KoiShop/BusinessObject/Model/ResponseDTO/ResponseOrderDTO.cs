@@ -13,6 +13,7 @@ namespace BusinessObject.Model.ResponseDTO
         public string UserName {  get; set; }
         public DateTime? OrderDate { get; set; }
         public decimal TotalPrice { get; set; }
+        public DateTime? CompleteDate { get; set; }
         public string Status { get; set; }
         public int PaymentMethodId { get; set; }
         public bool IsSent { get; set; }

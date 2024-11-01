@@ -1,5 +1,6 @@
 ﻿using DataAccess.Entity;
 using DataAccess.IRepo;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,13 @@ namespace DataAccess.Repo
         public CartItemRepo(KoiShopContext context):base(context) 
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<CartItem>> GetAll()
+        {
+            return await _context.Set<CartItem>().Include(c => c.Fish)
+                .Include(ci => ci.Package)
+                .ToListAsync();
         }
     }
 }
