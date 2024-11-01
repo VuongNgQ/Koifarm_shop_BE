@@ -36,11 +36,11 @@ namespace KoiShopController.Controllers
 
         //    return Ok(new { PaymentUrl = result.Data });
         //}
-        public async Task<IActionResult> CreatePayment(decimal amount, string orderId, string description)
+        public async Task<IActionResult> CreatePayment([FromBody] ZaloPayRequestDTO request)
         {
             try
             {
-                var result = await _zaloPayService.CreateOrder(amount, orderId, description);
+                var result = await _zaloPayService.CreateOrder(request);
                 return Ok(result);
             }
             catch (Exception ex)
@@ -71,14 +71,14 @@ namespace KoiShopController.Controllers
         }
 
         [HttpPost("zalopay-callback")]
-        public IActionResult HandleZaloPayCallback([FromBody] ZaloPayCallbackRequestDTO request)
+        public async Task<IActionResult> ZaloPayCallback([FromBody] ZaloPayCallbackRequestDTO request)
         {
-            bool isValid = _zaloPayService.VerifyCallback(request);
-            if (isValid)
+            var result = await _zaloPayService.HandleCallbackAsync(request);
+            if (result)
             {
-                return Ok("Giao dịch hợp lệ");
+                return Ok(new { message = "Cập nhật trạng thái đơn hàng thành công" });
             }
-            return BadRequest("Giao dịch không hợp lệ");
+            return BadRequest(new { message = "Xác thực hoặc cập nhật không thành công" });
         }
     }
 }

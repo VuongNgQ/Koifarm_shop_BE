@@ -43,44 +43,50 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ZaloPayCreateOrderResponseDTO> CreateOrder(decimal amount, string orderId, string description)
+        public async Task<ZaloPayCreateOrderResponseDTO> CreateOrder(ZaloPayRequestDTO request)
         {
-            if (amount <= 0)
-            {
-                throw new ArgumentException("Amount must be greater than 0.");
-            }
-
-            if (string.IsNullOrWhiteSpace(orderId))
-            {
-                throw new ArgumentException("OrderId cannot be null or empty.");
-            }
-
-            if (string.IsNullOrWhiteSpace(description))
-            {
-                throw new ArgumentException("Description cannot be null or empty.");
-            }
-            var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            var embedData = "{}";
-            //var embedData = JsonConvert.SerializeObject(new { redirecturl = "https://yourwebsite.com/return" });
-            var amountInVND = (int)(amount * 1000);
-            var items = "[]";
-            var data = $"{_configuration["ZaloPaySettings:AppId"]}|{orderId}|{amount}|{appTime}|{embedData}|{items}";
+            var appId = _configuration["ZaloPaySettings:AppId"];
+            var key1 = _configuration["ZaloPaySettings:Key1"];
+            var transId = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var embedData = JsonConvert.SerializeObject(new { redirecturl = "your_redirect_url" });
+            var item = "[{\"itemid\":\"knb\",\"itemname\":\"kim nguyen bao\",\"itemquantity\":10,\"itemprice\":50000}]";
+            var data = $"{appId}|{transId}|user_id|{request.Amount}|{appTime}|{embedData}|{item}";
             var mac = GenerateSignature(data, _configuration["ZaloPaySettings:Key1"]);
+            //=====================
+            //var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+            //var embedData = "{}";
+            ////var embedData = JsonConvert.SerializeObject(new { redirecturl = "https://yourwebsite.com/return" });
+            //var amountInVND = (int)(amount * 1000);
+            //var items = "[]";
+            //var data = $"{_configuration["ZaloPaySettings:AppId"]}|{orderId}|{amount}|{appTime}|{embedData}|{items}";
+            //var mac = GenerateSignature(data, _configuration["ZaloPaySettings:Key1"]);
+            //var requestData = new Dictionary<string, object>
+            //{
+            //{ "appid", _configuration["ZaloPaySettings:AppId"] },
+            //{ "apptransid", orderId },
+            //{ "apptime", appTime },
+            //{ "amount", amountInVND },
+            //{ "appuser", "user123" },
+            //{ "description", description },
+            //{ "embeddata", embedData },
+            //{ "item", items },
+            //{ "mac", mac }
+            //};
+            var paymentData = new
+            {
+                app_id = appId,
+                app_trans_id = transId,
+                app_user = "user123",
+                amount = request.Amount,
+                app_time = appTime,
+                embed_data = embedData,
+                item = item,
+                description = request.Description,
+                mac = mac
+            };
 
-            var requestData = new Dictionary<string, object>
-        {
-            { "appid", _configuration["ZaloPaySettings:AppId"] },
-            { "apptransid", orderId },
-            { "apptime", appTime },
-            { "amount", amountInVND },
-            { "appuser", "user123" },
-            { "description", description },
-            { "embeddata", embedData },
-            { "item", items },
-            { "mac", mac }
-        };
-
-            var content = new StringContent(JsonConvert.SerializeObject(requestData), Encoding.UTF8, "application/json");
+            var content = new StringContent(JsonConvert.SerializeObject(paymentData), Encoding.UTF8, "application/json");
             var response = await _httpClient.PostAsync(_configuration["ZaloPaySettings:Endpoint"], content);
             var responseContent = await response.Content.ReadAsStringAsync();
 
@@ -91,12 +97,10 @@ namespace BusinessObject.Service
 
             // Deserialize JSON response
             var zaloResponse = JsonConvert.DeserializeObject<ZaloPayCreateOrderResponseDTO>(responseContent);
-
-            // Check return code from ZaloPay response
-            if (zaloResponse.ReturnCode != 1)
-            {
-                throw new Exception($"ZaloPay returned error: {zaloResponse.ReturnMessage}");
-            }
+            //if (zaloResponse.ReturnCode != 1)
+            //{
+            //    throw new Exception($"ZaloPay returned error: {zaloResponse.ReturnMessage}");
+            //}
 
             return zaloResponse;
         }
@@ -128,11 +132,27 @@ namespace BusinessObject.Service
 
             return responseContent;
         }
-        public bool VerifyCallback(ZaloPayCallbackRequestDTO request)
+        public async Task<bool> HandleCallbackAsync(ZaloPayCallbackRequestDTO callbackRequest)
         {
-            var data = request.data;
-            var macLocal = GenerateSignature(data, _configuration["ZaloPaySettings:Key2"]);
-            return macLocal == request.mac;
+            //var data = request.data;
+            //var macLocal = GenerateSignature(data, _configuration["ZaloPaySettings:Key2"]);
+            //return macLocal == request.mac;
+            var key2 = _configuration["ZaloPaySettings:Key2"];
+            var data = $"{callbackRequest.AppId}|{callbackRequest.AppTransId}|{callbackRequest.Amount}|{callbackRequest.AppTime}|{callbackRequest.ResultCode}";
+            var mac = GenerateSignature(data, key2);
+
+            if (mac != callbackRequest.Mac)
+            {
+                return false;
+            }
+            if (callbackRequest.ResultCode == 1) // 1 = Thanh toán thành công
+            {
+                // Cập nhật trạng thái đơn hàng trong hệ thống của bạn
+                // Logic cập nhật đơn hàng như đổi trạng thái đơn hàng thành "Đã thanh toán"
+                return true;
+            }
+
+            return false;
         }
     }
 }
