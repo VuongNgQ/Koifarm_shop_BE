@@ -10,5 +10,6 @@ namespace DataAccess.IRepo
     public interface IOrderRepo:IBaseRepo<Order>
     {
         Task<IEnumerable<Order>> GetAllOrder();
+        Task<Order> GetByIdWithItemsAsync(int id);
     }
 }
