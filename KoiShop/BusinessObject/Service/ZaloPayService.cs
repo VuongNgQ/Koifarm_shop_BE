@@ -47,12 +47,15 @@ namespace BusinessObject.Service
         {
             var appId = _configuration["ZaloPaySettings:AppId"];
             var key1 = _configuration["ZaloPaySettings:Key1"];
-            var transId = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-            var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            // Lấy múi giờ Việt Nam
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"); var vietnamTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, vietnamTimeZone);
+            //var transId = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            var transId = $"{vietnamTime:yyMMdd}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+            var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             var embedData = JsonConvert.SerializeObject(new { redirecturl = "your_redirect_url" });
-            var item = "[{\"itemid\":\"knb\",\"itemname\":\"kim nguyen bao\",\"itemquantity\":10,\"itemprice\":50000}]";
-            var data = $"{appId}|{transId}|user_id|{request.Amount}|{appTime}|{embedData}|{item}";
-            var mac = GenerateSignature(data, _configuration["ZaloPaySettings:Key1"]);
+            var items = "[{\"itemid\":\"knb\",\"itemname\":\"kim nguyen bao\",\"itemquantity\":10,\"itemprice\":50000}]";
+            var data = $"{appId}|{transId}|user_id|{request.Amount}|{appTime}|{embedData}|{items}";
+            var hmac = GenerateSignature(data, _configuration["ZaloPaySettings:Key1"]);
             //=====================
             //var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
             //var embedData = "{}";
@@ -77,13 +80,13 @@ namespace BusinessObject.Service
             {
                 app_id = appId,
                 app_trans_id = transId,
-                app_user = "user123",
+                app_user = _configuration["ZaloPaySettings:AppUser"],
                 amount = request.Amount,
                 app_time = appTime,
                 embed_data = embedData,
-                item = item,
+                item = items,
                 description = request.Description,
-                mac = mac
+                mac = hmac
             };
 
             var content = new StringContent(JsonConvert.SerializeObject(paymentData), Encoding.UTF8, "application/json");

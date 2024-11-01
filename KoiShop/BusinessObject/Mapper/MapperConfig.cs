@@ -80,6 +80,8 @@ namespace BusinessObject.Mapper
             CreateMap<SubImage, CreateFishSubImageDTO>().ReverseMap();
             CreateMap<SubImage, CreatePackageSubImageDTO>().ReverseMap();
             CreateMap<SubImage, ResponseSubImageDTO>().ReverseMap();
+            //Fish Consignment
+            CreateMap<FishConsignment, FishConsignmentDTO>().ReverseMap();
         }
     }
 }
