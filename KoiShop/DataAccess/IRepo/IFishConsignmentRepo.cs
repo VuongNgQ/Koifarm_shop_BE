@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace DataAccess.IRepo
 {
-
     public interface IFishConsignmentRepo
     {
-        //Task<int> CreateConsignmentAsync(FishConsignment consignment);
-        Task AddAsync(FishConsignment consignment);
-        Task<FishConsignment?> GetConsignmentByIdAsync(int consignmentId);
-        Task<List<FishConsignment>> GetAllConsignmentsAsync();
-        Task UpdateConsignmentAsync(FishConsignment consignment);
+        Task<FishConsignment?> GetFishConsignmentByIdAsync(int id);
+        Task<IEnumerable<FishConsignment>> GetAllFishConsignmentAsync();
+        Task<IEnumerable<FishConsignment>> GetConsignmentsByUserIdAsync(int userId);
+        Task<FishConsignment?> AddFishConsignmentAsync(FishConsignment consignment);
+        Task<FishConsignment?> UpdateFishConsignmentAsync(FishConsignment consignment);
+        Task DeleteFishConsignmentAsync(int id);
     }
 }

@@ -16,30 +16,48 @@ namespace DataAccess.Repo
         {
             _context = context;
         }
-        public async Task AddAsync(FishConsignment consignment)
+        public async Task<FishConsignment?> GetFishConsignmentByIdAsync(int id)
+        {
+            return await _context.FishConsignments
+                .Include(fc => fc.User)
+                .Include(fc => fc.Fish)
+                .Include(fc => fc.Payments)
+                .FirstOrDefaultAsync(fc => fc.FishConsignmentId == id);
+        }
+        public async Task<IEnumerable<FishConsignment>> GetAllFishConsignmentAsync()
+        {
+            return await _context.FishConsignments
+                .Include(fc => fc.User)
+                .Include(fc => fc.Fish)
+                .Include(fc => fc.Payments)
+                .ToListAsync();
+        }
+        public async Task<IEnumerable<FishConsignment>> GetConsignmentsByUserIdAsync(int userId)
+        {
+            return await _context.FishConsignments.Where(c => c.UserId == userId).ToListAsync();
+        }
+        public async Task<FishConsignment?> AddFishConsignmentAsync(FishConsignment consignment)
         {
             await _context.FishConsignments.AddAsync(consignment);
             await _context.SaveChangesAsync();
+            return await _context.FishConsignments.FirstOrDefaultAsync(f => f.FishConsignmentId ==consignment.FishConsignmentId);
         }
 
-        public async Task<FishConsignment?> GetConsignmentByIdAsync(int consignmentId)
+        public async Task<FishConsignment?> UpdateFishConsignmentAsync(FishConsignment consignment)
         {
-            return await _context.FishConsignments.FindAsync(consignmentId);
-        }
-
-        public async Task<List<FishConsignment>> GetAllConsignmentsAsync()
-        {
-            return await _context.FishConsignments.ToListAsync();
-        }
-        public async Task UpdateConsignmentAsync(FishConsignment consignment)
-        {
-            var existingConsignment = await _context.FishConsignments.FindAsync(consignment.FishConsignmentId);
-            if (existingConsignment == null)
-                throw new KeyNotFoundException("Consignment not found.");
-
-            _context.Entry(existingConsignment).CurrentValues.SetValues(consignment);
-
+            _context.FishConsignments.Update(consignment);
             await _context.SaveChangesAsync();
+            return await _context.FishConsignments.FirstOrDefaultAsync(f => f.FishConsignmentId == consignment.FishConsignmentId);
+        }
+
+        public async Task DeleteFishConsignmentAsync(int id)
+        {
+            var consignment = await GetFishConsignmentByIdAsync(id);
+            if (consignment != null)
+            {
+                _context.FishConsignments.Remove(consignment);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ using BusinessObject.Model.ResponseDTO;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -42,71 +43,133 @@ namespace BusinessObject.Service
                 return BitConverter.ToString(hash).Replace("-", "").ToLower();
             }
         }
+        public async Task<JObject> SendPostAsync(string url, Dictionary<string, string> formData)
+        {
+            // Tạo đối tượng FormUrlEncodedContent, nó sẽ tự động thêm Content-Type header
+            var content = new FormUrlEncodedContent(formData);
+
+            try
+            {
+                // Gửi yêu cầu POST
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    Console.WriteLine("Error: BAD_REQUEST " + await response.Content.ReadAsStringAsync());
+                    return null;
+                }
+
+                // Đọc nội dung phản hồi và chuyển đổi sang JObject
+                var responseString = await response.Content.ReadAsStringAsync();
+                return JObject.Parse(responseString);
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine("Request error: " + e.Message);
+                return null;
+            }
+            catch (JsonException e)
+            {
+                Console.WriteLine("JSON error: " + e.Message);
+                return null;
+            }
+        }
+
 
         public async Task<ZaloPayCreateOrderResponseDTO> CreateOrder(ZaloPayRequestDTO request)
         {
             var appId = _configuration["ZaloPaySettings:AppId"];
             var key1 = _configuration["ZaloPaySettings:Key1"];
-            // Lấy múi giờ Việt Nam
-            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"); var vietnamTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, vietnamTimeZone);
-            //var transId = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+
+            // Lấy thời gian và các thông tin cần thiết
+            var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            var vietnamTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, vietnamTimeZone);
             var transId = $"{vietnamTime:yyMMdd}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+
             var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            var embedData = JsonConvert.SerializeObject(new { redirecturl = "your_redirect_url" });
+            var embedData = "";
             var items = "[{\"itemid\":\"knb\",\"itemname\":\"kim nguyen bao\",\"itemquantity\":10,\"itemprice\":50000}]";
-            var data = $"{appId}|{transId}|user_id|{request.Amount}|{appTime}|{embedData}|{items}";
-            var hmac = GenerateSignature(data, _configuration["ZaloPaySettings:Key1"]);
-            //=====================
-            //var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
-            //var embedData = "{}";
-            ////var embedData = JsonConvert.SerializeObject(new { redirecturl = "https://yourwebsite.com/return" });
-            //var amountInVND = (int)(amount * 1000);
-            //var items = "[]";
-            //var data = $"{_configuration["ZaloPaySettings:AppId"]}|{orderId}|{amount}|{appTime}|{embedData}|{items}";
-            //var mac = GenerateSignature(data, _configuration["ZaloPaySettings:Key1"]);
-            //var requestData = new Dictionary<string, object>
-            //{
-            //{ "appid", _configuration["ZaloPaySettings:AppId"] },
-            //{ "apptransid", orderId },
-            //{ "apptime", appTime },
-            //{ "amount", amountInVND },
-            //{ "appuser", "user123" },
-            //{ "description", description },
-            //{ "embeddata", embedData },
-            //{ "item", items },
-            //{ "mac", mac }
-            //};
-            var paymentData = new
-            {
-                app_id = appId,
-                app_trans_id = transId,
-                app_user = _configuration["ZaloPaySettings:AppUser"],
-                amount = request.Amount,
-                app_time = appTime,
-                embed_data = embedData,
-                item = items,
-                description = request.Description,
-                mac = hmac
-            };
 
-            var content = new StringContent(JsonConvert.SerializeObject(paymentData), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(_configuration["ZaloPaySettings:Endpoint"], content);
-            var responseContent = await response.Content.ReadAsStringAsync();
+            // Tạo chữ ký HMAC
+            var data = $"{appId}|{transId}|{_configuration["ZaloPaySettings:AppUser"]}|{request.Amount}|{appTime}|{embedData}|{items}";
+            var hmac = GenerateSignature(data, key1);
 
-            if (!response.IsSuccessStatusCode)
+            // Chuẩn bị dữ liệu dưới dạng Dictionary cho form-urlencoded
+            var formData = new Dictionary<string, string>
+    {
+        { "app_id", appId },
+        { "app_user", _configuration["ZaloPaySettings:AppUser"] },
+        { "app_time", appTime },
+        { "amount", request.Amount.ToString() },
+        { "bank_code", "" },
+        { "app_trans_id", transId },
+        { "embed_data", embedData },
+        { "item", items },
+        { "callback_url", "" },
+        { "description", request.Description },
+        { "mac", hmac }
+    };
+            Console.WriteLine(JsonConvert.SerializeObject(formData));
+
+            // Gọi phương thức SendPostAsync để gửi yêu cầu
+            var responseJson = await SendPostAsync(_configuration["ZaloPaySettings:Endpoint"], formData);
+
+            if (responseJson == null)
             {
-                throw new Exception($"Error creating ZaloPay order: {responseContent}");
+                throw new Exception("Error creating ZaloPay order.");
             }
 
-            // Deserialize JSON response
-            var zaloResponse = JsonConvert.DeserializeObject<ZaloPayCreateOrderResponseDTO>(responseContent);
-            //if (zaloResponse.ReturnCode != 1)
-            //{
-            //    throw new Exception($"ZaloPay returned error: {zaloResponse.ReturnMessage}");
-            //}
-
+            // Deserialize response JSON thành đối tượng ZaloPayCreateOrderResponseDTO
+            var zaloResponse = responseJson.ToObject<ZaloPayCreateOrderResponseDTO>();
             return zaloResponse;
         }
+
+        //public async Task<ZaloPayCreateOrderResponseDTO> CreateOrder(ZaloPayRequestDTO request)
+        //{
+        //    var appId = _configuration["ZaloPaySettings:AppId"];
+        //    var key1 = _configuration["ZaloPaySettings:Key1"];
+        //    // Lấy múi giờ Việt Nam
+        //    var vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time"); var vietnamTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, vietnamTimeZone);
+        //    //var transId = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+        //    var transId = $"{vietnamTime:yyMMdd}_{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}";
+        //    Random rnd = new Random();
+        //    var app_trans_id = rnd.Next(1000000);
+        //    var user_id = _configuration["ZaloPaySettings:AppUser"];
+        //    //var transId = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString("yyMMdd") + "_" + app_trans_id);
+        //    var appTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+        //    var embedData = "";
+        //    var items = "[{\"itemid\":\"knb\",\"itemname\":\"kim nguyen bao\",\"itemquantity\":10,\"itemprice\":50000}]";
+        //    var data = $"{appId}|{transId}|{user_id}|{request.Amount}|{appTime}|{embedData}|{items}";
+        //    var hmac = GenerateSignature(data, _configuration["ZaloPaySettings:Key1"]);
+        //    var paymentData = new
+        //    {
+        //        app_id = appId,
+        //        app_user = _configuration["ZaloPaySettings:AppUser"],
+        //        app_time = appTime,
+        //        amount = request.Amount,
+        //        bank_code = "",
+        //        app_trans_id = transId,
+        //        embed_data = embedData,
+        //        item = items,
+        //        callback_url = "",
+        //        description = request.Description,
+        //        mac = hmac
+        //    };
+
+        //    var content = new StringContent(JsonConvert.SerializeObject(paymentData), Encoding.UTF8, "application/json");
+
+        //    var response = await _httpClient.PostAsync(_configuration["ZaloPaySettings:Endpoint"], content);
+        //    var responseContent = await response.Content.ReadAsStringAsync();
+
+        //    if (!response.IsSuccessStatusCode)
+        //    {
+        //        throw new Exception($"Error creating ZaloPay order: {responseContent}");
+        //    }
+
+        //    // Deserialize JSON response
+        //    var zaloResponse = JsonConvert.DeserializeObject<ZaloPayCreateOrderResponseDTO>(responseContent);
+        //    return zaloResponse;
+        //}
 
         public async Task<string> RefundOrder(string zpTransId, decimal amount, string description)
         {
