@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccess.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,13 +15,20 @@ namespace BusinessObject.Model.RequestDTO
     {
         public int? UserId { get; set; }
         public int? FishId { get; set; }
-        public int? ConsignmentTypeId { get; set; }
+        public ConsignmentPurpose Purpose { get; set; }
+        public bool IsFromShop { get; set; }
         public decimal? Price { get; set; }
+        public decimal? DepositAmount { get; set; }
         public DateTime? TransferDate { get; set; }
         public DateTime? ReceiveDate { get; set; }
         public string? ConditionDescription { get; set; }
         public List<string>? ImageUrls { get; set; }
         public string? VideoUrl { get; set; }
     }
-
+    public class ApproveConsignmentDTO
+    {
+        public int ConsignmentId { get; set; }
+        public decimal? AgreedPrice { get; set; } // Giá thỏa thuận (chỉ cho ký gửi bán)
+        public decimal? DepositAmount { get; set; } // Tiền cọc (chỉ cho ký gửi chăm sóc)
+    }
 }

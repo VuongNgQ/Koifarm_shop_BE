@@ -1,8 +1,10 @@
 ﻿using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Service;
+using DataAccess.Enum;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 
 namespace KoiShopController.Controllers
 {
@@ -10,19 +12,51 @@ namespace KoiShopController.Controllers
     [ApiController]
     public class PaymentController : ControllerBase
     {
+        private readonly IPaymentService _paymentService;
         private readonly IZaloPayService _zaloPayService;
         private readonly IOrderService _orderService;
 
-        public PaymentController(IZaloPayService zaloPayService, IOrderService orderService)
+        public PaymentController(IZaloPayService zaloPayService, IOrderService orderService, IPaymentService paymentService)
         {
             _zaloPayService = zaloPayService;
             _orderService = orderService;
+            _paymentService = paymentService;
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetPaymentById(int id)
+        {
+            var payment = await _paymentService.GetPaymentByIdAsync(id);
+            if (payment != null)
+                return Ok(payment);
+            return NotFound("Payment not found.");
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllPayments()
+        {
+            var payments = await _paymentService.GetAllPaymentsAsync();
+            return Ok(payments);
+        }
+
+        [HttpPut("{id}/update-status")]
+        public async Task<IActionResult> UpdatePaymentStatus(int id, [FromQuery] PaymentStatus status)
+        {
+            try
+            {
+                await _paymentService.UpdatePaymentStatusAsync(id, status);
+                return Ok("Payment status updated successfully.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         /// <summary>
         /// Tạo yêu cầu thanh toán qua ZaloPay cho đơn hàng hiện có.
         /// </summary>
-        /// <param name="orderId">ID của đơn hàng cần thanh toán.</param>
+        /// <param name="request">ID của đơn hàng cần thanh toán.</param>
         /// <returns>URL thanh toán của ZaloPay.</returns>
         [HttpPost("createPayment/{orderId}")]
         //public async Task<IActionResult> CreatePayment(int orderId)
@@ -41,7 +75,11 @@ namespace KoiShopController.Controllers
             try
             {
                 var result = await _zaloPayService.CreateOrder(request);
-                return Ok(result);
+                if (result == null)
+                {
+                    return BadRequest("Please try again");
+                }
+                    return Ok(result);
             }
             catch (Exception ex)
             {

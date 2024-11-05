@@ -41,7 +41,8 @@ namespace DataAccess
         public DbSet<FAQ> FAQs { get; set; }
         public DbSet<Blog> Blogs { get; set; }
         public DbSet<UserAddress> UserAddresses { get; set; }
-        
+        public DbSet<Payment> Payments { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -150,21 +151,26 @@ namespace DataAccess
             modelBuilder.Entity<FishConsignment>()
                 .HasOne(fc => fc.Fish)
                 .WithMany(f => f.Consignments)
-                .HasForeignKey(fc => fc.FishId);
-
+                .HasForeignKey(fc => fc.FishId)
+                .OnDelete(DeleteBehavior.Restrict);
             // FishConsignment and User (one-to-many)
             modelBuilder.Entity<FishConsignment>()
                 .HasOne(fc => fc.User)
                 .WithMany(u => u.FishConsignments)
-                .HasForeignKey(fc => fc.UserId);
-
-            // FishConsignment and ConsignmentType (one-to-many)
+                .HasForeignKey(fc => fc.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+            // Quan hệ one-to-many giữa FishConsignment và Payment
             modelBuilder.Entity<FishConsignment>()
-                .HasOne(fc => fc.ConsignmentType)
-                .WithMany(ct => ct.FishConsignments)
-                .HasForeignKey(fc => fc.ConsignmentTypeId);
-
-            
+                .HasMany(fc => fc.Payments)
+                .WithOne()
+                .HasForeignKey(p => p.RelatedId)
+                .OnDelete(DeleteBehavior.Cascade);
+            // Configure User relationship with Payment
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.User)
+                .WithMany()
+                .HasForeignKey(p => p.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // PackageConsignment and FishPackage (one-to-many)
             modelBuilder.Entity<PackageConsignment>()

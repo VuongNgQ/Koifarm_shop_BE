@@ -87,6 +87,13 @@ namespace BusinessObject.Mapper
             CreateMap<SubImage, CreateFishSubImageDTO>().ReverseMap();
             CreateMap<SubImage, CreatePackageSubImageDTO>().ReverseMap();
             CreateMap<SubImage, ResponseSubImageDTO>().ReverseMap();
+            //Fish Consignment
+            CreateMap<FishConsignment, FishConsignmentDTO>().ReverseMap();
+            CreateMap<FishConsignment, CreateConsignmentDTO>().ReverseMap();
+            // Trong MapperConfig, thêm mapping cho Payment
+            CreateMap<Payment, PaymentDTO>().ReverseMap();
+            CreateMap<Payment, CreatePaymentDTO>().ReverseMap();
+            CreateMap<Payment, UpdatePaymentDTO>().ReverseMap();
         }
     }
 }

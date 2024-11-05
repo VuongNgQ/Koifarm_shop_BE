@@ -32,7 +32,7 @@ namespace DataAccess.Enum
     }
     public enum ConsignmentStatusEnum
     {
-        Pending,
+        PendingApproval,
         Approved,
         Rejected,
         Completed
@@ -41,5 +41,27 @@ namespace DataAccess.Enum
     {
         ACTIVE,
         INACTIVE
+    }
+    public enum ConsignmentPurpose
+    {
+        Care = 0,
+        Sale = 1
+    }
+    public enum TransactionType
+    {
+        CareConsignment = 0,
+        SaleConsignment = 1,
+        BuyFish = 2,
+        SellFishBatch = 3
+    }
+    public enum PaymentStatus
+    {
+        Pending,
+        Completed,
+        Failed
+    }
+    public enum NotificationStatus
+    {
+
     }
 }
