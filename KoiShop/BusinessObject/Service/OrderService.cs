@@ -92,7 +92,7 @@ namespace BusinessObject.Service
                 {
                     exist.Status = OrderStatusEnum.CANCELLED;
                 }
-                else if (OrderStatusEnum.COMPLETED.Equals(status.ToUpper().Trim()))
+                else if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()))
                 {
                     exist.Status = OrderStatusEnum.COMPLETED;
                 }
@@ -279,41 +279,82 @@ namespace BusinessObject.Service
             try
             {
                 var orders = await _repo.GetAllOrder();
-                var exist = orders.FirstOrDefault(x=>x.OrderId==id&&x.Status == OrderStatusEnum.PENDING);
+                var exist = orders.FirstOrDefault(x => x.OrderId == id && x.Status == OrderStatusEnum.PENDING);
+
                 if (exist != null)
                 {
-                    var mapp = _mapper.Map<Order>(orderDTO);
-                    var addressMap = _mapper.Map<Address>(orderDTO.Address);
-                    if (OrderStatusEnum.PENDING.Equals(orderDTO.Status.ToUpper().Trim()))
+                    bool isUpdated = false; // Flag to track if any updates are made
+
+                    // Check and update status
+                    if (!string.IsNullOrEmpty(orderDTO.Status) && orderDTO.Status != exist.Status.ToString())
                     {
-                        mapp.Status = OrderStatusEnum.PENDING;
+                        if (Enum.TryParse(orderDTO.Status, true, out OrderStatusEnum newStatus))
+                        {
+                            exist.Status = newStatus;
+                            isUpdated = true;
+                        }
                     }
-                    if (OrderStatusEnum.COMPLETED.Equals(orderDTO.Status.ToUpper().Trim()))
+
+                    // Check and update payment method
+                    if (orderDTO.PaymentMethodId > 0 && orderDTO.PaymentMethodId != exist.PaymentMethodId)
                     {
-                        mapp.Status = OrderStatusEnum.COMPLETED;
+                        exist.PaymentMethodId = orderDTO.PaymentMethodId;
+                        isUpdated = true;
                     }
-                    mapp.PaymentMethodId=orderDTO.PaymentMethodId;
-                    mapp.IsSent=orderDTO.IsSent;
-                    _addressRepo.Update(addressMap);
+
+                    // Check and update IsSent
+                    if (orderDTO.IsSent != exist.IsSent)
+                    {
+                        exist.IsSent = orderDTO.IsSent;
+                        isUpdated = true;
+                    }
+
+                    // Check and update address fields if Address is provided
+                    if (orderDTO.Address != null)
+                    {
+                        if (!string.IsNullOrEmpty(orderDTO.Address.Street) && orderDTO.Address.Street != exist.Address.Street)
+                        {
+                            exist.Address.Street = orderDTO.Address.Street;
+                            isUpdated = true;
+                        }
+                        if (!string.IsNullOrEmpty(orderDTO.Address.City) && orderDTO.Address.City != exist.Address.City)
+                        {
+                            exist.Address.City = orderDTO.Address.City;
+                            isUpdated = true;
+                        }
+                        if (!string.IsNullOrEmpty(orderDTO.Address.District) && orderDTO.Address.District != exist.Address.District)
+                        {
+                            exist.Address.District = orderDTO.Address.District;
+                            isUpdated = true;
+                        }
+                    }
+
+                    // If no fields were updated, return a message
+                    if (!isUpdated)
+                    {
+                        res.Success = false;
+                        res.Message = "No fields were updated.";
+                        return res;
+                    }
+
+                    // Save the changes to the database
                     _repo.Update(exist);
-                    var addRes=_mapper.Map<ResponseAddressDTO>(addressMap);
-                    var result = _mapper.Map<ResponseOrderDTO>(exist);
                     res.Success = true;
-                    res.Message = "Order Updated Successfully";
-                    res.Data = result;
+                    res.Message = "Order updated successfully.";
+                    res.Data = _mapper.Map<ResponseOrderDTO>(exist);
                     return res;
                 }
                 else
                 {
                     res.Success = false;
-                    res.Message = "No Order Found ";
+                    res.Message = "No Order Found/Order Completed or Cancelled";
                     return res;
                 }
             }
             catch (Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to update Order:{ex.Message}";
+                res.Message = $"Fail to update Order: {ex.Message}";
                 return res;
             }
         }

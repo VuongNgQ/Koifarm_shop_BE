@@ -9,9 +9,17 @@ namespace BusinessObject.Model.RequestDTO.UpdateReq.Entity
 {
     public class UpdateOrderDTO
     {
-        public string Status { get; set; }
-        public int PaymentMethodId { get; set; }
-        public bool IsSent { get; set; }
-        public CreateAddressDTO Address { get; set; }
+        public string? Status { get; set; }
+        public int? PaymentMethodId { get; set; }
+        public bool? IsSent { get; set; }
+        public UpdateAddressDTO? Address { get; set; }
     }
+
+    public class UpdateAddressDTO
+    {
+        public string? Street { get; set; }
+        public string? City { get; set; }
+        public string? District { get; set; }
+    }
+
 }

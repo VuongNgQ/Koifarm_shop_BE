@@ -50,6 +50,7 @@ namespace BusinessObject.Mapper
             //Addresss
             CreateMap<Address, CreateAddressDTO>().ReverseMap();
             CreateMap<Address, ResponseAddressDTO>().ReverseMap();
+            CreateMap<Address, UpdateAddressDTO>().ReverseMap();
             //Order 
             CreateMap<Order, CreateOrderDTO>()
                 .ForMember(dest => dest.CreateAddressDTO, opt => opt.MapFrom(src => src.Address))
@@ -59,6 +60,9 @@ namespace BusinessObject.Mapper
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.UserId))
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems))
+                .ReverseMap();
+            CreateMap<Order, UpdateOrderDTO>()
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ReverseMap();
             //Payment Method
             CreateMap<PaymentMethod, CreatePaymentMethodDTO>().ReverseMap();
