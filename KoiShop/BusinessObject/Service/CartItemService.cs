@@ -226,9 +226,11 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<bool>> UpdateFishQuantity(int id,int quantity)
+        public async Task<ServiceResponseFormat<bool>> UpdateFishQuantity(int id, int? quantity)
         {
-            var res=new ServiceResponseFormat<bool>();
+            var res = new ServiceResponseFormat<bool>();
+            bool isUpdated = false;
+
             try
             {
                 var exist = await _repo.GetByIdAsync(id);
@@ -237,29 +239,47 @@ namespace BusinessObject.Service
                     if (exist.FishId == null)
                     {
                         res.Success = false;
-                        res.Message = "You can get only 1 package";
+                        res.Message = "You can only update the quantity for fish items.";
                         return res;
                     }
-                    exist.Quantity = quantity;
-                    exist.TotalPricePerItem = quantity * exist.Fish?.Price;
+
+                    // Check and update the quantity if provided
+                    if (quantity.HasValue && quantity.Value != exist.Quantity)
+                    {
+                        exist.Quantity = quantity.Value;
+                        exist.TotalPricePerItem = quantity.Value * (exist.Fish?.Price ?? 0);
+                        isUpdated = true;
+                    }
+
+                    // If nothing was updated, return a message
+                    if (!isUpdated)
+                    {
+                        res.Success = false;
+                        res.Message = "No fields were updated.";
+                        return res;
+                    }
+
+                    // Save the changes if any updates were applied
                     _repo.Update(exist);
                     res.Success = true;
-                    res.Message = "Quantity Updated Successfully";
+                    res.Message = "Quantity updated successfully.";
                     return res;
                 }
                 else
                 {
                     res.Success = false;
-                    res.Message = "No Item Found";
+                    res.Message = "No item found with the provided ID.";
                     return res;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to update quantity:{ex.Message}";
+                res.Message = $"Failed to update quantity: {ex.Message}";
                 return res;
             }
         }
+
+
     }
 }
