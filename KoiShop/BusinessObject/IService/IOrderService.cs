@@ -12,6 +12,7 @@ namespace BusinessObject.IService
     public interface IOrderService
     {
         Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrder(CreateOrderDTO orderDTO);
+        Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrderWithItems(CreateOrderDTO orderDTO);
         Task<ServiceResponseFormat<PaginationModel<ResponseOrderDTO>>> GetOrders(int page, int pageSize,
             string? search, string sort);
         Task<ServiceResponseFormat<ResponseOrderDTO>> GetOrderById(int id);
