@@ -36,7 +36,7 @@ namespace DataAccess.Repo
 
         public async Task<IEnumerable<User>> GetAllUser()
         {
-            return await _context.Set<User>().Include(u => u.Role).Include(u=>u.UserCarts).Include(u=>u.UserAddresses).ThenInclude(u=>u.Address).ToListAsync();
+            return await _context.Set<User>().Include(u => u.Role).Include(u=>u.UserCart).Include(u=>u.UserAddresses).ThenInclude(u=>u.Address).ToListAsync();
         }
         public async Task<User> GetManager()
         {

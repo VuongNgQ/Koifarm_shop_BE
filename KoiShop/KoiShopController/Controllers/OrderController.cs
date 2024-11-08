@@ -51,7 +51,7 @@ namespace KoiShopController.Controllers
             }
             else { return BadRequest(result.Message); }
         }
-        /// <summary>
+        /*/// <summary>
         /// Get Order by ID
         /// </summary>
         /// <param name="id"></param>
@@ -70,7 +70,7 @@ namespace KoiShopController.Controllers
                 return Ok(result);
             }
             else { return BadRequest(result.Message); }
-        }
+        }*/
         /// <summary>
         /// Get Order by ID
         /// </summary>
