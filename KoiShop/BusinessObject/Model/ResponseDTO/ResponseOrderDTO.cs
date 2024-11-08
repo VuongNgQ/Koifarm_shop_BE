@@ -15,7 +15,6 @@ namespace BusinessObject.Model.ResponseDTO
         public decimal TotalPrice { get; set; }
         public DateTime? CompleteDate { get; set; }
         public string Status { get; set; }
-        public int PaymentMethodId { get; set; }
         public bool IsSent { get; set; }
         public ResponseAddressDTO Address { get; set; }
         public List<ResponseOrderItemDTO> Items { get; set; }
