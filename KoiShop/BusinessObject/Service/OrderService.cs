@@ -398,12 +398,7 @@ namespace BusinessObject.Service
                         }
                     }
 
-                    // Check and update payment method
-                    if (orderDTO.PaymentMethodId > 0 && orderDTO.PaymentMethodId != exist.PaymentMethodId)
-                    {
-                        exist.PaymentMethodId = orderDTO.PaymentMethodId;
-                        isUpdated = true;
-                    }
+                    
 
                     // Check and update IsSent
                     if (orderDTO.IsSent != exist.IsSent)

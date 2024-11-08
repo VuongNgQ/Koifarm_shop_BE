@@ -23,7 +23,7 @@ namespace DataAccess
         public DbSet<Permission> Permissions { get; set; }
         public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<PaymentMethod> PaymentMethods { get; set; }
+        
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<CartItem> CartItems { get; set; }
@@ -33,13 +33,11 @@ namespace DataAccess
         
         public DbSet<FishPackage> FishPackages { get; set; }
         public DbSet<FishConsignment> FishConsignments { get; set; }
-        public DbSet<PackageConsignment> PackageConsignments { get; set; }
-        public DbSet<ConsignmentType> ConsignmentTypes { get; set; }
+        
         
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<SubImage> SubImages { get; set; }
-        public DbSet<FAQ> FAQs { get; set; }
-        public DbSet<Blog> Blogs { get; set; }
+        
         public DbSet<UserAddress> UserAddresses { get; set; }
         public DbSet<Payment> Payments { get; set; }
 
@@ -84,12 +82,6 @@ namespace DataAccess
                 .WithMany(u => u.Orders)
                 .HasForeignKey(o => o.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
-
-            // PaymentMethod and Order (one-to-many)
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.PaymentMethod)
-                .WithMany(pm => pm.Orders)
-                .HasForeignKey(o => o.PaymentMethodId);
 
             // OrderItem and Order (one-to-many)
             modelBuilder.Entity<OrderItem>()
@@ -144,9 +136,6 @@ namespace DataAccess
                 .HasOne(f => f.Category)
                 .WithMany(c => c.Fish)
                 .HasForeignKey(f => f.CategoryId);
-
-            
-
             // FishConsignment and Fish (one-to-many)
             modelBuilder.Entity<FishConsignment>()
                 .HasOne(fc => fc.Fish)
@@ -171,60 +160,27 @@ namespace DataAccess
                 .WithMany()
                 .HasForeignKey(p => p.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-            // PackageConsignment and FishPackage (one-to-many)
-            modelBuilder.Entity<PackageConsignment>()
-                .HasOne(pc => pc.Package)
-                .WithMany(fp => fp.Consignments)
-                .HasForeignKey(pc => pc.PackageId);
-
-            // PackageConsignment and User (one-to-many)
-            modelBuilder.Entity<PackageConsignment>()
-                .HasOne(pc => pc.User)
-                .WithMany(u => u.PackageConsignments)
-                .HasForeignKey(pc => pc.UserId);
-
-            // PackageConsignment and ConsignmentType (one-to-many)
-            modelBuilder.Entity<PackageConsignment>()
-                .HasOne(pc => pc.ConsignmentType)
-                .WithMany(ct => ct.PackageConsignments)
-                .HasForeignKey(pc => pc.ConsignmentTypeId);
-
-            
-
             // Feedback and User (one-to-many)
             modelBuilder.Entity<Feedback>()
                 .HasOne(fb => fb.User)
                 .WithMany(u => u.Feedbacks)
                 .HasForeignKey(fb => fb.UserId);
-
-            // Feedback and Fish (one-to-many)
-            modelBuilder.Entity<Feedback>()
-                .HasOne(fb => fb.Fish)
-                .WithMany(f => f.Feedbacks)
-                .HasForeignKey(fb => fb.FishId);
-
             // Feedback and Package (one-to-many)
             modelBuilder.Entity<Feedback>()
-                .HasOne(fb => fb.Package)
+                .HasOne(fb => fb.Order)
                 .WithMany(f => f.Feedbacks)
-                .HasForeignKey(fb => fb.FishId);
-
-           
+                .HasForeignKey(fb => fb.OrderId);
             // Address and Order (one-to-many)
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Address)
                 .WithMany(os => os.Orders)
                 .HasForeignKey(o => o.AddressId);
-            
-           
-            base.OnModelCreating(modelBuilder);
-
             // User and PasswordResetToken
             modelBuilder.Entity<PasswordResetToken>()
                 .HasOne(p => p.User)
                 .WithMany(u => u.PasswordResetTokens)
                 .HasForeignKey(p => p.UserId);
+            base.OnModelCreating(modelBuilder);
         }
 
     }

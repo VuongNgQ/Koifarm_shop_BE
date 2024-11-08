@@ -12,8 +12,6 @@ namespace BusinessObject.Model.RequestDTO
         [Required]
         public int UserId { get; set; }
         [Required]
-        public int PaymentMethodId { get; set; }
-        [Required]
         public bool IsSent { get; set; }
         public CreateAddressDTO CreateAddressDTO { get; set; }
     }
