@@ -19,5 +19,6 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<ResponseOrderDTO>> UpdateOrder(int id, UpdateOrderDTO orderDTO);
         Task<ServiceResponseFormat<bool>> DeleteOrder(int id);
         Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status);
+        Task<ServiceResponseFormat<bool>> FinishOrder(int id);
     }
 }

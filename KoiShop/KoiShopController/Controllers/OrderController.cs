@@ -132,13 +132,31 @@ namespace KoiShopController.Controllers
         /// Change status of Order
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="status">COMPLETE or CANCEL</param>
+        /// <param name="status">COMPLETED or CANCELED</param>
         /// <returns></returns>
         [HttpPatch("ChangeStatus/{id}&&{status}")]
         
         public async Task<IActionResult> ChangeStatus([FromRoute] int id, string status)
         {
             var result = await _service.ChangeStatus(id, status);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
+        }
+        /// <summary>
+        /// Completing Order
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns></returns>
+        [HttpPatch("FinishOrder/{id}")]
+        public async Task<IActionResult> FinishOrder([FromRoute] int id)
+        {
+            var result = await _service.FinishOrder(id);
             if (result.Success)
             {
                 return Ok(result);

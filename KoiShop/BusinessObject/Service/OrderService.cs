@@ -61,9 +61,10 @@ namespace BusinessObject.Service
                     res.Message = "No Order found";
                     return res;
                 }
-                else if(exist.Status==OrderStatusEnum.ONPORT)
+                else if(exist.Status==OrderStatusEnum.ONPORT|| exist.Status == OrderStatusEnum.PENDING)
                 {
                     exist.Status = OrderStatusEnum.COMPLETED;
+                    exist.CompleteDate=DateTime.Now;
                     _repo.Update(exist);
                     res.Success = true;
                     res.Message = "Order Updated Successfully";
