@@ -37,6 +37,26 @@ namespace KoiShopController.Controllers
             }
         }
         /// <summary>
+        /// Create Order with item inside
+        /// </summary>
+        /// <param name="orderDTO"></param>
+        /// <returns></returns>
+        [HttpPost("IncludeItems")]
+        public async Task<IActionResult> CreateOrderWithItem([FromForm] CreateOrderDTO orderDTO)
+        {
+            var result = await _service.CreateOrderWithItems(orderDTO);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else { return BadRequest(result.Message); }
+        }
+        /// <summary>
+        /// Get Order by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <summary>
         /// Create Order
         /// </summary>
         /// <param name="orderDTO"></param>

@@ -8,6 +8,7 @@ using DataAccess;
 using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
+using DataAccess.Repo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +25,17 @@ namespace BusinessObject.Service
         private readonly IUserAddressRepo _uaRepo;
         private readonly IUserRepo _userRepo;
         private readonly IOrderItemRepo _itemRepo;
+        private readonly ICartRepo _cartRepo;
+        private readonly ICartItemRepo _cartItemRepo;
+        private readonly IOrderItemRepo _orderItemRepo;
+
+        private readonly ICartItemService _cartItemService;
+        private readonly IOrderItemService _orderItemService;
         public OrderService(IOrderRepo repo, 
             IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo
-            , IUserRepo userRepo, IOrderItemRepo itemRepo)
+            , IUserRepo userRepo, IOrderItemRepo itemRepo, ICartRepo cartRepo
+            , ICartItemRepo cartItemRepo, IOrderItemRepo orderItemRepo, ICartItemService cartItemService
+            , IOrderItemService orderItemService)
         {
             _repo = repo;
             _mapper = mapper;
@@ -34,6 +43,11 @@ namespace BusinessObject.Service
             _uaRepo = uaRepo;
             _userRepo = userRepo;
             _itemRepo = itemRepo;
+            _cartRepo = cartRepo;
+            _cartItemRepo = cartItemRepo;
+            _orderItemRepo = orderItemRepo;
+            _cartItemService = cartItemService;
+            _orderItemService = orderItemService;
         }
         public async Task<ServiceResponseFormat<bool>> FinishOrder(int id)
         {
@@ -118,6 +132,95 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderDTO"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrderWithItems(CreateOrderDTO orderDTO)
+        {
+            var res = new ServiceResponseFormat<ResponseOrderDTO>();
+            try
+            {
+                // 1. Create Order
+                var mappedOrder = _mapper.Map<Order>(orderDTO);
+                mappedOrder.Status = OrderStatusEnum.PENDING;
+                mappedOrder.OrderDate = DateTime.Now;
+
+                var addressMap = _mapper.Map<Address>(orderDTO.CreateAddressDTO);
+                await _addressRepo.AddAsync(addressMap);
+
+                var user = await _userRepo.GetByIdAsync(orderDTO.UserId);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "No User found";
+                    return res;
+                }
+
+                UserAddress userAddress = new UserAddress
+                {
+                    UserId = orderDTO.UserId,
+                    AddressId = addressMap.AddressId,
+                };
+                await _uaRepo.AddAsync(userAddress);
+                await _repo.AddAsync(mappedOrder);
+
+                // 2. Retrieve User's Cart and Items
+                var cartList = await _cartRepo.GetAll();
+
+                /*var cart = await _cartRepo.GetByUserIdAsync(orderDTO.UserId);*/
+                var cart = cartList.FirstOrDefault(c=>c.UserId==orderDTO.UserId);
+                if (cart == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Cart found for the user";
+                    return res;
+                }
+                var listItem=await _cartItemRepo.GetAll();
+                var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
+                /*var cartItems = await _cartItemRepo.GetItemsByCartId(cart.CartId);*/
+                if (!cartItems.Any())
+                {
+                    res.Success = false;
+                    res.Message = "No items in cart";
+                    return res;
+                }
+
+                // 3. Add Items to Order
+                foreach (var cartItem in cartItems)
+                {
+                    OrderItem newItem = new OrderItem
+                    {
+                        OrderId = mappedOrder.OrderId,
+                        FishId = cartItem.FishId,
+                        PackageId = cartItem.PackageId,
+                        Quantity = cartItem.Quantity,
+                        Price = cartItem.TotalPricePerItem
+                    };
+                    await _orderItemRepo.AddAsync(newItem);
+                    await _cartItemService.DeleteCartItemById(cartItem.CartItemId);
+                }
+
+                // 4. Update Order Total Price
+                await _orderItemService.UpdateOrderTotalPrice(mappedOrder.OrderId);
+
+                // 5. Map response
+                var result = _mapper.Map<ResponseOrderDTO>(mappedOrder);
+                res.Success = true;
+                res.Message = "Order created with items successfully";
+                res.Data = result;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Failed to create order with items: {ex.Message}";
+                return res;
+            }
+        }
+
+
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrder(CreateOrderDTO orderDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderDTO>();

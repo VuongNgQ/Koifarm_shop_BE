@@ -79,7 +79,7 @@ namespace BusinessObject.Service
             try
             {
                 var items = await _repo.GetAllAsync();
-                if (items.Any(i => i.PackageId == itemDTO.PackageId))
+                if (items.Any(i => i.PackageId == itemDTO.PackageId&&i.UserCartId==itemDTO.UserCartId))
                 {
                     res.Success = false;
                     res.Message = "You haved added this Package before";
@@ -246,8 +246,9 @@ namespace BusinessObject.Service
                     // Check and update the quantity if provided
                     if (quantity.HasValue && quantity.Value != exist.Quantity)
                     {
+                        var fish=await _fishRepo.GetFishByIdAsync((int)exist.FishId);
                         exist.Quantity = quantity.Value;
-                        exist.TotalPricePerItem = quantity.Value * (exist.Fish?.Price ?? 0);
+                        exist.TotalPricePerItem = quantity.Value * (fish.Price ?? 0);
                         isUpdated = true;
                     }
 

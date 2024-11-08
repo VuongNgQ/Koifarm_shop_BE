@@ -39,10 +39,10 @@ namespace BusinessObject.Service
         }
 
         // Method to update TotalPrice
-        private async Task UpdateOrderTotalPrice(int orderId)
+        public async Task UpdateOrderTotalPrice(int orderId)
         {
             var orderItems = await _repo.GetItemsByOrderId(orderId);
-            var totalPrice = orderItems.Sum(item => item.Price * item.Quantity);
+            var totalPrice = orderItems.Sum(item => item.Price);
             var order = await _orderRepo.GetByIdAsync(orderId);
             order.TotalPrice = totalPrice;
             _orderRepo.Update(order);
