@@ -132,7 +132,7 @@ namespace KoiShopController.Controllers
         /// Change status of Order
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="status">COMPLETED or CANCELED</param>
+        /// <param name="status">COMPLETED or CANCELLED</param>
         /// <returns></returns>
         [HttpPatch("ChangeStatus/{id}&&{status}")]
         

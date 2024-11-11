@@ -103,7 +103,7 @@ namespace BusinessObject.Service
                     res.Message = "This Order is Done so you can't change it anymore";
                     return res;
                 }
-                if (OrderStatusEnum.CANCELLED.Equals(status.ToUpper().Trim()))
+                if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim()))
                 {
                     exist.Status = OrderStatusEnum.CANCELLED;
                 }
@@ -111,7 +111,7 @@ namespace BusinessObject.Service
                 {
                     exist.Status = OrderStatusEnum.COMPLETED;
                 }
-                else if (OrderStatusEnum.PENDING.Equals(status.ToUpper().Trim()))
+                else if (OrderStatusEnum.PENDING.ToString().Equals(status.ToUpper().Trim()))
                 {
                     exist.Status = OrderStatusEnum.PENDING;
                 }
