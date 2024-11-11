@@ -12,7 +12,6 @@ namespace DataAccess.Entity
         public int FishConsignmentId { get; set; }
         public int? UserId { get; set; }
         public int? FishId { get; set; }
-        //public int? ConsignmentTypeId { get; set; }
         public ConsignmentPurpose Purpose { get; set; }
         public bool IsFromShop { get; set; }
         public decimal? Price { get; set; }
@@ -23,7 +22,6 @@ namespace DataAccess.Entity
         public int? FishStatusId { get; set; }
         public string? ConditionDescription { get; set; }
         public List<string>? ImageUrls { get; set; } = new List<string>();
-        public string? VideoUrl { get; set; }
         public User? User { get; set; }
         public Fish? Fish { get; set; }
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();

@@ -54,14 +54,15 @@ namespace DataAccess.Enum
         BuyFish = 2,
         SellFishBatch = 3
     }
+    public enum PaymentMethod
+    {
+        CASH,
+        ZALOPAY
+    }
     public enum PaymentStatus
     {
         Pending,
         Completed,
         Failed
-    }
-    public enum NotificationStatus
-    {
-
     }
 }
