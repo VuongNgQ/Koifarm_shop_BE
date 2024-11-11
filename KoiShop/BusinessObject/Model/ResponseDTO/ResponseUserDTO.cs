@@ -14,6 +14,7 @@ namespace BusinessObject.Model.ResponseDTO
         public DateTime DateOfBirth { get; set; }
         public string Phone { get; set; }
         public String RoleName { get; set; }
+        public int UserCartId {  get; set; }
         public string Status { get; set; }
         public List<ResponseAddressDTO> Addresses { get; set; }
     }
