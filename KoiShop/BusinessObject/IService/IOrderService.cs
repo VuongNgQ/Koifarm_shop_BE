@@ -12,11 +12,13 @@ namespace BusinessObject.IService
     public interface IOrderService
     {
         Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrder(CreateOrderDTO orderDTO);
+        Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrderWithItems(CreateOrderDTO orderDTO);
         Task<ServiceResponseFormat<PaginationModel<ResponseOrderDTO>>> GetOrders(int page, int pageSize,
             string? search, string sort);
         Task<ServiceResponseFormat<ResponseOrderDTO>> GetOrderById(int id);
         Task<ServiceResponseFormat<ResponseOrderDTO>> UpdateOrder(int id, UpdateOrderDTO orderDTO);
         Task<ServiceResponseFormat<bool>> DeleteOrder(int id);
         Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status);
+        Task<ServiceResponseFormat<bool>> FinishOrder(int id);
     }
 }

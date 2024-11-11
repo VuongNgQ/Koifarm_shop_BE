@@ -37,6 +37,26 @@ namespace KoiShopController.Controllers
             }
         }
         /// <summary>
+        /// Create Order with item inside
+        /// </summary>
+        /// <param name="orderDTO"></param>
+        /// <returns></returns>
+        [HttpPost("IncludeItems")]
+        public async Task<IActionResult> CreateOrderWithItem([FromForm] CreateOrderDTO orderDTO)
+        {
+            var result = await _service.CreateOrderWithItems(orderDTO);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else { return BadRequest(result.Message); }
+        }
+        /*/// <summary>
+        /// Get Order by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <summary>
         /// Create Order
         /// </summary>
         /// <param name="orderDTO"></param>
@@ -50,7 +70,7 @@ namespace KoiShopController.Controllers
                 return Ok(result);
             }
             else { return BadRequest(result.Message); }
-        }
+        }*/
         /// <summary>
         /// Get Order by ID
         /// </summary>
@@ -112,13 +132,31 @@ namespace KoiShopController.Controllers
         /// Change status of Order
         /// </summary>
         /// <param name="id"></param>
-        /// <param name="status">COMPLETE or CANCEL</param>
+        /// <param name="status">COMPLETED or CANCELLED</param>
         /// <returns></returns>
         [HttpPatch("ChangeStatus/{id}&&{status}")]
         
         public async Task<IActionResult> ChangeStatus([FromRoute] int id, string status)
         {
             var result = await _service.ChangeStatus(id, status);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
+        }
+        /// <summary>
+        /// Completing Order
+        /// </summary>
+        /// <param name="id">Order Id</param>
+        /// <returns></returns>
+        [HttpPatch("FinishOrder/{id}")]
+        public async Task<IActionResult> FinishOrder([FromRoute] int id)
+        {
+            var result = await _service.FinishOrder(id);
             if (result.Success)
             {
                 return Ok(result);

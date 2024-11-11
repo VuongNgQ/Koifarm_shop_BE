@@ -19,6 +19,7 @@ namespace BusinessObject.Mapper
             CreateMap<User, ResponseUserDTO>()
                 .ForMember(u => u.RoleName, w => w.MapFrom(src => src.Role != null ? src.Role.RoleName : null))
                 .ForMember(u=>u.Addresses, w=>w.MapFrom(src=>src.UserAddresses.Select(ua => ua.Address)))
+                .ForMember(u => u.UserCartId, c => c.MapFrom(src => src.UserCart.UserCartId))
                 .ReverseMap();
             CreateMap<User, UserResponseDTO>().ReverseMap();
             CreateMap<User, UpdateUserDTO> ().ReverseMap();
@@ -44,12 +45,11 @@ namespace BusinessObject.Mapper
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
                 .ReverseMap();
             CreateMap<Fish, UpdateFishDTO>().ReverseMap();
-            //Consignment Type Mapping
-            CreateMap<ConsignmentType, CreateConsignmentTypeDTO>().ReverseMap();
-            CreateMap<ConsignmentType, ResponseConsignmentTypeDTO>().ReverseMap();
+            
             //Addresss
             CreateMap<Address, CreateAddressDTO>().ReverseMap();
             CreateMap<Address, ResponseAddressDTO>().ReverseMap();
+            CreateMap<Address, UpdateAddressDTO>().ReverseMap();
             //Order 
             CreateMap<Order, CreateOrderDTO>()
                 .ForMember(dest => dest.CreateAddressDTO, opt => opt.MapFrom(src => src.Address))
@@ -58,11 +58,13 @@ namespace BusinessObject.Mapper
                 .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.Name))
                 .ForMember(dest => dest.UserId, opt => opt.MapFrom(src => src.User.UserId))
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.User.Phone))
                 .ForMember(dest => dest.Items, opt => opt.MapFrom(src => src.OrderItems))
                 .ReverseMap();
-            //Payment Method
-            CreateMap<PaymentMethod, CreatePaymentMethodDTO>().ReverseMap();
-            CreateMap<PaymentMethod, ResponsePaymentMethodDTO>().ReverseMap();
+            CreateMap<Order, UpdateOrderDTO>()
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
+                .ReverseMap();
+            
             //Cart
             CreateMap<UserCart, CreateCartDTO>().ReverseMap();
             //Item

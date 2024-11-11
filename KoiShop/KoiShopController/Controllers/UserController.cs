@@ -177,6 +177,7 @@ namespace KoiShopController.Controllers
                 Token = token,
                 UserName = user.Name,
                 Role = user.RoleName,
+                UserCartId = user.UserCartId, 
                 Message = loginResult.Message
             });
         }
