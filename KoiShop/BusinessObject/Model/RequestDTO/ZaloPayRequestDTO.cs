@@ -8,16 +8,6 @@ namespace BusinessObject.Model.RequestDTO
 {
     public class ZaloPayRequestDTO
     {
-        //public string app_id { get; set; }
-        //public string app_trans_id { get; set; }
-        //public long app_time { get; set; }
-        //public string app_user { get; set; }
-        //public string amount { get; set; }
-        //public string description { get; set; }
-        //public string bank_code { get; set; }
-        //public string embed_data { get; set; }
-        //public string ReturnUrl { get; }
-        //public string mac { get; set; }
         public decimal Amount { get; set; }
         public string Description { get; set; } = string.Empty;
         public string Item { get; set; } = string.Empty;

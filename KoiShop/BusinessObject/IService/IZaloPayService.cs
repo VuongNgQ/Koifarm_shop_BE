@@ -11,7 +11,7 @@ namespace BusinessObject.IService
 {
     public interface IZaloPayService
     {
-        Task<ZaloPayCreateOrderResponseDTO> CreateOrder(ZaloPayRequestDTO request);
+        Task<Dictionary<string, string>> CreateZaloPayOrder(int orderId);
         Task<string> RefundOrder(string zpTransId, decimal amount, string description);
         Task<bool> HandleCallbackAsync(ZaloPayCallbackRequestDTO request);
     }

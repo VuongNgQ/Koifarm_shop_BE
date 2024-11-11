@@ -56,36 +56,33 @@ namespace KoiShopController.Controllers
         /// <summary>
         /// Tạo yêu cầu thanh toán qua ZaloPay cho đơn hàng hiện có.
         /// </summary>
-        /// <param name="request">ID của đơn hàng cần thanh toán.</param>
         /// <returns>URL thanh toán của ZaloPay.</returns>
-        [HttpPost("createPayment/{orderId}")]
-        //public async Task<IActionResult> CreatePayment(int orderId)
-        //{
-        //    var result = await _orderService.CreateZaloPayOrder(orderId);
-
-        //    if (!result.Success)
-        //    {
-        //        return BadRequest(result.Message);
-        //    }
-
-        //    return Ok(new { PaymentUrl = result.Data });
-        //}
-        public async Task<IActionResult> CreatePayment([FromBody] ZaloPayRequestDTO request)
+        [HttpPost("create-payment")]
+        public async Task<IActionResult> CreatePayment([FromBody] int orderId)
         {
             try
             {
-                var result = await _zaloPayService.CreateOrder(request);
-                if (result == null)
+                var checkOrder = await _orderService.GetOrderById(orderId);
+                if (checkOrder == null)
                 {
-                    return BadRequest("Please try again");
+                    return BadRequest("Order not found: " + orderId);
                 }
-                    return Ok(result);
+
+                var result = await _zaloPayService.CreateZaloPayOrder(orderId);
+
+                if (result == null || result.Count == 0)
+                {
+                    return BadRequest("Please try again.");
+                }
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
+
 
         /// <summary>
         /// Hoàn tiền giao dịch qua ZaloPay.
