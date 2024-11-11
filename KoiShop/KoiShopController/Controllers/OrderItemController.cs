@@ -49,7 +49,7 @@ namespace KoiShopController.Controllers
             }
             return NotFound(result.Message);
         }
-        /// <summary>
+       /* /// <summary>
         /// Create Fish items by bringing all Fish items in Cart to Order
         /// </summary>
         /// <param name="itemDTO"></param>
@@ -78,7 +78,7 @@ namespace KoiShopController.Controllers
                 return Ok(result);
             }
             return BadRequest(result.Message);
-        }
+        }*/
         /*[HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

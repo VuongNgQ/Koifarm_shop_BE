@@ -16,5 +16,6 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<bool>> DeleteOrderItemById(int id);
         Task<ServiceResponseFormat<bool>> UpdateFishQuantity(int id, int quantity);
         Task<ServiceResponseFormat<IEnumerable<ResponseOrderItemDTO>>> GetItemByOrderId(int id);
+        Task UpdateOrderTotalPrice(int orderId);
     }
 }

@@ -16,7 +16,7 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<PaginationModel<ResponseCartItemDTO>>>GetAllItem(int page , int pageSize ,
             string search , string sort);
         Task<ServiceResponseFormat<bool>> DeleteCartItemById(int id);
-        Task<ServiceResponseFormat<bool>> UpdateFishQuantity(int id ,int quantity);
+        Task<ServiceResponseFormat<bool>> UpdateFishQuantity(int id ,int? quantity);
         Task<ServiceResponseFormat<IEnumerable<ResponseCartItemDTO>>> GetItemByCartId(int id);
     }
 }

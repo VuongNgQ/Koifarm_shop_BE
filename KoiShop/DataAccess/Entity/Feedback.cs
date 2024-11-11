@@ -10,13 +10,12 @@ namespace DataAccess.Entity
     {
         public int FeedbackId { get; set; }
         public int? UserId { get; set; }
-        public int? FishId { get; set; }
+        public int? OrderId { get; set; }
         public int? Rating { get; set; }
         public string? Comment { get; set; }
         public DateTime? AddedDate { get; set; }
 
         public User? User { get; set; }
-        public Fish? Fish { get; set; }
-        public FishPackage? Package { get; set; }
+        public Order? Order { get; set; }
     }
 }

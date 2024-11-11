@@ -8,6 +8,7 @@ using DataAccess;
 using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
+using DataAccess.Repo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +25,17 @@ namespace BusinessObject.Service
         private readonly IUserAddressRepo _uaRepo;
         private readonly IUserRepo _userRepo;
         private readonly IOrderItemRepo _itemRepo;
+        private readonly ICartRepo _cartRepo;
+        private readonly ICartItemRepo _cartItemRepo;
+        private readonly IOrderItemRepo _orderItemRepo;
+
+        private readonly ICartItemService _cartItemService;
+        private readonly IOrderItemService _orderItemService;
         public OrderService(IOrderRepo repo, 
             IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo
-            , IUserRepo userRepo, IOrderItemRepo itemRepo)
+            , IUserRepo userRepo, IOrderItemRepo itemRepo, ICartRepo cartRepo
+            , ICartItemRepo cartItemRepo, IOrderItemRepo orderItemRepo, ICartItemService cartItemService
+            , IOrderItemService orderItemService)
         {
             _repo = repo;
             _mapper = mapper;
@@ -34,6 +43,11 @@ namespace BusinessObject.Service
             _uaRepo = uaRepo;
             _userRepo = userRepo;
             _itemRepo = itemRepo;
+            _cartRepo = cartRepo;
+            _cartItemRepo = cartItemRepo;
+            _orderItemRepo = orderItemRepo;
+            _cartItemService = cartItemService;
+            _orderItemService = orderItemService;
         }
         public async Task<ServiceResponseFormat<bool>> FinishOrder(int id)
         {
@@ -47,9 +61,10 @@ namespace BusinessObject.Service
                     res.Message = "No Order found";
                     return res;
                 }
-                else if(exist.Status==OrderStatusEnum.ONPORT)
+                else if(exist.Status==OrderStatusEnum.ONPORT|| exist.Status == OrderStatusEnum.PENDING)
                 {
                     exist.Status = OrderStatusEnum.COMPLETED;
+                    exist.CompleteDate=DateTime.Now;
                     _repo.Update(exist);
                     res.Success = true;
                     res.Message = "Order Updated Successfully";
@@ -88,15 +103,15 @@ namespace BusinessObject.Service
                     res.Message = "This Order is Done so you can't change it anymore";
                     return res;
                 }
-                if (OrderStatusEnum.CANCELLED.Equals(status.ToUpper().Trim()))
+                if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim()))
                 {
                     exist.Status = OrderStatusEnum.CANCELLED;
                 }
-                else if (OrderStatusEnum.COMPLETED.Equals(status.ToUpper().Trim()))
+                else if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()))
                 {
                     exist.Status = OrderStatusEnum.COMPLETED;
                 }
-                else if (OrderStatusEnum.PENDING.Equals(status.ToUpper().Trim()))
+                else if (OrderStatusEnum.PENDING.ToString().Equals(status.ToUpper().Trim()))
                 {
                     exist.Status = OrderStatusEnum.PENDING;
                 }
@@ -118,6 +133,95 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderDTO"></param>
+        /// <returns></returns>
+        public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrderWithItems(CreateOrderDTO orderDTO)
+        {
+            var res = new ServiceResponseFormat<ResponseOrderDTO>();
+            try
+            {
+                // 1. Create Order
+                var mappedOrder = _mapper.Map<Order>(orderDTO);
+                mappedOrder.Status = OrderStatusEnum.PENDING;
+                mappedOrder.OrderDate = DateTime.Now;
+
+                var addressMap = _mapper.Map<Address>(orderDTO.CreateAddressDTO);
+                await _addressRepo.AddAsync(addressMap);
+
+                var user = await _userRepo.GetByIdAsync(orderDTO.UserId);
+                if (user == null)
+                {
+                    res.Success = false;
+                    res.Message = "No User found";
+                    return res;
+                }
+
+                UserAddress userAddress = new UserAddress
+                {
+                    UserId = orderDTO.UserId,
+                    AddressId = addressMap.AddressId,
+                };
+                await _uaRepo.AddAsync(userAddress);
+                await _repo.AddAsync(mappedOrder);
+
+                // 2. Retrieve User's Cart and Items
+                var cartList = await _cartRepo.GetAll();
+
+                /*var cart = await _cartRepo.GetByUserIdAsync(orderDTO.UserId);*/
+                var cart = cartList.FirstOrDefault(c=>c.UserId==orderDTO.UserId);
+                if (cart == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Cart found for the user";
+                    return res;
+                }
+                var listItem=await _cartItemRepo.GetAll();
+                var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
+                /*var cartItems = await _cartItemRepo.GetItemsByCartId(cart.CartId);*/
+                if (!cartItems.Any())
+                {
+                    res.Success = false;
+                    res.Message = "No items in cart";
+                    return res;
+                }
+
+                // 3. Add Items to Order
+                foreach (var cartItem in cartItems)
+                {
+                    OrderItem newItem = new OrderItem
+                    {
+                        OrderId = mappedOrder.OrderId,
+                        FishId = cartItem.FishId,
+                        PackageId = cartItem.PackageId,
+                        Quantity = cartItem.Quantity,
+                        Price = cartItem.TotalPricePerItem
+                    };
+                    await _orderItemRepo.AddAsync(newItem);
+                    await _cartItemService.DeleteCartItemById(cartItem.CartItemId);
+                }
+
+                // 4. Update Order Total Price
+                await _orderItemService.UpdateOrderTotalPrice(mappedOrder.OrderId);
+
+                // 5. Map response
+                var result = _mapper.Map<ResponseOrderDTO>(mappedOrder);
+                res.Success = true;
+                res.Message = "Order created with items successfully";
+                res.Data = result;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Failed to create order with items: {ex.Message}";
+                return res;
+            }
+        }
+
+
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrder(CreateOrderDTO orderDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderDTO>();
@@ -279,41 +383,77 @@ namespace BusinessObject.Service
             try
             {
                 var orders = await _repo.GetAllOrder();
-                var exist = orders.FirstOrDefault(x=>x.OrderId==id&&x.Status == OrderStatusEnum.PENDING);
+                var exist = orders.FirstOrDefault(x => x.OrderId == id && x.Status == OrderStatusEnum.PENDING);
+
                 if (exist != null)
                 {
-                    var mapp = _mapper.Map<Order>(orderDTO);
-                    var addressMap = _mapper.Map<Address>(orderDTO.Address);
-                    if (OrderStatusEnum.PENDING.Equals(orderDTO.Status.ToUpper().Trim()))
+                    bool isUpdated = false; // Flag to track if any updates are made
+
+                    // Check and update status
+                    if (!string.IsNullOrEmpty(orderDTO.Status) && orderDTO.Status != exist.Status.ToString())
                     {
-                        mapp.Status = OrderStatusEnum.PENDING;
+                        if (Enum.TryParse(orderDTO.Status, true, out OrderStatusEnum newStatus))
+                        {
+                            exist.Status = newStatus;
+                            isUpdated = true;
+                        }
                     }
-                    if (OrderStatusEnum.COMPLETED.Equals(orderDTO.Status.ToUpper().Trim()))
+
+                    
+
+                    // Check and update IsSent
+                    if (orderDTO.IsSent != exist.IsSent)
                     {
-                        mapp.Status = OrderStatusEnum.COMPLETED;
+                        exist.IsSent = orderDTO.IsSent;
+                        isUpdated = true;
                     }
-                    mapp.PaymentMethodId=orderDTO.PaymentMethodId;
-                    mapp.IsSent=orderDTO.IsSent;
-                    _addressRepo.Update(addressMap);
+
+                    // Check and update address fields if Address is provided
+                    if (orderDTO.Address != null)
+                    {
+                        if (!string.IsNullOrEmpty(orderDTO.Address.Street) && orderDTO.Address.Street != exist.Address.Street)
+                        {
+                            exist.Address.Street = orderDTO.Address.Street;
+                            isUpdated = true;
+                        }
+                        if (!string.IsNullOrEmpty(orderDTO.Address.City) && orderDTO.Address.City != exist.Address.City)
+                        {
+                            exist.Address.City = orderDTO.Address.City;
+                            isUpdated = true;
+                        }
+                        if (!string.IsNullOrEmpty(orderDTO.Address.District) && orderDTO.Address.District != exist.Address.District)
+                        {
+                            exist.Address.District = orderDTO.Address.District;
+                            isUpdated = true;
+                        }
+                    }
+
+                    // If no fields were updated, return a message
+                    if (!isUpdated)
+                    {
+                        res.Success = false;
+                        res.Message = "No fields were updated.";
+                        return res;
+                    }
+
+                    // Save the changes to the database
                     _repo.Update(exist);
-                    var addRes=_mapper.Map<ResponseAddressDTO>(addressMap);
-                    var result = _mapper.Map<ResponseOrderDTO>(exist);
                     res.Success = true;
-                    res.Message = "Order Updated Successfully";
-                    res.Data = result;
+                    res.Message = "Order updated successfully.";
+                    res.Data = _mapper.Map<ResponseOrderDTO>(exist);
                     return res;
                 }
                 else
                 {
                     res.Success = false;
-                    res.Message = "No Order Found ";
+                    res.Message = "No Order Found/Order Completed or Cancelled";
                     return res;
                 }
             }
             catch (Exception ex)
             {
                 res.Success = false;
-                res.Message = $"Fail to update Order:{ex.Message}";
+                res.Message = $"Fail to update Order: {ex.Message}";
                 return res;
             }
         }

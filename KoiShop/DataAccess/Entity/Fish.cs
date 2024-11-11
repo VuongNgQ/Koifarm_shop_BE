@@ -20,7 +20,7 @@ namespace DataAccess.Entity
         
         public ICollection<OrderItem>? OrderItems { get; set; }
         public ICollection<CartItem>? CartItems { get; set; }
-        public ICollection<Feedback>? Feedbacks { get; set; }
+        
         public ICollection<FishConsignment>? Consignments { get; set; }
         public ICollection<SubImage>? SubImages { get; set; }
     }
