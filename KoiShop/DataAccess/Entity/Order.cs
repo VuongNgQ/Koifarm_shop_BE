@@ -16,6 +16,7 @@ namespace DataAccess.Entity
         public int? AddressId { get; set; }
         public decimal? TotalPrice { get; set; }
         public OrderStatusEnum Status { get; set; }
+        public PaymentMethod PaymentMethod { get; set; }
         public bool? IsSent { get; set; }
         public User? User { get; set; }
         public Address? Address { get; set; }

@@ -24,11 +24,4 @@ namespace DataAccess.Entity
         public ICollection<FishConsignment>? Consignments { get; set; }
         public ICollection<SubImage>? SubImages { get; set; }
     }
-
-    public enum FishGenderEnum
-    {
-        Male,
-        Female,
-        Unknown
-    }
 }

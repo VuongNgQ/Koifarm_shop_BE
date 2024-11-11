@@ -42,6 +42,12 @@ namespace DataAccess.Enum
         ACTIVE,
         INACTIVE
     }
+    public enum FishGenderEnum
+    {
+        Male,
+        Female,
+        Unknown
+    }
     public enum ConsignmentPurpose
     {
         Care = 0,
