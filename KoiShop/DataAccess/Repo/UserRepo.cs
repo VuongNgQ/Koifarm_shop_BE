@@ -45,7 +45,7 @@ namespace DataAccess.Repo
         }
         public async Task<User?> GetByEmail(string email)
         {
-            return await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(e=>e.Email.Equals(email));
+            return await _context.Users.Include(u => u.Role).Include(u=>u.UserCart).FirstOrDefaultAsync(e=>e.Email.Equals(email));
         }
 
         public async Task<User?> GetById(int id)
