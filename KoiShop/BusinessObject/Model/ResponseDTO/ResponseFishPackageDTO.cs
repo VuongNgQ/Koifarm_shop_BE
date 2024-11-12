@@ -16,6 +16,6 @@ namespace BusinessObject.Model.ResponseDTO
         public string ImageUrl { get; set; }
         public int NumberOfFish { get; set; }
         
-        public string Status { get; set; }
+        public string ProductStatus { get; set; }
     }
 }
