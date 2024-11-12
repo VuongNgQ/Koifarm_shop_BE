@@ -10,6 +10,7 @@ using DataAccess.Enum;
 using DataAccess.IRepo;
 using DataAccess.Repo;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,11 +32,13 @@ namespace BusinessObject.Service
 
         private readonly ICartItemService _cartItemService;
         private readonly IOrderItemService _orderItemService;
+        private readonly IFishPackageService _packageService;
+        private readonly IFishService _fishService;
         public OrderService(IOrderRepo repo, 
             IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo
             , IUserRepo userRepo, IOrderItemRepo itemRepo, ICartRepo cartRepo
             , ICartItemRepo cartItemRepo, IOrderItemRepo orderItemRepo, ICartItemService cartItemService
-            , IOrderItemService orderItemService)
+            , IOrderItemService orderItemService, IFishPackageService packageService, IFishService fishService)
         {
             _repo = repo;
             _mapper = mapper;
@@ -48,6 +51,8 @@ namespace BusinessObject.Service
             _orderItemRepo = orderItemRepo;
             _cartItemService = cartItemService;
             _orderItemService = orderItemService;
+            _packageService = packageService;
+            _fishService = fishService;
         }
         public async Task<ServiceResponseFormat<bool>> FinishOrder(int id)
         {
@@ -147,7 +152,14 @@ namespace BusinessObject.Service
                 var mappedOrder = _mapper.Map<Order>(orderDTO);
                 mappedOrder.Status = OrderStatusEnum.PENDING;
                 mappedOrder.OrderDate = DateTime.Now;
-
+                if (PaymentMethod.CASH.ToString().Equals(orderDTO.PaymentMethod.ToUpper().Trim()))
+                {
+                    mappedOrder.PaymentMethod = PaymentMethod.CASH;
+                }
+                else if (PaymentMethod.ZALOPAY.ToString().Equals(orderDTO.PaymentMethod.ToUpper().Trim()))
+                {
+                    mappedOrder.PaymentMethod = PaymentMethod.ZALOPAY;
+                }
                 var addressMap = _mapper.Map<Address>(orderDTO.CreateAddressDTO);
                 await _addressRepo.AddAsync(addressMap);
 
@@ -201,6 +213,14 @@ namespace BusinessObject.Service
                     };
                     await _orderItemRepo.AddAsync(newItem);
                     await _cartItemService.DeleteCartItemById(cartItem.CartItemId);
+                    if (newItem.FishId != null)
+                    {
+                        await _fishService.SoldoutFish((int)newItem.FishId);
+                    }
+                    if(newItem.PackageId != null)
+                    {
+                        await _packageService.SoldoutPackage((int)newItem.PackageId);
+                    }
                 }
 
                 // 4. Update Order Total Price

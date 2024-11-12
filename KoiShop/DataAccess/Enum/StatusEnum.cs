@@ -45,8 +45,7 @@ namespace DataAccess.Enum
     public enum FishGenderEnum
     {
         Male,
-        Female,
-        Unknown
+        Female
     }
     public enum ConsignmentPurpose
     {

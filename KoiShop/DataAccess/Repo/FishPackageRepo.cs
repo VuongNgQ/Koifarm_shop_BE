@@ -54,7 +54,7 @@ namespace DataAccess.Repo
                 exist.Name = fishPackage.Name;
                 exist.Description = fishPackage.Description;
                 exist.NumberOfFish= fishPackage.NumberOfFish;
-                exist.Gender = fishPackage.Gender;
+                
                 exist.Age = fishPackage.Age;
                 
                 exist.DailyFood = fishPackage.DailyFood;

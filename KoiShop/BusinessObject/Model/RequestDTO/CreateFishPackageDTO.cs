@@ -14,8 +14,6 @@ namespace BusinessObject.Model.RequestDTO
         public string Name { get; set; }
         [Required(ErrorMessage = "Age must not be null")]
         public int Age { get; set; }
-        [Required(ErrorMessage = "Gender must not be null")]
-        public string Gender { get; set; }
         [Required(ErrorMessage = "Size must not be null")]
         public decimal Size { get; set; }
         public string Description { get; set; }

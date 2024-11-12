@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241111183617_updateOrder")]
-    partial class updateOrder
+    [Migration("20241112034635_Add_ProductStatus_To_Fish")]
+    partial class Add_ProductStatus_To_Fish
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,7 +170,7 @@ namespace DataAccess.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("QuantityInStock")
+                    b.Property<int>("ProductStatus")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("Size")
@@ -254,9 +254,6 @@ namespace DataAccess.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")

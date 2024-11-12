@@ -18,5 +18,6 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> CreatePackage(CreateFishPackageDTO package);
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> UpdatePackage(int id, UpdatePackageDTO package);
         Task<ServiceResponseFormat<bool>> DeletePackage(int id);
+        Task<ServiceResponseFormat<bool>> SoldoutPackage(int id);
     }
 }

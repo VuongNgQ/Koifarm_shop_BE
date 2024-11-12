@@ -13,6 +13,8 @@ namespace BusinessObject.Model.RequestDTO
         public int UserId { get; set; }
         [Required]
         public bool IsSent { get; set; }
+        [Required]
+        public string PaymentMethod { get; set; }
         public CreateAddressDTO CreateAddressDTO { get; set; }
     }
 }
