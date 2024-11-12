@@ -89,6 +89,62 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+        public async Task<ServiceResponseFormat<bool>> CancelOrder(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var orders = await _repo.GetAllOrder();
+                var exist = orders.FirstOrDefault(o => o.OrderId == id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Order found";
+                    return res;
+                }
+                else if (exist.Status == OrderStatusEnum.PENDING)
+                {
+                    exist.Status = OrderStatusEnum.CANCELLED;
+                    exist.CompleteDate = DateTime.Now;
+                    _repo.Update(exist);
+                    if(exist.OrderItems.Count > 0)
+                    {
+                        foreach (var item in exist.OrderItems)
+                        {
+                            if (item.FishId != null)
+                            {
+                                await _fishService.RestoreFish((int)item.FishId);
+                            }
+                            if (item.PackageId != null)
+                            {
+                                await _packageService.RestorePackage((int)item.PackageId);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        res.Success = false;
+                        res.Message = "No Item In Order";
+                        return res;
+                    }
+                    res.Success = true;
+                    res.Message = "Order Updated Successfully";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Order may have COMPLETED/CANCELED/ONPORT";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to Update Order:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
         {
             var res = new ServiceResponseFormat<bool>();
@@ -177,7 +233,7 @@ namespace BusinessObject.Service
                     AddressId = addressMap.AddressId,
                 };
                 await _uaRepo.AddAsync(userAddress);
-                await _repo.AddAsync(mappedOrder);
+                
 
                 // 2. Retrieve User's Cart and Items
                 var cartList = await _cartRepo.GetAll();
@@ -193,14 +249,45 @@ namespace BusinessObject.Service
                 var listItem=await _cartItemRepo.GetAll();
                 var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
                 /*var cartItems = await _cartItemRepo.GetItemsByCartId(cart.CartId);*/
-                if (!cartItems.Any())
+                if (cartItems.Count == 0)
                 {
                     res.Success = false;
                     res.Message = "No items in cart";
                     return res;
                 }
-
-                // 3. Add Items to Order
+                else
+                {
+                    await _repo.AddAsync(mappedOrder);
+                    foreach (var cartItem in cartItems)
+                    {
+                        OrderItem newItem = new OrderItem
+                        {
+                            OrderId = mappedOrder.OrderId,
+                            FishId = cartItem.FishId,
+                            PackageId = cartItem.PackageId,
+                            Quantity = cartItem.Quantity,
+                            Price = cartItem.TotalPricePerItem
+                        };
+                        await _orderItemRepo.AddAsync(newItem);
+                        await _cartItemService.DeleteCartItemById(cartItem.CartItemId);
+                        if (newItem.FishId != null)
+                        {
+                            await _fishService.SoldoutFish((int)newItem.FishId);
+                        }
+                        if (newItem.PackageId != null)
+                        {
+                            await _packageService.SoldoutPackage((int)newItem.PackageId);
+                        }
+                    }
+                    // 4. Update Order Total Price
+                    await _orderItemService.UpdateOrderTotalPrice(mappedOrder.OrderId);
+                    var result = _mapper.Map<ResponseOrderDTO>(mappedOrder);
+                    res.Success = true;
+                    res.Message = "Order created with items successfully";
+                    res.Data = result;
+                    return res;
+                }
+                /*// 3. Add Items to Order
                 foreach (var cartItem in cartItems)
                 {
                     OrderItem newItem = new OrderItem
@@ -222,16 +309,12 @@ namespace BusinessObject.Service
                         await _packageService.SoldoutPackage((int)newItem.PackageId);
                     }
                 }
-
+                await _repo.AddAsync(mappedOrder);
                 // 4. Update Order Total Price
                 await _orderItemService.UpdateOrderTotalPrice(mappedOrder.OrderId);
-
+*/
                 // 5. Map response
-                var result = _mapper.Map<ResponseOrderDTO>(mappedOrder);
-                res.Success = true;
-                res.Message = "Order created with items successfully";
-                res.Data = result;
-                return res;
+                
             }
             catch (Exception ex)
             {

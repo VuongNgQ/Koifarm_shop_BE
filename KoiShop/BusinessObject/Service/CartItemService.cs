@@ -4,6 +4,7 @@ using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using DataAccess.Entity;
+using DataAccess.Enum;
 using DataAccess.IRepo;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,12 @@ namespace BusinessObject.Service
                     res.Message = "No fish with this Id";
                     return res;
                 }
+                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus))
+                {
+                    res.Success = false;
+                    res.Message = "This fish is SOLD OUT/UNAVAILABLE";
+                    return res;
+                }
                 var cartExist = await _cartRepo.GetByIdAsync(itemDTO.UserCartId);
                 if (cartExist == null)
                 {
@@ -56,10 +63,10 @@ namespace BusinessObject.Service
                     return res;
                 }
                 var mapp = _mapper.Map<CartItem>(itemDTO);
-                mapp.TotalPricePerItem = exist.Price*itemDTO.Quantity;
+                mapp.TotalPricePerItem = exist.Price;
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
-                result.TotalPricePerItem=exist.Price*itemDTO.Quantity;
+                result.TotalPricePerItem=exist.Price;
                 res.Success = true;
                 res.Message = "Create Item Successfully";
                 res.Data=result;
@@ -90,6 +97,12 @@ namespace BusinessObject.Service
                 {
                     res.Success = false;
                     res.Message = "No Package with this Id";
+                    return res;
+                }
+                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.Status) || ProductStatusEnum.SOLDOUT.Equals(exist.Status))
+                {
+                    res.Success = false;
+                    res.Message = "This Package is SOLD OUT/UNAVAILABLE";
                     return res;
                 }
                 var cartExist = await _cartRepo.GetByIdAsync(itemDTO.UserCartId);

@@ -11,8 +11,6 @@ namespace DataAccess.Entity
     {
         public int FishPackageId { get; set; }
         public string? Name { get; set; }
-        public int? Age { get; set; }
-        public decimal? Size { get; set; }
         public string? Description { get; set; }
         public decimal? TotalPrice { get; set; }
         public decimal? DailyFood { get; set; }
