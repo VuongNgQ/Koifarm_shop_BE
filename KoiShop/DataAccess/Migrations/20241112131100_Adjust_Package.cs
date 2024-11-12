@@ -54,7 +54,7 @@ namespace DataAccess.Migrations
                     DailyFood = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NumberOfFish = table.Column<int>(type: "int", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false)
+                    ProductStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

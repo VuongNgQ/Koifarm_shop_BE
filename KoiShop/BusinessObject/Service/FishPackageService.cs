@@ -44,7 +44,7 @@ namespace BusinessObject.Service
                 
                 var mapp=_mapper.Map<FishPackage>(package);
                 
-                mapp.Status = ProductStatusEnum.AVAILABLE;
+                mapp.ProductStatus = ProductStatusEnum.AVAILABLE;
                 mapp.ImageUrl = uploadedImageUrl;
                 await _repo.CreatePackage(mapp);
                 var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
@@ -69,7 +69,7 @@ namespace BusinessObject.Service
                 var packageExist = await _repo.GetByIdAsync(id);
                 if (packageExist != null)
                 {
-                    packageExist.Status = ProductStatusEnum.AVAILABLE;
+                    packageExist.ProductStatus = ProductStatusEnum.AVAILABLE;
                     res.Data = true;
                     res.Success = true;
                     res.Message = "THIS PACKAGE HAS BEEN SOLD OUT";
@@ -97,7 +97,7 @@ namespace BusinessObject.Service
                 var packageExist = await _repo.GetByIdAsync(id);
                 if(packageExist != null)
                 {
-                    packageExist.Status = ProductStatusEnum.SOLDOUT;
+                    packageExist.ProductStatus = ProductStatusEnum.SOLDOUT;
                     res.Data = true;
                     res.Success = true;
                     res.Message = "THIS PACKAGE HAS BEEN SOLD OUT";
@@ -183,7 +183,7 @@ namespace BusinessObject.Service
                 if (!string.IsNullOrEmpty(search))
                 {
                     packages = packages.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase)||
-                    p.Status.ToString().Contains(search, StringComparison.OrdinalIgnoreCase));
+                    p.ProductStatus.ToString().Contains(search, StringComparison.OrdinalIgnoreCase));
                 }
                 packages = sort.ToLower().Trim() switch
                 {
@@ -280,14 +280,14 @@ namespace BusinessObject.Service
                 if (!string.IsNullOrEmpty(package.Status))
                 {
                     var statusEnum = package.Status.ToUpper().Trim();
-                    if (ProductStatusEnum.AVAILABLE.Equals(statusEnum) && existingPackage.Status != ProductStatusEnum.AVAILABLE)
+                    if (ProductStatusEnum.AVAILABLE.Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.AVAILABLE)
                     {
-                        existingPackage.Status = ProductStatusEnum.AVAILABLE;
+                        existingPackage.ProductStatus = ProductStatusEnum.AVAILABLE;
                         isUpdated = true;
                     }
-                    else if (ProductStatusEnum.UNAVAILABLE.Equals(statusEnum) && existingPackage.Status != ProductStatusEnum.UNAVAILABLE)
+                    else if (ProductStatusEnum.UNAVAILABLE.Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.UNAVAILABLE)
                     {
-                        existingPackage.Status = ProductStatusEnum.UNAVAILABLE;
+                        existingPackage.ProductStatus = ProductStatusEnum.UNAVAILABLE;
                         isUpdated = true;
                     }
                 }
