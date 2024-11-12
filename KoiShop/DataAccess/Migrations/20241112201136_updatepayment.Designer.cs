@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    partial class KoiShopContextModelSnapshot : ModelSnapshot
+    [Migration("20241112201136_updatepayment")]
+    partial class updatepayment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,7 +170,7 @@ namespace DataAccess.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("ProductStatus")
+                    b.Property<int?>("QuantityInStock")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("Size")
@@ -244,10 +247,16 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FishPackageId"));
 
+                    b.Property<int?>("Age")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("DailyFood")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
@@ -259,7 +268,10 @@ namespace DataAccess.Migrations
                     b.Property<int?>("NumberOfFish")
                         .HasColumnType("int");
 
-                    b.Property<int>("ProductStatus")
+                    b.Property<decimal?>("Size")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")
@@ -412,8 +424,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("PaymentUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TransactionId")
-                        .HasColumnType("int");
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");

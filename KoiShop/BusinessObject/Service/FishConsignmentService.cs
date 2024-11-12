@@ -26,22 +26,18 @@ namespace BusinessObject.Service
             _fishRepo = fishRepo;
         }
 
-        // Tạo mới ký gửi
         public async Task<ServiceResponseFormat<FishConsignmentDTO>> CreateConsignmentAsync(CreateConsignmentDTO consignmentDTO)
         {
             var response = new ServiceResponseFormat<FishConsignmentDTO>();
 
             try
             {
-                // Chuyển đổi DTO thành Entity
                 var consignment = _mapper.Map<FishConsignment>(consignmentDTO);
                 consignment.CreateDate = DateTime.Now;
                 consignment.ConsignmentStatus = ConsignmentStatusEnum.PendingApproval;
 
-                // Kiểm tra nguồn gốc của cá (của shop hay không)
                 if (consignmentDTO.IsFromShop)
                 {
-                    // Nếu là từ shop, cần kiểm tra tồn tại của cá
                     if (consignmentDTO.FishId == null)
                     {
                         response.Success = false;
@@ -51,13 +47,10 @@ namespace BusinessObject.Service
                 }
                 else
                 {
-                    // Nếu không phải từ shop, tạo cá mới sau khi duyệt ký gửi
                     consignment.FishId = null;
                 }
-                // Lưu ký gửi vào cơ sở dữ liệu
                 await _consignmentRepo.AddFishConsignmentAsync(consignment);
 
-                // Trả về DTO sau khi tạo thành công
                 response.Data = _mapper.Map<FishConsignmentDTO>(consignment);
                 response.Success = true;
                 response.Message = "Consignment created successfully.";
@@ -71,7 +64,6 @@ namespace BusinessObject.Service
             return response;
         }
 
-        // Duyệt ký gửi dựa trên mục đích (Care hoặc Sale) với switch-case
         public async Task<ServiceResponseFormat<bool>> ApproveConsignmentAsync(int consignmentId, ApproveConsignmentDTO approveDto)
         {
             var response = new ServiceResponseFormat<bool>();
@@ -86,19 +78,16 @@ namespace BusinessObject.Service
                     return response;
                 }
 
-                // Sử dụng switch-case cho các mục đích khác nhau
                 switch (consignment.Purpose)
                 {
                     case ConsignmentPurpose.Care:
                         if (!consignment.IsFromShop)
                         {
-                            // Tạo cá mới cho ký gửi chăm sóc nếu không phải từ shop
                             var newFish = new Fish { /* Các thuộc tính dựa trên consignment */ };
                             await _fishRepo.AddFishAsync(newFish);
                             consignment.FishId = newFish.FishId;
                         }
 
-                        // Cập nhật trạng thái và tạo thanh toán cọc
                         consignment.ConsignmentStatus = ConsignmentStatusEnum.Approved;
                         await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
                         await _paymentService.CreateDepositPaymentAsync(
@@ -110,13 +99,11 @@ namespace BusinessObject.Service
                     case ConsignmentPurpose.Sale:
                         if (!consignment.IsFromShop)
                         {
-                            // Tạo cá mới cho ký gửi bán nếu không phải từ shop
                             var newFish = new Fish { /* Các thuộc tính dựa trên consignment */ };
                             await _fishRepo.AddFishAsync(newFish);
                             consignment.FishId = newFish.FishId;
                         }
 
-                        // Cập nhật giá và trạng thái ký gửi bán
                         consignment.Price = approveDto.AgreedPrice;
                         consignment.ConsignmentStatus = ConsignmentStatusEnum.Approved;
                         await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
@@ -140,8 +127,7 @@ namespace BusinessObject.Service
 
             return response;
         }
-
-        // Hoàn tất ký gửi bán và thanh toán cho khách hàng
+ 
         public async Task<ServiceResponseFormat<bool>> CompleteSaleConsignmentAsync(int consignmentId)
         {
             var response = new ServiceResponseFormat<bool>();

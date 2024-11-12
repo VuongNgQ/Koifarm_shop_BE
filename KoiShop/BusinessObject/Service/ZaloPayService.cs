@@ -3,6 +3,7 @@ using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
+using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -36,7 +37,7 @@ namespace BusinessObject.Service
             _paymentRepo = paymentRepo;
         }
 
-        static string app_id = "2553";
+        static string app_id = "2554";
         static string create_order_url = "https://sb-openapi.zalopay.vn/v2/create";
 
         public async Task<Dictionary<string, string>> CreateZaloPayOrder(int orderId)
@@ -57,11 +58,23 @@ namespace BusinessObject.Service
             }).ToArray();
             Random rnd = new Random();
             var embed_data = new { orderId = orderId};
-            var callbackUrl = "http://localhost:5260/api/Payment/zalopay-callback";
+            var callbackUrl = "https://9722-2405-4800-5b0f-8530-40a1-546a-e447-e37c.ngrok-free.app/api/Payment/zalopay-callback";
             var app_trans_id = rnd.Next(1000000);
+
+            var payment = new Payment
+            {
+                Amount = order.TotalPrice,
+                OrderId = orderId,
+                TransactionId = app_trans_id,
+                Currency = "VND",
+                TransactionType = TransactionType.BuyFish,
+                PaymentStatus = PaymentStatus.Pending,
+                Description = "KoiFarmShop - Thanh toán đơn hàng #" + app_trans_id
+            };
+            await _paymentRepo.AddPaymentAsync(payment);
             var param = new Dictionary<string, string>
             {
-                { "app_id", app_id },
+                { "app_id", _config.AppId },
                 { "app_user", order.UserId.ToString() },
                 { "app_time", Utils.Util.GetTimeStamp().ToString() },
                 { "amount", amount.ToString() },
@@ -69,17 +82,21 @@ namespace BusinessObject.Service
                 { "embed_data", JsonConvert.SerializeObject(embed_data) },
                 { "item", JsonConvert.SerializeObject(items) },
                 {"callback_url", callbackUrl },
-                { "description", "KoiFarmShop - Thanh toán đơn hàng #" + app_trans_id },
-                { "bank_code", "zalopayapp" }
+                { "description", payment.Description },
+                { "bank_code", "" }
             };
 
-            var data = app_id + "|" + param["app_trans_id"] + "|" + param["app_user"] + "|" + param["amount"] + "|"
+            var data = _config.AppId + "|" + param["app_trans_id"] + "|" + param["app_user"] + "|" + param["amount"] + "|"
                        + param["app_time"] + "|" + param["embed_data"] + "|" + param["item"];
             param.Add("mac", HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, _config.Key1, data));
 
             var result = await HttpHelper.PostFormAsync(create_order_url, param);
             var stringResult = result.ToDictionary(entry => entry.Key, entry => entry.Value?.ToString());
-
+            if (stringResult.TryGetValue("order_url", out var orderUrl))
+            {
+                payment.PaymentUrl = orderUrl;
+                await _paymentRepo.UpdatePaymentAsync(payment);
+            }
             return stringResult;
         }
 
@@ -110,14 +127,16 @@ namespace BusinessObject.Service
 
             return null;
         }
-        public async Task<Dictionary<string, object>> HandleCallbackAsync(dynamic cbdata)
+        public async Task<Dictionary<string, object>> HandleCallbackAsync(ZaloPayCallbackRequestDTO cbdata)
         {
             var result = new Dictionary<string, object>();
 
             try
             {
-                var dataStr = Convert.ToString(cbdata["data"]);
-                var reqMac = Convert.ToString(cbdata["mac"]);
+                //var dataStr = Convert.ToString(cbdata["data"]);
+                //var reqMac = Convert.ToString(cbdata["mac"]);
+                var dataStr = cbdata.Data;
+                var reqMac = cbdata.Mac;
                 var mac = HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, _config.Key2, dataStr);
 
                 if (!reqMac.Equals(mac))
@@ -131,7 +150,7 @@ namespace BusinessObject.Service
                 var appTransId = Convert.ToString(dataJson["app_trans_id"]);
                 var isSuccess = dataJson.ContainsKey("return_code") && Convert.ToInt32(dataJson["return_code"]) == 1;
 
-                var payment = await _paymentRepo.GetPaymentByIdAsync(int.Parse(appTransId.Split('_')[1]));
+                var payment = await _paymentRepo.GetPaymentByTransactionIdAsync(int.Parse(appTransId.Split('_')[1]));
                 if (payment == null)
                 {
                     result["return_code"] = -1;
@@ -143,12 +162,12 @@ namespace BusinessObject.Service
                 payment.PaymentDate = DateTime.Now;
                 await _paymentRepo.UpdatePaymentAsync(payment);
 
-                var order = await _orderRepo.GetByIdAsync(payment.RelatedId.Value);
+                var order = await _orderRepo.GetByIdAsync(payment.OrderId.Value);
                 if (order != null)
                 {
                     order.Status = isSuccess ? OrderStatusEnum.COMPLETED : OrderStatusEnum.CANCELLED;
                     order.CompleteDate = DateTime.Now;
-                    await _orderRepo.Update(order);
+                    await _orderRepo.UpdateOrder(order);
                 }
 
                 result["return_code"] = 1;

@@ -22,5 +22,6 @@ namespace DataAccess.Entity
         public Address? Address { get; set; }
         public ICollection<OrderItem>? OrderItems { get; set; }
         public ICollection<Feedback>? Feedbacks { get; set; }
+        public ICollection<Payment>? Payments { get; set; }
     }
 }

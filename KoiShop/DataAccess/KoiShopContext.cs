@@ -148,18 +148,30 @@ namespace DataAccess
                 .WithMany(u => u.FishConsignments)
                 .HasForeignKey(fc => fc.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
-            // Quan hệ one-to-many giữa FishConsignment và Payment
-            modelBuilder.Entity<FishConsignment>()
-                .HasMany(fc => fc.Payments)
-                .WithOne()
-                .HasForeignKey(p => p.RelatedId)
-                .OnDelete(DeleteBehavior.Cascade);
-            // Configure User relationship with Payment
             modelBuilder.Entity<Payment>()
-                .HasOne(p => p.User)
-                .WithMany()
-                .HasForeignKey(p => p.UserId)
+                .HasOne(p => p.Order)
+                .WithMany(o => o.Payments)
+                .HasForeignKey(p => p.OrderId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(p => p.FishConsignment)
+                .WithMany(fc => fc.Payments)
+                .HasForeignKey(p => p.FishConsignmentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            //modelBuilder.Entity<FishConsignment>()
+            //    .HasMany(fc => fc.Payments)
+            //    .WithOne()
+            //    .HasForeignKey(p => p.RelatedId)
+            //    .OnDelete(DeleteBehavior.Cascade);
+            // Configure User relationship with Payment
+            //modelBuilder.Entity<Payment>()
+            //    .HasOne(p => p.User)
+            //    .WithMany()
+            //    .HasForeignKey(p => p.UserId)
+            //    .OnDelete(DeleteBehavior.Restrict);
             // Feedback and User (one-to-many)
             modelBuilder.Entity<Feedback>()
                 .HasOne(fb => fb.User)
