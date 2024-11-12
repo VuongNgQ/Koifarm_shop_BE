@@ -280,12 +280,12 @@ namespace BusinessObject.Service
                 if (!string.IsNullOrEmpty(package.ProductStatus))
                 {
                     var statusEnum = package.ProductStatus.ToUpper().Trim();
-                    if (ProductStatusEnum.AVAILABLE.Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.AVAILABLE)
+                    if (ProductStatusEnum.AVAILABLE.ToString().Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.AVAILABLE)
                     {
                         existingPackage.ProductStatus = ProductStatusEnum.AVAILABLE;
                         isUpdated = true;
                     }
-                    else if (ProductStatusEnum.UNAVAILABLE.Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.UNAVAILABLE)
+                    if (ProductStatusEnum.UNAVAILABLE.ToString().Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.UNAVAILABLE)
                     {
                         existingPackage.ProductStatus = ProductStatusEnum.UNAVAILABLE;
                         isUpdated = true;
