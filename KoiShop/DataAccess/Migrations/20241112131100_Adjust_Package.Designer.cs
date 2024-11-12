@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241112090250_Adjust_Package")]
+    [Migration("20241112131100_Adjust_Package")]
     partial class Adjust_Package
     {
         /// <inheritdoc />
@@ -262,7 +262,7 @@ namespace DataAccess.Migrations
                     b.Property<int?>("NumberOfFish")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("ProductStatus")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")

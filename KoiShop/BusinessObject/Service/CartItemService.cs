@@ -99,7 +99,7 @@ namespace BusinessObject.Service
                     res.Message = "No Package with this Id";
                     return res;
                 }
-                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.Status) || ProductStatusEnum.SOLDOUT.Equals(exist.Status))
+                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus))
                 {
                     res.Success = false;
                     res.Message = "This Package is SOLD OUT/UNAVAILABLE";

@@ -259,7 +259,7 @@ namespace DataAccess.Migrations
                     b.Property<int?>("NumberOfFish")
                         .HasColumnType("int");
 
-                    b.Property<int>("Status")
+                    b.Property<int>("ProductStatus")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")

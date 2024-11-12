@@ -56,7 +56,7 @@ namespace DataAccess.Repo
                 exist.NumberOfFish= fishPackage.NumberOfFish;
                 exist.DailyFood = fishPackage.DailyFood;
                 exist.ImageUrl = fishPackage.ImageUrl;
-                exist.Status = fishPackage.Status;
+                exist.ProductStatus = fishPackage.ProductStatus;
                 exist.TotalPrice = fishPackage.TotalPrice;
                 
                 _context.Update(exist);
