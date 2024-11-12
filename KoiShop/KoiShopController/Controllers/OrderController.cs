@@ -148,7 +148,7 @@ namespace KoiShopController.Controllers
                 return BadRequest(result.Message);
             }
         }
-        /// <summary>
+        /*/// <summary>
         /// Completing Order
         /// </summary>
         /// <param name="id">Order Id</param>
@@ -178,6 +178,6 @@ namespace KoiShopController.Controllers
             {
                 return BadRequest(result.Message);
             }
-        }
+        }*/
     }
 }

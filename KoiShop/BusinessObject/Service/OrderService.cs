@@ -150,7 +150,8 @@ namespace BusinessObject.Service
             var res = new ServiceResponseFormat<bool>();
             try
             {
-                var exist =await _repo.GetByIdAsync(id);
+                var orders = await _repo.GetAllOrder();
+                var exist = orders.FirstOrDefault(o => o.OrderId == id);
                 if (exist == null)
                 {
                     res.Success = false;
@@ -167,6 +168,26 @@ namespace BusinessObject.Service
                 if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim()))
                 {
                     exist.Status = OrderStatusEnum.CANCELLED;
+                    if (exist.OrderItems.Count > 0)
+                    {
+                        foreach (var item in exist.OrderItems)
+                        {
+                            if (item.FishId != null)
+                            {
+                                await _fishService.RestoreFish((int)item.FishId);
+                            }
+                            if (item.PackageId != null)
+                            {
+                                await _packageService.RestorePackage((int)item.PackageId);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        res.Success = false;
+                        res.Message = "No Item In Order";
+                        return res;
+                    }
                 }
                 else if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()))
                 {
