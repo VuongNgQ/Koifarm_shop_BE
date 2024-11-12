@@ -27,6 +27,34 @@ namespace BusinessObject.Service
             _categoryRepo = categoryRepository;
             _mapper = mapper;
         }
+        public async Task<ServiceResponseFormat<bool>> RestoreFish(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var fishExist = await _fishRepository.GetFishByIdAsync(id);
+                if (fishExist != null)
+                {
+                    fishExist.ProductStatus = ProductStatusEnum.AVAILABLE;
+                    res.Data = true;
+                    res.Success = true;
+                    res.Message = "THIS FISH NOW HAS BEEN REFUND";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Fish not found?";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change status:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<bool>> SoldoutFish(int id)
         {
             var res = new ServiceResponseFormat<bool>();

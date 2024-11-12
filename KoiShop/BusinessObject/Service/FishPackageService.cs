@@ -61,6 +61,34 @@ namespace BusinessObject.Service
             }
             
         }
+        public async Task<ServiceResponseFormat<bool>> RestorePackage(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var packageExist = await _repo.GetByIdAsync(id);
+                if (packageExist != null)
+                {
+                    packageExist.Status = ProductStatusEnum.AVAILABLE;
+                    res.Data = true;
+                    res.Success = true;
+                    res.Message = "THIS PACKAGE HAS BEEN SOLD OUT";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Package not found?";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change status:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<bool>> SoldoutPackage(int id)
         {
             var res=new ServiceResponseFormat<bool>();
@@ -162,7 +190,6 @@ namespace BusinessObject.Service
                     "name" => packages.OrderBy(e => e.Name),
                     
                     "fishinpackage" => packages.OrderBy(e => e.NumberOfFish),
-                    "age" => packages.OrderBy(e => e.Age),
                     "price" => packages.OrderBy(e => e.TotalPrice),
                     _=>packages.OrderBy(e=>e.FishPackageId)
                 };
@@ -229,20 +256,6 @@ namespace BusinessObject.Service
                 if (!string.IsNullOrEmpty(package.Name) && package.Name != existingPackage.Name)
                 {
                     existingPackage.Name = package.Name;
-                    isUpdated = true;
-                }
-
-                if (package.Age.HasValue && package.Age != existingPackage.Age)
-                {
-                    existingPackage.Age = package.Age.Value;
-                    isUpdated = true;
-                }
-
-                
-
-                if (package.Size.HasValue && package.Size != existingPackage.Size)
-                {
-                    existingPackage.Size = package.Size.Value;
                     isUpdated = true;
                 }
 

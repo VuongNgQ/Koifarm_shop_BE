@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Add_ProductStatus_To_Fish : Migration
+    public partial class Adjust_Package : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,8 +49,6 @@ namespace DataAccess.Migrations
                     FishPackageId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Age = table.Column<int>(type: "int", nullable: true),
-                    Size = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     DailyFood = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
