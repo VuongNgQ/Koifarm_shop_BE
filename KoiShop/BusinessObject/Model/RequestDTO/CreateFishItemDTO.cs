@@ -10,7 +10,5 @@ namespace BusinessObject.Model.RequestDTO
     {
         public int UserCartId { get; set; }
         public int FishId { get; set; }
-        public int Quantity { get; set; }
-
     }
 }

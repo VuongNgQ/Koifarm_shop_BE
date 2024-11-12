@@ -13,14 +13,14 @@ namespace BusinessObject.Model.ResponseDTO
         public int FishId { get; set; }
         public string? Name { get; set; }
         public int? Age { get; set; }
-        public FishGenderEnum Gender { get; set; }
+        public string Gender { get; set; }
         public decimal? Size { get; set; }
         public string? Description { get; set; }
         public string? CategoryName { get; set; }
         public decimal? Price { get; set; }
         public decimal? DailyFood { get; set; }
         public string? ImageUrl { get; set; }
-        public int? QuantityInStock { get; set; }
-        public ProductStatusEnum Status { get; set; }
+        public string Status { get; set; }
+        public string ProductStatus { get; set; }
     }
 }

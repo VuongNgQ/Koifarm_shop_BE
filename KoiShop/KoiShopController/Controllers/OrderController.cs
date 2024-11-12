@@ -148,7 +148,7 @@ namespace KoiShopController.Controllers
                 return BadRequest(result.Message);
             }
         }
-        /// <summary>
+        /*/// <summary>
         /// Completing Order
         /// </summary>
         /// <param name="id">Order Id</param>
@@ -166,5 +166,18 @@ namespace KoiShopController.Controllers
                 return BadRequest(result.Message);
             }
         }
+        [HttpPatch("CancelOrder/{id}")]
+        public async Task<IActionResult> CancelOrder([FromRoute] int id)
+        {
+            var result = await _service.CancelOrder(id);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return BadRequest(result.Message);
+            }
+        }*/
     }
 }
