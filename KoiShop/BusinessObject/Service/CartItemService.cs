@@ -63,6 +63,7 @@ namespace BusinessObject.Service
                     return res;
                 }
                 var mapp = _mapper.Map<CartItem>(itemDTO);
+                mapp.Quantity = 1;
                 mapp.TotalPricePerItem = exist.Price;
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
