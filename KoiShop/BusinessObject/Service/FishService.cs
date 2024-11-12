@@ -4,6 +4,7 @@ using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using DataAccess.Entity;
+using DataAccess.Enum;
 using DataAccess.IRepo;
 using DataAccess.Repo;
 using System;
@@ -25,6 +26,34 @@ namespace BusinessObject.Service
             _fishRepository = fishRepository;
             _categoryRepo = categoryRepository;
             _mapper = mapper;
+        }
+        public async Task<ServiceResponseFormat<bool>> SoldoutFish(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var fishExist = await _fishRepository.GetFishByIdAsync(id);
+                if (fishExist != null)
+                {
+                    fishExist.ProductStatus = ProductStatusEnum.SOLDOUT;
+                    res.Data = true;
+                    res.Success = true;
+                    res.Message = "THIS FISH NOW HAS BEEN SOLD OUT";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Fish not found?";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change status:{ex.Message}";
+                return res;
+            }
         }
         public async Task<ServiceResponseFormat<List<ResponseFishDTO>>> GetAllFishes()
         {
@@ -103,6 +132,8 @@ namespace BusinessObject.Service
             // Tạo mới cá
             var newFish = _mapper.Map<Fish>(createFishDto);
             newFish.ImageUrl = uploadedImageUrl;
+            newFish.ProductStatus = ProductStatusEnum.AVAILABLE;
+            newFish.Status = FishStatusEnum.GOOD;
             await _fishRepository.AddFishAsync(newFish);
             response.Data = _mapper.Map<ResponseFishDTO>(newFish);
             response.Success = true;

@@ -43,17 +43,7 @@ namespace BusinessObject.Service
                 }
                 
                 var mapp=_mapper.Map<FishPackage>(package);
-                // Gender validation and conversion
-                if (Enum.TryParse<GenderEnum>(package.Gender.ToUpper().Trim(), out var parsedGender))
-                {
-                    mapp.Gender = parsedGender.ToString();
-                }
-                else
-                {
-                    res.Success = false;
-                    res.Message = "Invalid Gender";
-                    return res;
-                }
+                
                 mapp.Status = ProductStatusEnum.AVAILABLE;
                 mapp.ImageUrl = uploadedImageUrl;
                 await _repo.CreatePackage(mapp);
@@ -71,7 +61,34 @@ namespace BusinessObject.Service
             }
             
         }
-
+        public async Task<ServiceResponseFormat<bool>> SoldoutPackage(int id)
+        {
+            var res=new ServiceResponseFormat<bool>();
+            try
+            {
+                var packageExist = await _repo.GetByIdAsync(id);
+                if(packageExist != null)
+                {
+                    packageExist.Status = ProductStatusEnum.SOLDOUT;
+                    res.Data = true;
+                    res.Success = true;
+                    res.Message = "THIS PACKAGE HAS BEEN SOLD OUT";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Package not found?";
+                    return res;
+                }
+            }
+            catch(Exception ex)
+            {
+                res.Success=false;
+                res.Message=$"Fail to change status:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<bool>> DeletePackage(int id)
         {
             var res = new ServiceResponseFormat<bool>();
@@ -137,7 +154,8 @@ namespace BusinessObject.Service
                 var packages=await _repo.GetFishPackages();
                 if (!string.IsNullOrEmpty(search))
                 {
-                    packages = packages.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+                    packages = packages.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase)||
+                    p.Status.ToString().Contains(search, StringComparison.OrdinalIgnoreCase));
                 }
                 packages = sort.ToLower().Trim() switch
                 {
@@ -226,11 +244,7 @@ namespace BusinessObject.Service
                     isUpdated = true;
                 }
 
-                if (!string.IsNullOrEmpty(package.Gender) && package.Gender != existingPackage.Gender)
-                {
-                    existingPackage.Gender = package.Gender;
-                    isUpdated = true;
-                }
+                
 
                 if (package.Size.HasValue && package.Size != existingPackage.Size)
                 {
@@ -254,21 +268,6 @@ namespace BusinessObject.Service
                 {
                     existingPackage.DailyFood = package.DailyFood.Value;
                     isUpdated = true;
-                }
-                if (!string.IsNullOrEmpty(package.Gender))
-                {
-                    var genderEnum = package.Gender.ToUpper().Trim();
-                    if (GenderEnum.MALE.Equals(genderEnum))
-                    {
-                        existingPackage.Gender = GenderEnum.MALE.ToString();
-                        isUpdated = true;
-
-                    }
-                    else if (GenderEnum.FEMALE.Equals(genderEnum))
-                    {
-                        existingPackage.Gender = GenderEnum.FEMALE.ToString();
-                        isUpdated = true;
-                    }
                 }
                 
                 if (!string.IsNullOrEmpty(package.Status))

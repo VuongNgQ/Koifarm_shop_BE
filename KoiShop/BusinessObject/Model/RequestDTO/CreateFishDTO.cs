@@ -20,8 +20,6 @@ namespace BusinessObject.Model.RequestDTO
         public decimal? Price { get; set; }
         public decimal? DailyFood { get; set; }
         public IFormFile? ImageUrl { get; set; }
-        public int? QuantityInStock { get; set; }
-        public ProductStatusEnum Status { get; set; }
     }
     public class UpdateFishDTO
     {
