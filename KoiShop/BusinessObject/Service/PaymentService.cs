@@ -26,7 +26,6 @@ namespace BusinessObject.Service
             return await _paymentRepository.GetAllPaymentsAsync();
         }
 
-        // Tạo thanh toán cọc cho dịch vụ ký gửi chăm sóc
         public async Task<Payment> CreateDepositPaymentAsync(int userId, int relatedId, decimal amount, string description)
         {
             var payment = new Payment
@@ -43,7 +42,6 @@ namespace BusinessObject.Service
             return await _paymentRepository.AddPaymentAsync(payment);
         }
 
-        // Tạo thanh toán khi ký gửi bán hoàn tất
         public async Task<Payment> CreateSalePaymentAsync(int userId, int relatedId, decimal amount, string description)
         {
             var payment = new Payment
@@ -64,13 +62,13 @@ namespace BusinessObject.Service
         {
             var payment = await _paymentRepository.GetPaymentByIdAsync(paymentId);
             if (payment == null)
+            {
                 throw new KeyNotFoundException("Payment not found.");
+            }
 
             payment.PaymentStatus = newStatus;
             await _paymentRepository.UpdatePaymentAsync(payment);
         }
-
-        // Thêm phương thức mới trong PaymentService
         public async Task<Payment> CreateRemainingCarePaymentAsync(int userId, int relatedId, decimal amount, string description)
         {
             var payment = new Payment

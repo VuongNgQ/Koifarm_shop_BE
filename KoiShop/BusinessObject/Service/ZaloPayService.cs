@@ -3,6 +3,8 @@ using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
+using DataAccess.Enum;
+using DataAccess.IRepo;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -21,89 +23,59 @@ namespace BusinessObject.Service
     {
         private readonly ZaloPayConfig _config;
         private readonly HttpClient _httpClient;
+        private readonly IOrderService _orderService;
+        private readonly IOrderRepo _orderRepo;
+        private readonly IPaymentRepo _paymentRepo;
 
-        public ZaloPayService(IOptions<ZaloPayConfig> config, HttpClient httpClient)
+        public ZaloPayService(IOptions<ZaloPayConfig> config, IOrderService orderService, IOrderRepo orderRepo, IPaymentRepo paymentRepo, HttpClient httpClient)
         {
             _config = config.Value;
+            _orderService = orderService;
+            _orderRepo = orderRepo;
             _httpClient = httpClient;
-        }
-
-        private string GenerateSignature(string data, string key)
-        {
-            if (string.IsNullOrEmpty(data))
-            {
-                throw new ArgumentException("Data cannot be null or empty", nameof(data));
-            }
-
-            if (string.IsNullOrEmpty(key))
-            {
-                throw new ArgumentException("Key cannot be null or empty", nameof(key));
-            }
-            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(key)))
-            {
-                var hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(data));
-                return BitConverter.ToString(hash).Replace("-", "").ToLower();
-            }
-        }
-        public async Task<JObject> SendPostAsync(string url, Dictionary<string, string> formData)
-        {
-            // Tạo đối tượng FormUrlEncodedContent, nó sẽ tự động thêm Content-Type header
-            var content = new FormUrlEncodedContent(formData);
-
-            try
-            {
-                // Gửi yêu cầu POST
-                var response = await _httpClient.PostAsync(url, content);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine("Error: BAD_REQUEST " + await response.Content.ReadAsStringAsync());
-                    return null;
-                }
-
-                // Đọc nội dung phản hồi và chuyển đổi sang JObject
-                var responseString = await response.Content.ReadAsStringAsync();
-                return JObject.Parse(responseString);
-            }
-            catch (HttpRequestException e)
-            {
-                Console.WriteLine("Request error: " + e.Message);
-                return null;
-            }
-            catch (JsonException e)
-            {
-                Console.WriteLine("JSON error: " + e.Message);
-                return null;
-            }
+            _paymentRepo = paymentRepo;
         }
 
         static string app_id = "2553";
-        static string key1 = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL";
         static string create_order_url = "https://sb-openapi.zalopay.vn/v2/create";
 
         public async Task<Dictionary<string, string>> CreateZaloPayOrder(int orderId)
         {
-            Random rnd = new Random();
-            var embed_data = new { orderId = orderId };
-            var items = new[] { new { item_name = "Sample Item", item_quantity = 1, item_price = 50000 } }; // Sample item
 
-            var app_trans_id = rnd.Next(1000000); // Generate a random order's ID.
+            var orderResponse = await _orderService.GetOrderById(orderId);
+            if (orderResponse == null)
+            {
+                throw new ArgumentException("Order or Order items not found.");
+            }
+            var order = orderResponse.Data;
+            var amount = (int)order.TotalPrice;
+            var items = order.Items.Select(item => new
+            {
+                item_name = item.FishName ?? item.PackageName ?? "Unknown item",
+                item_quantity = item.Quantity,
+                item_price = (int)item.Price
+            }).ToArray();
+            Random rnd = new Random();
+            var embed_data = new { orderId = orderId};
+            var callbackUrl = "http://localhost:5260/api/Payment/zalopay-callback";
+            var app_trans_id = rnd.Next(1000000);
             var param = new Dictionary<string, string>
-    {
-        { "app_id", app_id },
-        { "app_user", "user123" },
-        { "app_time", Utils.Util.GetTimeStamp().ToString() },
-        { "amount", "50000" },
-        { "app_trans_id", DateTime.Now.ToString("yyMMdd") + "_" + app_trans_id },
-        { "embed_data", JsonConvert.SerializeObject(embed_data) },
-        { "item", JsonConvert.SerializeObject(items) },
-        { "description", "Lazada - Thanh toán đơn hàng #" + app_trans_id },
-        { "bank_code", "zalopayapp" }
-    };
+            {
+                { "app_id", app_id },
+                { "app_user", order.UserId.ToString() },
+                { "app_time", Utils.Util.GetTimeStamp().ToString() },
+                { "amount", amount.ToString() },
+                { "app_trans_id", DateTime.Now.ToString("yyMMdd") + "_" + app_trans_id },
+                { "embed_data", JsonConvert.SerializeObject(embed_data) },
+                { "item", JsonConvert.SerializeObject(items) },
+                {"callback_url", callbackUrl },
+                { "description", "KoiFarmShop - Thanh toán đơn hàng #" + app_trans_id },
+                { "bank_code", "zalopayapp" }
+            };
 
             var data = app_id + "|" + param["app_trans_id"] + "|" + param["app_user"] + "|" + param["amount"] + "|"
                        + param["app_time"] + "|" + param["embed_data"] + "|" + param["item"];
-            param.Add("mac", HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, key1, data));
+            param.Add("mac", HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, _config.Key1, data));
 
             var result = await HttpHelper.PostFormAsync(create_order_url, param);
             var stringResult = result.ToDictionary(entry => entry.Key, entry => entry.Value?.ToString());
@@ -138,27 +110,57 @@ namespace BusinessObject.Service
 
             return null;
         }
-        public async Task<bool> HandleCallbackAsync(ZaloPayCallbackRequestDTO callbackRequest)
+        public async Task<Dictionary<string, object>> HandleCallbackAsync(dynamic cbdata)
         {
-            //var data = request.data;
-            //var macLocal = GenerateSignature(data, _configuration["ZaloPaySettings:Key2"]);
-            //return macLocal == request.mac;
-            //var key2 = _configuration["ZaloPaySettings:Key2"];
-            //var data = $"{callbackRequest.AppId}|{callbackRequest.AppTransId}|{callbackRequest.Amount}|{callbackRequest.AppTime}|{callbackRequest.ResultCode}";
-            //var mac = GenerateSignature(data, key2);
+            var result = new Dictionary<string, object>();
 
-            //if (mac != callbackRequest.Mac)
-            //{
-            //    return false;
-            //}
-            //if (callbackRequest.ResultCode == 1) // 1 = Thanh toán thành công
-            //{
-            //    // Cập nhật trạng thái đơn hàng trong hệ thống của bạn
-            //    // Logic cập nhật đơn hàng như đổi trạng thái đơn hàng thành "Đã thanh toán"
-            //    return true;
-            //}
+            try
+            {
+                var dataStr = Convert.ToString(cbdata["data"]);
+                var reqMac = Convert.ToString(cbdata["mac"]);
+                var mac = HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, _config.Key2, dataStr);
 
-            return false;
+                if (!reqMac.Equals(mac))
+                {
+                    result["return_code"] = -1;
+                    result["return_message"] = "mac not equal";
+                    return result;
+                }
+
+                var dataJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataStr);
+                var appTransId = Convert.ToString(dataJson["app_trans_id"]);
+                var isSuccess = dataJson.ContainsKey("return_code") && Convert.ToInt32(dataJson["return_code"]) == 1;
+
+                var payment = await _paymentRepo.GetPaymentByIdAsync(int.Parse(appTransId.Split('_')[1]));
+                if (payment == null)
+                {
+                    result["return_code"] = -1;
+                    result["return_message"] = "Payment not found";
+                    return result;
+                }
+
+                payment.PaymentStatus = isSuccess ? PaymentStatus.Completed : PaymentStatus.Failed;
+                payment.PaymentDate = DateTime.Now;
+                await _paymentRepo.UpdatePaymentAsync(payment);
+
+                var order = await _orderRepo.GetByIdAsync(payment.RelatedId.Value);
+                if (order != null)
+                {
+                    order.Status = isSuccess ? OrderStatusEnum.COMPLETED : OrderStatusEnum.CANCELLED;
+                    order.CompleteDate = DateTime.Now;
+                    await _orderRepo.Update(order);
+                }
+
+                result["return_code"] = 1;
+                result["return_message"] = "success";
+            }
+            catch (Exception ex)
+            {
+                result["return_code"] = 0;
+                result["return_message"] = ex.Message;
+            }
+
+            return result;
         }
     }
 }

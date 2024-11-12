@@ -14,12 +14,10 @@ namespace KoiShopController.Controllers
     {
         private readonly IPaymentService _paymentService;
         private readonly IZaloPayService _zaloPayService;
-        private readonly IOrderService _orderService;
 
-        public PaymentController(IZaloPayService zaloPayService, IOrderService orderService, IPaymentService paymentService)
+        public PaymentController(IZaloPayService zaloPayService, IPaymentService paymentService)
         {
             _zaloPayService = zaloPayService;
-            _orderService = orderService;
             _paymentService = paymentService;
         }
 
@@ -57,17 +55,11 @@ namespace KoiShopController.Controllers
         /// Tạo yêu cầu thanh toán qua ZaloPay cho đơn hàng hiện có.
         /// </summary>
         /// <returns>URL thanh toán của ZaloPay.</returns>
-        [HttpPost("create-payment")]
-        public async Task<IActionResult> CreatePayment([FromBody] int orderId)
+        [HttpPost("create-payment/{orderId}")]
+        public async Task<IActionResult> CreatePayment(int orderId)
         {
             try
             {
-                var checkOrder = await _orderService.GetOrderById(orderId);
-                if (checkOrder == null)
-                {
-                    return BadRequest("Order not found: " + orderId);
-                }
-
                 var result = await _zaloPayService.CreateZaloPayOrder(orderId);
 
                 if (result == null || result.Count == 0)
@@ -106,9 +98,9 @@ namespace KoiShopController.Controllers
         }
 
         [HttpPost("zalopay-callback")]
-        public async Task<IActionResult> ZaloPayCallback([FromBody] ZaloPayCallbackRequestDTO request)
+        public async Task<IActionResult> ZaloPayCallback([FromBody] dynamic cbdata)
         {
-            var result = await _zaloPayService.HandleCallbackAsync(request);
+            var result = await _zaloPayService.HandleCallbackAsync(cbdata);
             if (result)
             {
                 return Ok(new { message = "Cập nhật trạng thái đơn hàng thành công" });

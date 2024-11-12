@@ -13,6 +13,6 @@ namespace BusinessObject.IService
     {
         Task<Dictionary<string, string>> CreateZaloPayOrder(int orderId);
         Task<string> RefundOrder(string zpTransId, decimal amount, string description);
-        Task<bool> HandleCallbackAsync(ZaloPayCallbackRequestDTO request);
+        Task<Dictionary<string, object>> HandleCallbackAsync(dynamic cbdata);
     }
 }
