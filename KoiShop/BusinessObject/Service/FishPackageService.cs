@@ -204,13 +204,7 @@ namespace BusinessObject.Service
                     res.Message = "Package not found";
                     return res;
                 }
-                /*var nameExist = await _repo.FindAsync(p => p.Name == package.Name && p.FishPackageId != id);
-                if (nameExist != null)
-                {
-                    res.Success = false;
-                    res.Message = "Another package with the same name already exists.";
-                    return res;
-                }*/
+                
                 bool isUpdated = false;
 
                 // Handle image upload (either local or from a link)
