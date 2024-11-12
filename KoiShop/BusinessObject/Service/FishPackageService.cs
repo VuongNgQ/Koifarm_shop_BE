@@ -277,9 +277,9 @@ namespace BusinessObject.Service
                     isUpdated = true;
                 }
                 
-                if (!string.IsNullOrEmpty(package.Status))
+                if (!string.IsNullOrEmpty(package.ProductStatus))
                 {
-                    var statusEnum = package.Status.ToUpper().Trim();
+                    var statusEnum = package.ProductStatus.ToUpper().Trim();
                     if (ProductStatusEnum.AVAILABLE.Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.AVAILABLE)
                     {
                         existingPackage.ProductStatus = ProductStatusEnum.AVAILABLE;
