@@ -14,11 +14,8 @@ namespace BusinessObject.Model.RequestDTO
     }
     public class ZaloPayCallbackRequestDTO
     {
-        public int AppId { get; set; }
-        public string AppTransId { get; set; }
-        public decimal Amount { get; set; }
-        public long AppTime { get; set; }
-        public int ResultCode { get; set; }
+        public string Data { get; set; }
         public string Mac { get; set; }
+        public int Type { get; set; }
     }
 }

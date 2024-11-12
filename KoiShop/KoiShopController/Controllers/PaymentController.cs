@@ -98,14 +98,13 @@ namespace KoiShopController.Controllers
         }
 
         [HttpPost("zalopay-callback")]
-        public async Task<IActionResult> ZaloPayCallback([FromBody] dynamic cbdata)
+        public async Task<IActionResult> ZaloPayCallback([FromBody] ZaloPayCallbackRequestDTO cbdata)
         {
             var result = await _zaloPayService.HandleCallbackAsync(cbdata);
-            if (result)
-            {
-                return Ok(new { message = "Cập nhật trạng thái đơn hàng thành công" });
-            }
-            return BadRequest(new { message = "Xác thực hoặc cập nhật không thành công" });
+            
+                return Ok(result);
+            
+            //return BadRequest(new { message = "Xác thực hoặc cập nhật không thành công" });
         }
     }
 }

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241108142903_Delete_Some_Unnecessary_Entity")]
-    partial class Delete_Some_Unnecessary_Entity
+    [Migration("20241112203136_updatepayment1.0")]
+    partial class updatepayment10
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -230,9 +230,6 @@ namespace DataAccess.Migrations
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    b.Property<string>("VideoUrl")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("FishConsignmentId");
 
                     b.HasIndex("FishId");
@@ -304,6 +301,9 @@ namespace DataAccess.Migrations
 
                     b.Property<DateTime?>("OrderDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("PaymentMethod")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -397,36 +397,44 @@ namespace DataAccess.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime?>("CreatedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Currency")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ExpireDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("PaymentDate")
+                    b.Property<int?>("FishConsignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PaymentStatus")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RelatedId")
+                    b.Property<string>("PaymentUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("TransactionId")
                         .HasColumnType("int");
 
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("PaymentId");
 
-                    b.HasIndex("RelatedId");
+                    b.HasIndex("FishConsignmentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Payments");
                 });
@@ -692,17 +700,19 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entity.Payment", b =>
                 {
-                    b.HasOne("DataAccess.Entity.FishConsignment", null)
+                    b.HasOne("DataAccess.Entity.FishConsignment", "FishConsignment")
                         .WithMany("Payments")
-                        .HasForeignKey("RelatedId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DataAccess.Entity.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("FishConsignmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("User");
+                    b.HasOne("DataAccess.Entity.Order", "Order")
+                        .WithMany("Payments")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("FishConsignment");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.RolePermission", b =>
@@ -818,6 +828,8 @@ namespace DataAccess.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Permission", b =>

@@ -29,5 +29,11 @@ namespace DataAccess.Repo
                 .Include(o => o.OrderItems) // Includes OrderItems for the specified Order
                 .FirstOrDefaultAsync(o => o.OrderId == id);
         }
+        public async Task UpdateOrder(Order order)
+        {
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

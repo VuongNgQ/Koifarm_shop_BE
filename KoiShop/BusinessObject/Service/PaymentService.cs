@@ -30,9 +30,8 @@ namespace BusinessObject.Service
         {
             var payment = new Payment
             {
-                UserId = userId,
                 TransactionType = TransactionType.CareConsignment,
-                RelatedId = relatedId,
+                FishConsignmentId = relatedId,
                 Amount = amount,
                 PaymentDate = DateTime.Now,
                 PaymentStatus = PaymentStatus.Pending,
@@ -46,9 +45,8 @@ namespace BusinessObject.Service
         {
             var payment = new Payment
             {
-                UserId = userId,
                 TransactionType = TransactionType.SaleConsignment,
-                RelatedId = relatedId,
+                FishConsignmentId = relatedId,
                 Amount = amount,
                 PaymentDate = DateTime.Now,
                 PaymentStatus = PaymentStatus.Completed,
@@ -73,9 +71,8 @@ namespace BusinessObject.Service
         {
             var payment = new Payment
             {
-                UserId = userId,
                 TransactionType = TransactionType.CareConsignment,
-                RelatedId = relatedId,
+                FishConsignmentId = relatedId,
                 Amount = amount,
                 PaymentDate = DateTime.Now,
                 PaymentStatus = PaymentStatus.Pending,
@@ -88,9 +85,8 @@ namespace BusinessObject.Service
         {
             var payment = new Payment
             {
-                UserId = userId,
                 TransactionType = TransactionType.SaleConsignment,
-                RelatedId = relatedId,
+                FishConsignmentId = relatedId,
                 Amount = amount,
                 PaymentDate = DateTime.Now,
                 PaymentStatus = PaymentStatus.Completed,

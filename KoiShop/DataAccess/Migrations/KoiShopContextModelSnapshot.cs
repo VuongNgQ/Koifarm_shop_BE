@@ -406,7 +406,13 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("ExpireDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("PaymentDate")
+                    b.Property<int?>("FishConsignmentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("PaymentDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PaymentStatus")
@@ -415,23 +421,17 @@ namespace DataAccess.Migrations
                     b.Property<string>("PaymentUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("RelatedId")
+                    b.Property<int?>("TransactionId")
                         .HasColumnType("int");
-
-                    b.Property<string>("TransactionId")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("PaymentId");
 
-                    b.HasIndex("RelatedId");
+                    b.HasIndex("FishConsignmentId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("Payments");
                 });
@@ -697,17 +697,19 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entity.Payment", b =>
                 {
-                    b.HasOne("DataAccess.Entity.FishConsignment", null)
+                    b.HasOne("DataAccess.Entity.FishConsignment", "FishConsignment")
                         .WithMany("Payments")
-                        .HasForeignKey("RelatedId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DataAccess.Entity.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("FishConsignmentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.Navigation("User");
+                    b.HasOne("DataAccess.Entity.Order", "Order")
+                        .WithMany("Payments")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("FishConsignment");
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.RolePermission", b =>
@@ -823,6 +825,8 @@ namespace DataAccess.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("OrderItems");
+
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Permission", b =>

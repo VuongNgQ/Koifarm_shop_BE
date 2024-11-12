@@ -8,6 +8,7 @@ namespace DataAccess.IRepo
     {
         Task<Payment?> GetPaymentByIdAsync(int id);
         Task<IEnumerable<Payment>> GetAllPaymentsAsync();
+        Task<Payment?> GetPaymentByTransactionIdAsync(int transactionId);
         Task<Payment?> AddPaymentAsync(Payment payment);
         Task<Payment?> UpdatePaymentAsync(Payment payment);
         Task DeletePaymentAsync(int id);
