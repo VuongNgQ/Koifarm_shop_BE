@@ -54,14 +54,10 @@ namespace DataAccess.Repo
                 exist.Name = fishPackage.Name;
                 exist.Description = fishPackage.Description;
                 exist.NumberOfFish= fishPackage.NumberOfFish;
-                exist.Gender = fishPackage.Gender;
-                exist.Age = fishPackage.Age;
-                
                 exist.DailyFood = fishPackage.DailyFood;
                 exist.ImageUrl = fishPackage.ImageUrl;
-                exist.Status = fishPackage.Status;
+                exist.ProductStatus = fishPackage.ProductStatus;
                 exist.TotalPrice = fishPackage.TotalPrice;
-                exist.Size = fishPackage.Size;
                 
                 _context.Update(exist);
                 await _context.SaveChangesAsync();

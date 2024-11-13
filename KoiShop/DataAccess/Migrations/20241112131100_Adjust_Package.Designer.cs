@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    partial class KoiShopContextModelSnapshot : ModelSnapshot
+    [Migration("20241112131100_Adjust_Package")]
+    partial class Adjust_Package
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -397,13 +400,7 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("ExpireDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("FishConsignmentId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("PaymentDate")
+                    b.Property<DateTime>("PaymentDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("PaymentStatus")
@@ -412,17 +409,23 @@ namespace DataAccess.Migrations
                     b.Property<string>("PaymentUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("TransactionId")
+                    b.Property<int?>("RelatedId")
                         .HasColumnType("int");
+
+                    b.Property<string>("TransactionId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
                     b.HasKey("PaymentId");
 
-                    b.HasIndex("FishConsignmentId");
+                    b.HasIndex("RelatedId");
 
-                    b.HasIndex("OrderId");
+                    b.HasIndex("UserId");
 
                     b.ToTable("Payments");
                 });
@@ -688,19 +691,17 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entity.Payment", b =>
                 {
-                    b.HasOne("DataAccess.Entity.FishConsignment", "FishConsignment")
+                    b.HasOne("DataAccess.Entity.FishConsignment", null)
                         .WithMany("Payments")
-                        .HasForeignKey("FishConsignmentId")
+                        .HasForeignKey("RelatedId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("DataAccess.Entity.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict);
 
-                    b.HasOne("DataAccess.Entity.Order", "Order")
-                        .WithMany("Payments")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("FishConsignment");
-
-                    b.Navigation("Order");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.RolePermission", b =>
@@ -816,8 +817,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Feedbacks");
 
                     b.Navigation("OrderItems");
-
-                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Permission", b =>

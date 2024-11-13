@@ -4,6 +4,7 @@ using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using BusinessObject.Utils;
 using DataAccess.Entity;
+using DataAccess.Enum;
 using DataAccess.IRepo;
 using DataAccess.Repo;
 using System;
@@ -25,6 +26,62 @@ namespace BusinessObject.Service
             _fishRepository = fishRepository;
             _categoryRepo = categoryRepository;
             _mapper = mapper;
+        }
+        public async Task<ServiceResponseFormat<bool>> RestoreFish(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var fishExist = await _fishRepository.GetFishByIdAsync(id);
+                if (fishExist != null)
+                {
+                    fishExist.ProductStatus = ProductStatusEnum.AVAILABLE;
+                    res.Data = true;
+                    res.Success = true;
+                    res.Message = "THIS FISH NOW HAS BEEN REFUND";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Fish not found?";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change status:{ex.Message}";
+                return res;
+            }
+        }
+        public async Task<ServiceResponseFormat<bool>> SoldoutFish(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var fishExist = await _fishRepository.GetFishByIdAsync(id);
+                if (fishExist != null)
+                {
+                    fishExist.ProductStatus = ProductStatusEnum.SOLDOUT;
+                    res.Data = true;
+                    res.Success = true;
+                    res.Message = "THIS FISH NOW HAS BEEN SOLD OUT";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Fish not found?";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change status:{ex.Message}";
+                return res;
+            }
         }
         public async Task<ServiceResponseFormat<List<ResponseFishDTO>>> GetAllFishes()
         {
@@ -103,13 +160,15 @@ namespace BusinessObject.Service
             // Tạo mới cá
             var newFish = _mapper.Map<Fish>(createFishDto);
             newFish.ImageUrl = uploadedImageUrl;
+            newFish.ProductStatus = ProductStatusEnum.AVAILABLE;
+            newFish.Status = FishStatusEnum.GOOD;
             await _fishRepository.AddFishAsync(newFish);
             response.Data = _mapper.Map<ResponseFishDTO>(newFish);
             response.Success = true;
             response.Message = "Fish created successfully.";
             return response;
         }
-        public async Task<ServiceResponseFormat<ResponseFishDTO>> UpdateFish(int fishId, UpdateFishDTO updateFishDto)
+        /*public async Task<ServiceResponseFormat<ResponseFishDTO>> UpdateFish(int fishId, UpdateFishDTO updateFishDto)
         {
             var response = new ServiceResponseFormat<ResponseFishDTO>();
             var fish = await _fishRepository.GetFishByIdAsync(fishId);
@@ -138,7 +197,118 @@ namespace BusinessObject.Service
             response.Success = true;
             response.Message = "Fish updated successfully";
             return response;
+        }*/
+        public async Task<ServiceResponseFormat<ResponseFishDTO>> UpdateFish(int fishId, UpdateFishDTO updateFishDto)
+        {
+            var response = new ServiceResponseFormat<ResponseFishDTO>();
+            try
+            {
+                var fish = await _fishRepository.GetFishByIdAsync(fishId);
+                if (fish == null)
+                {
+                    response.Success = false;
+                    response.Message = "Fish not found";
+                    return response;
+                }
+
+                bool isUpdated = false;
+                var imageService = new CloudinaryService();
+                string uploadedImageUrl = string.Empty;
+
+                // Handle image upload
+                if (updateFishDto.ImageUrl != null)
+                {
+                    using (var stream = updateFishDto.ImageUrl.OpenReadStream())
+                    {
+                        uploadedImageUrl = await imageService.UploadImageAsync(stream, updateFishDto.ImageUrl.FileName);
+                        if (!string.IsNullOrEmpty(uploadedImageUrl))
+                        {
+                            fish.ImageUrl = uploadedImageUrl;
+                            isUpdated = true;
+                        }
+                    }
+                }
+
+                // Update other fields if they have changed
+                if (!string.IsNullOrEmpty(updateFishDto.Name) && updateFishDto.Name != fish.Name)
+                {
+                    fish.Name = updateFishDto.Name;
+                    isUpdated = true;
+                }
+
+                if (updateFishDto.Age.HasValue && updateFishDto.Age != fish.Age)
+                {
+                    fish.Age = updateFishDto.Age.Value;
+                    isUpdated = true;
+                }
+
+                if (Enum.TryParse<FishGenderEnum>(updateFishDto.Gender, true, out var genderEnum) && genderEnum != fish.Gender)
+                {
+                    fish.Gender = genderEnum;
+                    isUpdated = true;
+                }
+
+                if (updateFishDto.Size.HasValue && updateFishDto.Size != fish.Size)
+                {
+                    fish.Size = updateFishDto.Size.Value;
+                    isUpdated = true;
+                }
+
+                if (!string.IsNullOrEmpty(updateFishDto.Description) && updateFishDto.Description != fish.Description)
+                {
+                    fish.Description = updateFishDto.Description;
+                    isUpdated = true;
+                }
+
+                if (updateFishDto.CategoryId.HasValue && updateFishDto.CategoryId.Value != fish.CategoryId)
+                {
+                    fish.CategoryId = updateFishDto.CategoryId.Value;
+                    isUpdated = true;
+                }
+
+                if (updateFishDto.Price.HasValue && updateFishDto.Price != fish.Price)
+                {
+                    fish.Price = updateFishDto.Price.Value;
+                    isUpdated = true;
+                }
+
+                if (updateFishDto.DailyFood.HasValue && updateFishDto.DailyFood != fish.DailyFood)
+                {
+                    fish.DailyFood = updateFishDto.DailyFood.Value;
+                    isUpdated = true;
+                }
+
+                if (Enum.TryParse<ProductStatusEnum>(updateFishDto.ProductStatus, true, out var statusEnum) && statusEnum != fish.ProductStatus)
+                {
+                    fish.ProductStatus = statusEnum;
+                    isUpdated = true;
+                }
+
+                // Check if no updates were made
+                if (!isUpdated)
+                {
+                    response.Success = false;
+                    response.Message = "No changes detected. Fish was not updated.";
+                    return response;
+                }
+
+                // Save the updates if changes were made
+                await _fishRepository.UpdateFishAsync(fish);
+
+                response.Data = _mapper.Map<ResponseFishDTO>(fish);
+                response.Success = true;
+                response.Message = "Fish updated successfully";
+                return response;
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Failed to update Fish: {ex.Message}";
+                return response;
+            }
         }
+
+
         public async Task<ServiceResponseFormat<bool>> DeleteFish(int fishId)
         {
             var response = new ServiceResponseFormat<bool>();

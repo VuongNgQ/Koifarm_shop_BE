@@ -17,8 +17,15 @@ namespace BusinessObject.Model.ResponseDTO
         public int UserCartId {  get; set; }
         public string Status { get; set; }
         public List<ResponseAddressDTO> Addresses { get; set; }
+        public List<UserOrder> Orders { get; set; }
     }
-
+    public class UserOrder
+    {
+        public int OrderId { get; set; }
+        public DateTime? OrderDate { get; set; }
+        public decimal TotalPrice { get; set; }
+        public string? Status { get; set; }
+    }
     public class UserResponseDTO
     {
        

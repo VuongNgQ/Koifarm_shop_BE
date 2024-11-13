@@ -10,9 +10,6 @@ namespace BusinessObject.Model.RequestDTO.UpdateReq.Entity
     public class UpdatePackageDTO
     {
         public string? Name { get; set; }
-        public int? Age { get; set; }
-        public string? Gender { get; set; }
-        public decimal? Size { get; set; }
         public string? Description { get; set; }
 
         public decimal? TotalPrice { get; set; }
@@ -21,6 +18,6 @@ namespace BusinessObject.Model.RequestDTO.UpdateReq.Entity
         public IFormFile? ImageUrl { get; set; }
         public int? NumberOfFish { get; set; }
 
-        public string? Status { get; set; }
+        public string? ProductStatus { get; set; }
     }
 }

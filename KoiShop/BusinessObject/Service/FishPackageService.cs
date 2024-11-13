@@ -43,18 +43,8 @@ namespace BusinessObject.Service
                 }
                 
                 var mapp=_mapper.Map<FishPackage>(package);
-                // Gender validation and conversion
-                if (Enum.TryParse<GenderEnum>(package.Gender.ToUpper().Trim(), out var parsedGender))
-                {
-                    mapp.Gender = parsedGender.ToString();
-                }
-                else
-                {
-                    res.Success = false;
-                    res.Message = "Invalid Gender";
-                    return res;
-                }
-                mapp.Status = ProductStatusEnum.AVAILABLE;
+                
+                mapp.ProductStatus = ProductStatusEnum.AVAILABLE;
                 mapp.ImageUrl = uploadedImageUrl;
                 await _repo.CreatePackage(mapp);
                 var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
@@ -71,7 +61,62 @@ namespace BusinessObject.Service
             }
             
         }
-
+        public async Task<ServiceResponseFormat<bool>> RestorePackage(int id)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var packageExist = await _repo.GetByIdAsync(id);
+                if (packageExist != null)
+                {
+                    packageExist.ProductStatus = ProductStatusEnum.AVAILABLE;
+                    res.Data = true;
+                    res.Success = true;
+                    res.Message = "THIS PACKAGE HAS BEEN SOLD OUT";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Package not found?";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change status:{ex.Message}";
+                return res;
+            }
+        }
+        public async Task<ServiceResponseFormat<bool>> SoldoutPackage(int id)
+        {
+            var res=new ServiceResponseFormat<bool>();
+            try
+            {
+                var packageExist = await _repo.GetByIdAsync(id);
+                if(packageExist != null)
+                {
+                    packageExist.ProductStatus = ProductStatusEnum.SOLDOUT;
+                    res.Data = true;
+                    res.Success = true;
+                    res.Message = "THIS PACKAGE HAS BEEN SOLD OUT";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Package not found?";
+                    return res;
+                }
+            }
+            catch(Exception ex)
+            {
+                res.Success=false;
+                res.Message=$"Fail to change status:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<bool>> DeletePackage(int id)
         {
             var res = new ServiceResponseFormat<bool>();
@@ -137,14 +182,14 @@ namespace BusinessObject.Service
                 var packages=await _repo.GetFishPackages();
                 if (!string.IsNullOrEmpty(search))
                 {
-                    packages = packages.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase));
+                    packages = packages.Where(p => p.Name.Contains(search, StringComparison.OrdinalIgnoreCase)||
+                    p.ProductStatus.ToString().Contains(search, StringComparison.OrdinalIgnoreCase));
                 }
                 packages = sort.ToLower().Trim() switch
                 {
                     "name" => packages.OrderBy(e => e.Name),
                     
                     "fishinpackage" => packages.OrderBy(e => e.NumberOfFish),
-                    "age" => packages.OrderBy(e => e.Age),
                     "price" => packages.OrderBy(e => e.TotalPrice),
                     _=>packages.OrderBy(e=>e.FishPackageId)
                 };
@@ -186,13 +231,7 @@ namespace BusinessObject.Service
                     res.Message = "Package not found";
                     return res;
                 }
-                /*var nameExist = await _repo.FindAsync(p => p.Name == package.Name && p.FishPackageId != id);
-                if (nameExist != null)
-                {
-                    res.Success = false;
-                    res.Message = "Another package with the same name already exists.";
-                    return res;
-                }*/
+                
                 bool isUpdated = false;
 
                 // Handle image upload (either local or from a link)
@@ -220,24 +259,6 @@ namespace BusinessObject.Service
                     isUpdated = true;
                 }
 
-                if (package.Age.HasValue && package.Age != existingPackage.Age)
-                {
-                    existingPackage.Age = package.Age.Value;
-                    isUpdated = true;
-                }
-
-                if (!string.IsNullOrEmpty(package.Gender) && package.Gender != existingPackage.Gender)
-                {
-                    existingPackage.Gender = package.Gender;
-                    isUpdated = true;
-                }
-
-                if (package.Size.HasValue && package.Size != existingPackage.Size)
-                {
-                    existingPackage.Size = package.Size.Value;
-                    isUpdated = true;
-                }
-
                 if (!string.IsNullOrEmpty(package.Description) && package.Description != existingPackage.Description)
                 {
                     existingPackage.Description = package.Description;
@@ -255,33 +276,18 @@ namespace BusinessObject.Service
                     existingPackage.DailyFood = package.DailyFood.Value;
                     isUpdated = true;
                 }
-                if (!string.IsNullOrEmpty(package.Gender))
-                {
-                    var genderEnum = package.Gender.ToUpper().Trim();
-                    if (GenderEnum.MALE.Equals(genderEnum))
-                    {
-                        existingPackage.Gender = GenderEnum.MALE.ToString();
-                        isUpdated = true;
-
-                    }
-                    else if (GenderEnum.FEMALE.Equals(genderEnum))
-                    {
-                        existingPackage.Gender = GenderEnum.FEMALE.ToString();
-                        isUpdated = true;
-                    }
-                }
                 
-                if (!string.IsNullOrEmpty(package.Status))
+                if (!string.IsNullOrEmpty(package.ProductStatus))
                 {
-                    var statusEnum = package.Status.ToUpper().Trim();
-                    if (ProductStatusEnum.AVAILABLE.Equals(statusEnum) && existingPackage.Status != ProductStatusEnum.AVAILABLE)
+                    var statusEnum = package.ProductStatus.ToUpper().Trim();
+                    if (ProductStatusEnum.AVAILABLE.ToString().Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.AVAILABLE)
                     {
-                        existingPackage.Status = ProductStatusEnum.AVAILABLE;
+                        existingPackage.ProductStatus = ProductStatusEnum.AVAILABLE;
                         isUpdated = true;
                     }
-                    else if (ProductStatusEnum.UNAVAILABLE.Equals(statusEnum) && existingPackage.Status != ProductStatusEnum.UNAVAILABLE)
+                    if (ProductStatusEnum.UNAVAILABLE.ToString().Equals(statusEnum) && existingPackage.ProductStatus != ProductStatusEnum.UNAVAILABLE)
                     {
-                        existingPackage.Status = ProductStatusEnum.UNAVAILABLE;
+                        existingPackage.ProductStatus = ProductStatusEnum.UNAVAILABLE;
                         isUpdated = true;
                     }
                 }

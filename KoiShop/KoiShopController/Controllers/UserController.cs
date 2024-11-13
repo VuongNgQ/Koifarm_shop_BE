@@ -34,7 +34,7 @@ namespace KoiShopController.Controllers
         /// <response code="200">Returns a list of users.</response>
         /// <response code="404">No users found.</response>
         [HttpGet]
-        [Authorize(Roles = "Admin, Manager, Staff")]
+        [Authorize(Roles = "Admin, Manager, Staff, Customer")]
         public async Task<IActionResult> GetUser(int page = 1, int pageSize = 10,
             string search = "", string sort = "")
         {
