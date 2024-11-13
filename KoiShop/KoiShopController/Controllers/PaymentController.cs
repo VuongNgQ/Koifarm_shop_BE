@@ -30,6 +30,15 @@ namespace KoiShopController.Controllers
             return NotFound("Payment not found.");
         }
 
+        [HttpGet("getPayment/{id}")]
+        public async Task<IActionResult> GetPaymentByUserId(int id)
+        {
+            var payment = await _paymentService.GetPaymentByUserIdAsync(id);
+            if (payment != null)
+                return Ok(payment);
+            return NotFound("Payment not found.");
+        }
+
         [HttpGet("all")]
         public async Task<IActionResult> GetAllPayments()
         {
