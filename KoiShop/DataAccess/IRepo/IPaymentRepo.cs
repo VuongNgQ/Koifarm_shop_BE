@@ -7,6 +7,7 @@ namespace DataAccess.IRepo
     public interface IPaymentRepo
     {
         Task<Payment?> GetPaymentByIdAsync(int id);
+        Task<List<Payment>> GetPaymentByUserIdAsync(int id);
         Task<IEnumerable<Payment>> GetAllPaymentsAsync();
         Task<Payment?> GetPaymentByTransactionIdAsync(int transactionId);
         Task<Payment?> AddPaymentAsync(Payment payment);

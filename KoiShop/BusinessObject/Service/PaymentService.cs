@@ -21,6 +21,11 @@ namespace BusinessObject.Service
             return await _paymentRepository.GetPaymentByIdAsync(id);
         }
 
+        public async Task<Payment?> GetPaymentByUserIdAsync(int id)
+        {
+            return await _paymentRepository.GetPaymentByUserIdAsync(id);
+        }
+
         public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
         {
             return await _paymentRepository.GetAllPaymentsAsync();

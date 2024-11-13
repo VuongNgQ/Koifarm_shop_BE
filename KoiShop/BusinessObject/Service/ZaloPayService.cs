@@ -58,7 +58,7 @@ namespace BusinessObject.Service
             }).ToArray();
             Random rnd = new Random();
             var embed_data = new { orderId = orderId};
-            var callbackUrl = "https://9722-2405-4800-5b0f-8530-40a1-546a-e447-e37c.ngrok-free.app/api/Payment/zalopay-callback";
+            var callbackUrl = "https://7b3b-118-69-182-144.ngrok-free.app/api/Payment/zalopay-callback";
             var app_trans_id = rnd.Next(1000000);
 
             var payment = new Payment
@@ -145,10 +145,11 @@ namespace BusinessObject.Service
                     result["return_message"] = "mac not equal";
                     return result;
                 }
-
+                var isSuccess = cbdata.Type == 1;
                 var dataJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataStr);
                 var appTransId = Convert.ToString(dataJson["app_trans_id"]);
-                var isSuccess = dataJson.ContainsKey("return_code") && Convert.ToInt32(dataJson["return_code"]) == 1;
+                //var actualReturnCode = dataJson.ContainsKey("return_code") ? Convert.ToInt32(dataJson["return_code"]) : -1;
+                //var isSuccess = actualReturnCode == 1;
 
                 var payment = await _paymentRepo.GetPaymentByTransactionIdAsync(int.Parse(appTransId.Split('_')[1]));
                 if (payment == null)
