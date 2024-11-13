@@ -264,7 +264,11 @@ namespace BusinessObject.Service
                     existingPackage.Description = package.Description;
                     isUpdated = true;
                 }
-
+                if (package.NumberOfFish.HasValue && package.NumberOfFish != existingPackage.NumberOfFish)
+                {
+                    existingPackage.NumberOfFish = package.NumberOfFish.Value;
+                    isUpdated = true;
+                }
                 if (package.TotalPrice.HasValue && package.TotalPrice != existingPackage.TotalPrice)
                 {
                     existingPackage.TotalPrice = package.TotalPrice.Value;

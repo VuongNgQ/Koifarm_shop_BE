@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241112201136_updatepayment")]
-    partial class updatepayment
+    [Migration("20241113015137_Remake_Payment")]
+    partial class Remake_Payment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -170,7 +170,7 @@ namespace DataAccess.Migrations
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("QuantityInStock")
+                    b.Property<int>("ProductStatus")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("Size")
@@ -247,16 +247,10 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FishPackageId"));
 
-                    b.Property<int?>("Age")
-                        .HasColumnType("int");
-
                     b.Property<decimal?>("DailyFood")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Gender")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageUrl")
@@ -268,10 +262,7 @@ namespace DataAccess.Migrations
                     b.Property<int?>("NumberOfFish")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("Size")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Status")
+                    b.Property<int>("ProductStatus")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")
@@ -424,8 +415,8 @@ namespace DataAccess.Migrations
                     b.Property<string>("PaymentUrl")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TransactionId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("TransactionId")
+                        .HasColumnType("int");
 
                     b.Property<int>("TransactionType")
                         .HasColumnType("int");
