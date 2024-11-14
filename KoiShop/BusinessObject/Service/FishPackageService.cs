@@ -7,6 +7,7 @@ using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
+using DataAccess.Repo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +20,25 @@ namespace BusinessObject.Service
     {
         private readonly IFishPackageRepo _repo;
         private readonly IMapper _mapper;
-        public FishPackageService(IFishPackageRepo repo, IMapper mapper)
+        private readonly ICategoryPackageRepo _categoryPackageRepo;
+        private readonly ICategoryRepo _categoryRepo;
+        public FishPackageService(IFishPackageRepo repo, IMapper mapper, ICategoryPackageRepo categoryPackageRepo
+            , ICategoryRepo categoryRepo)
         {
             _mapper = mapper;
             _repo = repo;
+            _categoryPackageRepo = categoryPackageRepo;
+            _categoryRepo = categoryRepo;
         }
-
+        public async Task UpdatePackageTotalNumberOfFish(int packageId)
+        {
+            var list = await _categoryPackageRepo.GetAllAsync();
+            var categoryPackage = list.Where(c => c.FishPackageId == packageId);
+            var totalNumberOfFish = categoryPackage.Sum(item => item.QuantityOfEach);
+            var package = await _repo.GetByIdAsync(packageId);
+            package.NumberOfFish = totalNumberOfFish;
+            _repo.Update(package);
+        }
         public async Task<ServiceResponseFormat<ResponseFishPackageDTO>> CreatePackage(CreateFishPackageDTO package)
         {
             var res = new ServiceResponseFormat<ResponseFishPackageDTO>();
@@ -41,17 +55,42 @@ namespace BusinessObject.Service
                         uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageUrl.FileName);
                     }
                 }
-                
-                var mapp=_mapper.Map<FishPackage>(package);
-                
+                var mapp = _mapper.Map<FishPackage>(package);
                 mapp.ProductStatus = ProductStatusEnum.AVAILABLE;
                 mapp.ImageUrl = uploadedImageUrl;
                 await _repo.CreatePackage(mapp);
-                var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
+                /*await UpdatePackageTotalNumberOfFish(mapp.FishPackageId);*/
+                var result = _mapper.Map<ResponseFishPackageDTO>(mapp);
                 res.Success = true;
                 res.Message = "Package created successfully";
                 res.Data = result;
                 return res;
+                /*if (package.Categories.Count > 0)
+                {
+
+                    foreach (var item in package.Categories)
+                    {
+                        var categoryExist = await _categoryRepo.GetByIdAsync(item.CategoryId);
+                        if (categoryExist != null)
+                        {
+                            var categoryPackageMapp = _mapper.Map<CategoryPackage>(item);
+                            await _categoryPackageRepo.AddAsync(categoryPackageMapp);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Category with this {item.CategoryId} does not exist so we skip it");
+                        }
+                    }
+
+                    
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Can't Create Package with no Category";
+                    return res;
+                }*/
+
             }
             catch (Exception ex)
             {
@@ -59,7 +98,37 @@ namespace BusinessObject.Service
                 res.Message = $"Fail to create User:{ex.Message}";
                 return res;
             }
-            
+
+        }
+        public async Task<ServiceResponseFormat<bool>>AddFishToPackage(CreateCategoryPackageDTO categoryDTO)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var categoryExist = await _categoryRepo.GetByIdAsync(categoryDTO.CategoryId);
+                var packageExist = await _repo.GetByIdAsync(categoryDTO.FishPackageId);
+                if(categoryExist == null||packageExist==null)
+                {
+                    res.Success=false;
+                    res.Message = "Category/Package Not found";
+                    return res;
+                }
+                else
+                {
+                    var mapp = _mapper.Map<CategoryPackage>(categoryDTO);
+                    await _categoryPackageRepo.AddAsync(mapp);
+                    await UpdatePackageTotalNumberOfFish(categoryDTO.FishPackageId);
+                    res.Success = true;
+                    res.Message = "Add Fish to package Successfully";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to Add Fish {ex.Message}";
+                return res;
+            }
         }
         public async Task<ServiceResponseFormat<bool>> RestorePackage(int id)
         {

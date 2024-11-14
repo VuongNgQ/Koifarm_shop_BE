@@ -43,7 +43,7 @@ namespace DataAccess.Repo
 
         public async Task<IEnumerable<FishPackage>> GetFishPackages()
         {
-            return await _context.Set<FishPackage>().ToListAsync();
+            return await _context.Set<FishPackage>().Include(p=>p.CategoryPackages).ToListAsync();
         }
 
         public async Task<FishPackage> UpdatePackage(int id, FishPackage fishPackage)

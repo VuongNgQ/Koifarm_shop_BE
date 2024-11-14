@@ -66,6 +66,21 @@ namespace KoiShopController.Controllers
             return Ok(result);
         }
         /// <summary>
+        /// Create a package
+        /// </summary>
+        /// <param name="packageDTO"></param>
+        /// <returns></returns>
+        [HttpPost("AddFish")]
+        public async Task<IActionResult> AddToPackage([FromForm] CreateCategoryPackageDTO packageDTO)
+        {
+            var result = await _service.AddFishToPackage(packageDTO);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
+        }
+        /// <summary>
         /// Delete a package with ID
         /// </summary>
         /// <param name="id"></param>
