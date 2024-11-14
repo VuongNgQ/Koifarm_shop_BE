@@ -26,6 +26,9 @@ namespace BusinessObject.Model.RequestDTO
         [Required]
         public decimal DailyFood { get; set; }
         [Required]
+        [Range(9, 101, ErrorMessage = "Quantity must be between 10 and 100")]
+        public int Capacity { get; set; }
+        [Required]
         public IFormFile? ImageUrl { get; set; }
         [Required]
         public int QuantityInStock { get; set; }
@@ -35,7 +38,7 @@ namespace BusinessObject.Model.RequestDTO
     {
         public int FishPackageId { get; set; }
         public int CategoryId { get; set; }
-        [Range(0, 11, ErrorMessage = "Quantity must be between 0 and 11")]
+        [Range(0, 11, ErrorMessage = "Quantity must be between 1 and 10")]
         public int QuantityOfEach { get; set; }
     }
 }

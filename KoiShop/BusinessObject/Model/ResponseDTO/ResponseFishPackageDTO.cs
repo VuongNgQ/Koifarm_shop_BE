@@ -11,6 +11,7 @@ namespace BusinessObject.Model.ResponseDTO
     {
         public int FishPackageId { get; set; }
         public string Name { get; set; }
+        public int Capacity { get; set; }
         public ICollection<CreateCategoryPackageDTO> Categories { get; set; }
         public int Age { get; set; }
         public decimal MinSize { get; set; }

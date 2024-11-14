@@ -265,6 +265,9 @@ namespace DataAccess.Migrations
                     b.Property<int?>("Age")
                         .HasColumnType("int");
 
+                    b.Property<int?>("Capacity")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("DailyFood")
                         .HasColumnType("decimal(18,2)");
 

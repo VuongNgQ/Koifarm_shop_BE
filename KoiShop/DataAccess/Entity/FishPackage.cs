@@ -19,6 +19,7 @@ namespace DataAccess.Entity
         public decimal? DailyFood { get; set; }
         public string? ImageUrl { get; set; }
         public int? NumberOfFish { get; set; }
+        public int? Capacity { get; set; }
         public int? QuantityInStock { get; set; }
         public ProductStatusEnum ProductStatus { get; set; }
         public ICollection<OrderItem>? OrderItems { get; set; }
