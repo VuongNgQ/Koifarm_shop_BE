@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241114033127_Remake_Package")]
-    partial class Remake_Package
+    [Migration("20241114082127_Add_Capacity")]
+    partial class Add_Capacity
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -266,6 +266,9 @@ namespace DataAccess.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FishPackageId"));
 
                     b.Property<int?>("Age")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Capacity")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("DailyFood")
