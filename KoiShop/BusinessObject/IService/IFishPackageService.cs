@@ -16,6 +16,7 @@ namespace BusinessObject.IService
             string? search, string sort);
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> GetFishPackage(int id);
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> CreatePackage(CreateFishPackageDTO package);
+        Task<ServiceResponseFormat<bool>> AddFishToPackage(CreateCategoryPackageDTO categoryDTO);
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> UpdatePackage(int id, UpdatePackageDTO package);
         Task<ServiceResponseFormat<bool>> DeletePackage(int id);
         Task<ServiceResponseFormat<bool>> SoldoutPackage(int id);

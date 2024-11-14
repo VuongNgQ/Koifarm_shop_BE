@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241113015137_Remake_Payment")]
-    partial class Remake_Payment
+    [Migration("20241114033127_Remake_Package")]
+    partial class Remake_Package
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -104,6 +104,24 @@ namespace DataAccess.Migrations
                     b.HasKey("CategoryId");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("DataAccess.Entity.CategoryPackage", b =>
+                {
+                    b.Property<int>("FishPackageId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuantityOfEach")
+                        .HasColumnType("int");
+
+                    b.HasKey("FishPackageId", "CategoryId");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("CategoryPackage");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.Feedback", b =>
@@ -247,6 +265,9 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FishPackageId"));
 
+                    b.Property<int?>("Age")
+                        .HasColumnType("int");
+
                     b.Property<decimal?>("DailyFood")
                         .HasColumnType("decimal(18,2)");
 
@@ -256,6 +277,12 @@ namespace DataAccess.Migrations
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<decimal?>("MaxSize")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("MinSize")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -263,6 +290,9 @@ namespace DataAccess.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("ProductStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("QuantityInStock")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("TotalPrice")
@@ -430,22 +460,6 @@ namespace DataAccess.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("DataAccess.Entity.Permission", b =>
-                {
-                    b.Property<int>("PermissionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PermissionId"));
-
-                    b.Property<string>("PermissionName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PermissionId");
-
-                    b.ToTable("Permissions");
-                });
-
             modelBuilder.Entity("DataAccess.Entity.Role", b =>
                 {
                     b.Property<int>("RoleId")
@@ -460,21 +474,6 @@ namespace DataAccess.Migrations
                     b.HasKey("RoleId");
 
                     b.ToTable("Roles");
-                });
-
-            modelBuilder.Entity("DataAccess.Entity.RolePermission", b =>
-                {
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("PermissionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("RoleId", "PermissionId");
-
-                    b.HasIndex("PermissionId");
-
-                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.SubImage", b =>
@@ -600,6 +599,25 @@ namespace DataAccess.Migrations
                     b.Navigation("UserCart");
                 });
 
+            modelBuilder.Entity("DataAccess.Entity.CategoryPackage", b =>
+                {
+                    b.HasOne("DataAccess.Entity.Category", "Category")
+                        .WithMany("CategoryPackages")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Entity.FishPackage", "Package")
+                        .WithMany("CategoryPackages")
+                        .HasForeignKey("FishPackageId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("Package");
+                });
+
             modelBuilder.Entity("DataAccess.Entity.Feedback", b =>
                 {
                     b.HasOne("DataAccess.Entity.Order", "Order")
@@ -706,25 +724,6 @@ namespace DataAccess.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("DataAccess.Entity.RolePermission", b =>
-                {
-                    b.HasOne("DataAccess.Entity.Permission", "Permission")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("PermissionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DataAccess.Entity.Role", "Role")
-                        .WithMany("RolePermissions")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Permission");
-
-                    b.Navigation("Role");
-                });
-
             modelBuilder.Entity("DataAccess.Entity.SubImage", b =>
                 {
                     b.HasOne("DataAccess.Entity.Fish", "Fish")
@@ -786,6 +785,8 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entity.Category", b =>
                 {
+                    b.Navigation("CategoryPackages");
+
                     b.Navigation("Fish");
                 });
 
@@ -809,6 +810,8 @@ namespace DataAccess.Migrations
                 {
                     b.Navigation("CartItems");
 
+                    b.Navigation("CategoryPackages");
+
                     b.Navigation("OrderItems");
 
                     b.Navigation("SubImages");
@@ -823,15 +826,8 @@ namespace DataAccess.Migrations
                     b.Navigation("Payments");
                 });
 
-            modelBuilder.Entity("DataAccess.Entity.Permission", b =>
-                {
-                    b.Navigation("RolePermissions");
-                });
-
             modelBuilder.Entity("DataAccess.Entity.Role", b =>
                 {
-                    b.Navigation("RolePermissions");
-
                     b.Navigation("Users");
                 });
 

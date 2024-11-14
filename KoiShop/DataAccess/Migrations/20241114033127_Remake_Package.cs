@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Remake_Payment : Migration
+    public partial class Remake_Package : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,29 +49,20 @@ namespace DataAccess.Migrations
                     FishPackageId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Age = table.Column<int>(type: "int", nullable: true),
+                    MinSize = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    MaxSize = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TotalPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     DailyFood = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     ImageUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NumberOfFish = table.Column<int>(type: "int", nullable: true),
+                    QuantityInStock = table.Column<int>(type: "int", nullable: true),
                     ProductStatus = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_FishPackages", x => x.FishPackageId);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Permissions",
-                columns: table => new
-                {
-                    PermissionId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    PermissionName = table.Column<string>(type: "nvarchar(max)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Permissions", x => x.PermissionId);
                 });
 
             migrationBuilder.CreateTable(
@@ -116,26 +107,27 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RolePermissions",
+                name: "CategoryPackage",
                 columns: table => new
                 {
-                    RoleId = table.Column<int>(type: "int", nullable: false),
-                    PermissionId = table.Column<int>(type: "int", nullable: false)
+                    FishPackageId = table.Column<int>(type: "int", nullable: false),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    QuantityOfEach = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RolePermissions", x => new { x.RoleId, x.PermissionId });
+                    table.PrimaryKey("PK_CategoryPackage", x => new { x.FishPackageId, x.CategoryId });
                     table.ForeignKey(
-                        name: "FK_RolePermissions_Permissions_PermissionId",
-                        column: x => x.PermissionId,
-                        principalTable: "Permissions",
-                        principalColumn: "PermissionId",
-                        onDelete: ReferentialAction.Cascade);
+                        name: "FK_CategoryPackage_Categories_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "Categories",
+                        principalColumn: "CategoryId",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_RolePermissions_Roles_RoleId",
-                        column: x => x.RoleId,
-                        principalTable: "Roles",
-                        principalColumn: "RoleId",
+                        name: "FK_CategoryPackage_FishPackages_FishPackageId",
+                        column: x => x.FishPackageId,
+                        principalTable: "FishPackages",
+                        principalColumn: "FishPackageId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -461,6 +453,11 @@ namespace DataAccess.Migrations
                 column: "UserCartId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CategoryPackage_CategoryId",
+                table: "CategoryPackage",
+                column: "CategoryId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Feedbacks_OrderId",
                 table: "Feedbacks",
                 column: "OrderId");
@@ -526,11 +523,6 @@ namespace DataAccess.Migrations
                 column: "OrderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RolePermissions_PermissionId",
-                table: "RolePermissions",
-                column: "PermissionId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_SubImages_FishId",
                 table: "SubImages",
                 column: "FishId");
@@ -565,6 +557,9 @@ namespace DataAccess.Migrations
                 name: "CartItems");
 
             migrationBuilder.DropTable(
+                name: "CategoryPackage");
+
+            migrationBuilder.DropTable(
                 name: "Feedbacks");
 
             migrationBuilder.DropTable(
@@ -575,9 +570,6 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Payments");
-
-            migrationBuilder.DropTable(
-                name: "RolePermissions");
 
             migrationBuilder.DropTable(
                 name: "SubImages");
@@ -593,9 +585,6 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "Orders");
-
-            migrationBuilder.DropTable(
-                name: "Permissions");
 
             migrationBuilder.DropTable(
                 name: "FishPackages");

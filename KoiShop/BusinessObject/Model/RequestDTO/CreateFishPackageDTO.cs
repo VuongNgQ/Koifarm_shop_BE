@@ -10,18 +10,32 @@ namespace BusinessObject.Model.RequestDTO
 {
     public class CreateFishPackageDTO
     {
-        [Required(ErrorMessage ="Name must not be null")]
+        [Required]
         public string Name { get; set; }
+        [Required]
+        public int Age { get; set; }
+        /*[Required]
+        public ICollection<CreateCategoryPackageDTO> Categories { get; set; }*/
+        [Required]
+        public decimal MinSize { get; set; }
+        [Required]
+        public decimal MaxSize { get; set; }
         public string Description { get; set; }
-        [Required(ErrorMessage = "Total Price must not be null")]
-        public decimal TotalPrice { get; set; }
-        [Required(ErrorMessage = "Daily Food must not be null")]
+        [Required]
+        public decimal TotalPrice { get; set; }  
+        [Required]
         public decimal DailyFood { get; set; }
-        // Use IFormFile for local file uploads
-        [Required(ErrorMessage = "Image must not be null")]
+        [Required]
         public IFormFile? ImageUrl { get; set; }
-        [Required(ErrorMessage = "Number must not be null")]
-        public int NumberOfFish { get; set; }
-        
+        [Required]
+        public int QuantityInStock { get; set; }
+
+    }
+    public class CreateCategoryPackageDTO
+    {
+        public int FishPackageId { get; set; }
+        public int CategoryId { get; set; }
+        [Range(0, 11, ErrorMessage = "Quantity must be between 0 and 11")]
+        public int QuantityOfEach { get; set; }
     }
 }

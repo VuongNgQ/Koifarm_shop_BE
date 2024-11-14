@@ -14,5 +14,6 @@ namespace DataAccess.Entity
         public string? ImageUrl { get; set; }
         public string? OriginCountry { get; set; }
         public ICollection<Fish>? Fish { get; set; }
+        public ICollection<CategoryPackage> CategoryPackages { get; set; }
     }
 }
