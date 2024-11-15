@@ -21,8 +21,8 @@ namespace KoiShopController.Controllers
         /// </summary>
         /// <param name="page">Number of pages</param>
         /// <param name="pageSize">Number of records in a page</param>
-        /// <param name="search">Search with name</param>
-        /// <param name="sort">By name, number of fishes in package, age, price</param>
+        /// <param name="search">Search with name, status</param>
+        /// <param name="sort">By "name", "fishinpackage", "age", "price", "maxsize", "minsize", "capacity"</param>
         /// <returns>A list</returns>
         [HttpGet]
         public async Task<IActionResult> GetPackages(int page = 1, int pageSize = 10,
@@ -51,7 +51,7 @@ namespace KoiShopController.Controllers
             return Ok(result);
         }
         /// <summary>
-        /// Create a package
+        /// Create an empty package
         /// </summary>
         /// <param name="packageDTO"></param>
         /// <returns></returns>
@@ -64,6 +64,52 @@ namespace KoiShopController.Controllers
                 return BadRequest(result.Message);
             }
             return Ok(result);
+        }
+        /// <summary>
+        /// Add fish to package
+        /// </summary>
+        /// <param name="packageDTO"></param>
+        /// <returns></returns>
+        [HttpPost("AddFish")]
+        public async Task<IActionResult> AddToPackage([FromForm] CreateCategoryPackageDTO packageDTO)
+        {
+            var result = await _service.AddFishToPackage(packageDTO);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result);
+        }
+        /// <summary>
+        /// Update the quantity for each fish in the package
+        /// </summary>
+        /// <param name="dTO"></param>
+        /// <returns></returns>
+        [HttpPut("UpdateQuantity")]
+        public async Task<IActionResult> UpdateQuantity([FromForm]CreateCategoryPackageDTO dTO)
+        {
+            var result = await _service.UpdateQuantityInPackage(dTO);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result.Message);
+        }
+        /// <summary>
+        /// Delete fish in the package
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="categoryId"></param>
+        /// <returns></returns>
+        [HttpDelete("DeleteFishInPackage/{packageId}&&{categoryId}")]
+        public async Task<IActionResult> DeleteFishInPackage([FromRoute] int packageId, [FromRoute] int categoryId)
+        {
+            var result = await _service.DeleteCategoryInPackage(packageId, categoryId);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return BadRequest(result.Message);
         }
         /// <summary>
         /// Delete a package with ID

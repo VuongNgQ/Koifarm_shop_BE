@@ -34,9 +34,14 @@ namespace BusinessObject.Mapper
             //Role Mapping
             CreateMap<Role, CreateRoleDTO>().ReverseMap();
             //Package Mapping
-            CreateMap<FishPackage, CreateFishPackageDTO>().ReverseMap();
-            CreateMap<FishPackage, ResponseFishPackageDTO>().ReverseMap();
+            CreateMap<FishPackage, CreateFishPackageDTO>()
+                .ReverseMap();
+            CreateMap<FishPackage, ResponseFishPackageDTO>()
+                .ForMember(f=>f.Categories, o=>o.MapFrom(s=>s.CategoryPackages))
+                .ReverseMap();
             CreateMap<FishPackage, UpdatePackageDTO>().ReverseMap();
+            //Category Package
+            CreateMap<CategoryPackage, CreateCategoryPackageDTO>().ReverseMap();
             //Category
             CreateMap<Category, CreateCategoryDTO>().ReverseMap();
             CreateMap<Category, ResponseCategoryDTO>().ReverseMap();

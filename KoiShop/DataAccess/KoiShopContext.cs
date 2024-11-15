@@ -20,8 +20,6 @@ namespace DataAccess
         public DbSet<User> Users { get; set; }
         public DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
         public DbSet<Role> Roles { get; set; }
-        public DbSet<Permission> Permissions { get; set; }
-        public DbSet<RolePermission> RolePermissions { get; set; }
         public DbSet<Address> Addresses { get; set; }
         
         public DbSet<Order> Orders { get; set; }
@@ -44,18 +42,6 @@ namespace DataAccess
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // RolePermission (many-to-many relationship)
-            modelBuilder.Entity<RolePermission>()
-                .HasKey(rp => new { rp.RoleId, rp.PermissionId });
-            modelBuilder.Entity<RolePermission>()
-                .HasOne(rp => rp.Role)
-                .WithMany(r => r.RolePermissions)
-                .HasForeignKey(rp => rp.RoleId);
-            modelBuilder.Entity<RolePermission>()
-                .HasOne(rp => rp.Permission)
-                .WithMany(p => p.RolePermissions)
-                .HasForeignKey(rp => rp.PermissionId);
-
             // UserAddress (many-to-many relationship)
             modelBuilder.Entity<UserAddress>()
                 .HasKey(ua => new { ua.UserId, ua.AddressId });
@@ -69,7 +55,18 @@ namespace DataAccess
                 .WithMany(u=>u.UserAddresses)
                 .HasForeignKey(ua => ua.AddressId)
                 .OnDelete(DeleteBehavior.Restrict);
-
+            //CategoryPackage(many-to-many)
+            modelBuilder.Entity<CategoryPackage>()
+                .HasKey(ua => new { ua.FishPackageId, ua.CategoryId });
+            modelBuilder.Entity<CategoryPackage>()
+                .HasOne(ua => ua.Package)
+                .WithMany(u => u.CategoryPackages)
+                .HasForeignKey(ua => ua.FishPackageId);
+            modelBuilder.Entity<CategoryPackage>()
+                .HasOne(ua => ua.Category)
+                .WithMany(u => u.CategoryPackages)
+                .HasForeignKey(ua => ua.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
             // User and Role (one-to-many)
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)

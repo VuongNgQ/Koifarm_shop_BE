@@ -7,6 +7,7 @@ using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
+using DataAccess.Repo;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,12 +20,32 @@ namespace BusinessObject.Service
     {
         private readonly IFishPackageRepo _repo;
         private readonly IMapper _mapper;
-        public FishPackageService(IFishPackageRepo repo, IMapper mapper)
+        private readonly ICategoryPackageRepo _categoryPackageRepo;
+        private readonly ICategoryRepo _categoryRepo;
+        public FishPackageService(IFishPackageRepo repo, IMapper mapper, ICategoryPackageRepo categoryPackageRepo
+            , ICategoryRepo categoryRepo)
         {
             _mapper = mapper;
             _repo = repo;
+            _categoryPackageRepo = categoryPackageRepo;
+            _categoryRepo = categoryRepo;
         }
-
+        public async Task UpdatePackageTotalNumberOfFish(int packageId)
+        {
+            var list = await _categoryPackageRepo.GetAllAsync();
+            var categoryPackage = list.Where(c => c.FishPackageId == packageId);
+            var totalNumberOfFish = categoryPackage.Sum(item => item.QuantityOfEach);
+            var package = await _repo.GetByIdAsync(packageId);
+            if (totalNumberOfFish > package.Capacity)
+            {
+                throw new Exception("You can't add more than Package Capacity");
+            }
+            else
+            {
+                package.NumberOfFish = totalNumberOfFish;
+                _repo.Update(package);
+            }
+        }
         public async Task<ServiceResponseFormat<ResponseFishPackageDTO>> CreatePackage(CreateFishPackageDTO package)
         {
             var res = new ServiceResponseFormat<ResponseFishPackageDTO>();
@@ -41,17 +62,42 @@ namespace BusinessObject.Service
                         uploadedImageUrl = await imageService.UploadImageAsync(stream, package.ImageUrl.FileName);
                     }
                 }
-                
-                var mapp=_mapper.Map<FishPackage>(package);
-                
+                var mapp = _mapper.Map<FishPackage>(package);
                 mapp.ProductStatus = ProductStatusEnum.AVAILABLE;
                 mapp.ImageUrl = uploadedImageUrl;
                 await _repo.CreatePackage(mapp);
-                var result=_mapper.Map<ResponseFishPackageDTO>(mapp);
+                /*await UpdatePackageTotalNumberOfFish(mapp.FishPackageId);*/
+                var result = _mapper.Map<ResponseFishPackageDTO>(mapp);
                 res.Success = true;
                 res.Message = "Package created successfully";
                 res.Data = result;
                 return res;
+                /*if (package.Categories.Count > 0)
+                {
+
+                    foreach (var item in package.Categories)
+                    {
+                        var categoryExist = await _categoryRepo.GetByIdAsync(item.CategoryId);
+                        if (categoryExist != null)
+                        {
+                            var categoryPackageMapp = _mapper.Map<CategoryPackage>(item);
+                            await _categoryPackageRepo.AddAsync(categoryPackageMapp);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Category with this {item.CategoryId} does not exist so we skip it");
+                        }
+                    }
+
+                    
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Can't Create Package with no Category";
+                    return res;
+                }*/
+
             }
             catch (Exception ex)
             {
@@ -59,7 +105,167 @@ namespace BusinessObject.Service
                 res.Message = $"Fail to create User:{ex.Message}";
                 return res;
             }
-            
+
+        }
+        public async Task<ServiceResponseFormat<bool>>AddFishToPackage(CreateCategoryPackageDTO categoryDTO)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var categoryExist = await _categoryRepo.GetByIdAsync(categoryDTO.CategoryId);
+                var packageExist = await _repo.GetByIdAsync(categoryDTO.FishPackageId);
+                if(categoryExist == null||packageExist==null)
+                {
+                    res.Success=false;
+                    res.Message = "Category/Package Not found";
+                    return res;
+                }
+                else
+                {
+                    var mapp = _mapper.Map<CategoryPackage>(categoryDTO);
+
+                    var list = await _categoryPackageRepo.GetAllAsync();
+                    var categoryPackage = list.Where(c => c.FishPackageId == categoryDTO.FishPackageId);
+                    if (categoryPackage.Any(c => c.CategoryId == categoryDTO.CategoryId))
+                    {
+                        res.Success = false;
+                        res.Message = "YOU ADDED THIS BEFORE, SO NOW YOU CAN ONLY UPDATE THE QUANTITY!!!!";
+                        return res;
+                    }
+                    var currentTotalNumberOfFish = categoryPackage.Sum(item => item.QuantityOfEach);
+                    if (currentTotalNumberOfFish+categoryDTO.QuantityOfEach > packageExist.Capacity)
+                    {
+                        res.Success = false;
+                        res.Message = "You can't add more than Package Capacity";
+                        return res;
+                    }
+                    else
+                    {
+                        packageExist.NumberOfFish = currentTotalNumberOfFish+categoryDTO.QuantityOfEach;
+                        _repo.Update(packageExist);
+                    }
+                    await _categoryPackageRepo.AddAsync(mapp);
+                    res.Success = true;
+                    res.Message = "Add Fish to package Successfully";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to Add Fish: {ex.Message}";
+                return res;
+            }
+        }
+        public async Task<ServiceResponseFormat<bool>> UpdateQuantityInPackage(CreateCategoryPackageDTO categoryDTO)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                // Retrieve the package
+                var packageExist = await _repo.GetByIdAsync(categoryDTO.FishPackageId);
+                if (packageExist == null)
+                {
+                    res.Success = false;
+                    res.Message = "Package not found";
+                    return res;
+                }
+
+                // Retrieve the category packages for the specific package
+                var categoryPackages = await _categoryPackageRepo.GetAllAsync();
+                var targetCategoryPackage = categoryPackages
+                    .FirstOrDefault(c => c.FishPackageId == categoryDTO.FishPackageId && c.CategoryId == categoryDTO.CategoryId);
+                var otherCategoryPackages = categoryPackages
+                    .Where(c => c.FishPackageId == categoryDTO.FishPackageId && c.CategoryId != categoryDTO.CategoryId)
+                    .ToList();
+
+                // Check if the specific category package exists
+                if (targetCategoryPackage == null)
+                {
+                    res.Success = false;
+                    res.Message = "No fish in this category within the package";
+                    return res;
+                }
+
+                // Calculate the total quantity for other fish in the package
+                var currentTotalNumberOfOtherFish = otherCategoryPackages.Sum(item => item.QuantityOfEach);
+                if (currentTotalNumberOfOtherFish + categoryDTO.QuantityOfEach > packageExist.Capacity)
+                {
+                    res.Success = false;
+                    res.Message = "Cannot update - exceeds package capacity";
+                    return res;
+                }
+
+                // Update the existing CategoryPackage's quantity directly
+                targetCategoryPackage.QuantityOfEach = categoryDTO.QuantityOfEach;
+
+                // Update the package's total number of fish
+                packageExist.NumberOfFish = currentTotalNumberOfOtherFish + categoryDTO.QuantityOfEach;
+
+                // Save the changes
+                _repo.Update(packageExist);
+                _categoryPackageRepo.Update(targetCategoryPackage);
+
+                res.Success = true;
+                res.Message = "Update successful";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Failed to update: {ex.Message}";
+                return res;
+            }
+        }
+
+        public async Task<ServiceResponseFormat<bool>> DeleteCategoryInPackage(int packageId, int categoryId)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var packageExist = await _repo.GetByIdAsync(packageId);
+                var list = await _categoryPackageRepo.GetAllAsync();
+                var categoryPackage = list.Where(c => c.FishPackageId == packageId);
+                if (packageExist == null)
+                {
+                    res.Success = false;
+                    res.Message = "Package Not found";
+                    return res;
+                }
+                else if (!categoryPackage.Any())
+                {
+                    res.Success = false;
+                    res.Message = "No fish in this package";
+                    return res;
+                }
+                else
+                {
+                    var deletingCategory = categoryPackage.FirstOrDefault(c => c.CategoryId == categoryId);
+                    var otherCategoryPackage = categoryPackage.Where(c => c.CategoryId != categoryId);
+                    var currentTotalNumberOfOtherFish = otherCategoryPackage.Sum(item => item.QuantityOfEach);
+                    if (deletingCategory == null)
+                    {
+                        res.Success = false;
+                        res.Message = $"No fish with this Id= {categoryId}";
+                        return res;
+                    }
+                    else
+                    {
+                        packageExist.NumberOfFish = currentTotalNumberOfOtherFish;
+                        _categoryPackageRepo.Remove(deletingCategory);
+                        _repo.Update(packageExist);
+                    }
+                    res.Success = true;
+                    res.Message = "Delete Successfully";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to Delete:{ex.Message}";
+                return res;
+            }
         }
         public async Task<ServiceResponseFormat<bool>> RestorePackage(int id)
         {
@@ -122,19 +328,23 @@ namespace BusinessObject.Service
             var res = new ServiceResponseFormat<bool>();
             try
             {
-                var result = await _repo.DeletePackage(id);
-                if (result)
-                {
-                    res.Success = true;
-                    res.Message = "Package Deleted successfully";
-                    return res;
-                }
-                else
+                var packageToDelete = await _repo.GetByIdAsync(id);
+                if (packageToDelete==null)
                 {
                     res.Success = false;
                     res.Message = "No Package";
                     return res;
                 }
+                var categories = await _categoryPackageRepo.GetAllAsync();
+                var categoryInPackage = categories.Where(c => c.FishPackageId == packageToDelete.FishPackageId);
+                if(categoryInPackage.Any())
+                {
+                    _categoryPackageRepo.RemoveRange(categoryInPackage);
+                }
+                var result = await _repo.DeletePackage(id);
+                res.Success = true;
+                res.Message = "Package Deleted successfully";
+                return res;    
             }
             catch (Exception ex)
             {
@@ -188,10 +398,13 @@ namespace BusinessObject.Service
                 packages = sort.ToLower().Trim() switch
                 {
                     "name" => packages.OrderBy(e => e.Name),
-                    
+                    "age"=>packages.OrderBy(e=>e.Age),
                     "fishinpackage" => packages.OrderBy(e => e.NumberOfFish),
                     "price" => packages.OrderBy(e => e.TotalPrice),
-                    _=>packages.OrderBy(e=>e.FishPackageId)
+                    "maxsize" => packages.OrderBy(e => e.MaxSize),
+                    "minsize" => packages.OrderBy(e => e.MinSize),
+                    "capacity" => packages.OrderBy(e => e.Capacity),
+                    _ => packages.OrderBy(e => e.FishPackageId)
                 };
                 var mapp = _mapper.Map<IEnumerable<ResponseFishPackageDTO>>(packages);
                 if (mapp.Any())
@@ -258,13 +471,31 @@ namespace BusinessObject.Service
                     existingPackage.Name = package.Name;
                     isUpdated = true;
                 }
-
+                if (package.Age.HasValue && package.Age != existingPackage.Age)
+                {
+                    existingPackage.Age = package.Age.Value;
+                    isUpdated = true;
+                }
+                if (package.MinSize.HasValue && package.MinSize != existingPackage.MinSize)
+                {
+                    existingPackage.MinSize = package.MinSize.Value;
+                    isUpdated = true;
+                }
+                if (package.MaxSize.HasValue && package.MaxSize != existingPackage.MaxSize)
+                {
+                    existingPackage.MaxSize = package.MaxSize.Value;
+                    isUpdated = true;
+                }
                 if (!string.IsNullOrEmpty(package.Description) && package.Description != existingPackage.Description)
                 {
                     existingPackage.Description = package.Description;
                     isUpdated = true;
                 }
-
+                if (package.Capacity.HasValue && package.Capacity != existingPackage.Capacity)
+                {
+                    existingPackage.Capacity = package.Capacity.Value;
+                    isUpdated = true;
+                }
                 if (package.TotalPrice.HasValue && package.TotalPrice != existingPackage.TotalPrice)
                 {
                     existingPackage.TotalPrice = package.TotalPrice.Value;
@@ -299,7 +530,7 @@ namespace BusinessObject.Service
                     return res;
                 }
                 // Perform the update only if changes were made
-                await _repo.UpdatePackage(id, existingPackage);
+                _repo.Update(existingPackage);
 
                 var result = _mapper.Map<ResponseFishPackageDTO>(existingPackage);
                 res.Success = true;

@@ -30,10 +30,11 @@ namespace BusinessObject
             //Category
             services.AddScoped<ICategoryRepo, CategoryRepo>();
             services.AddScoped<ICategoryService, CategoryService>();
+            //Category Package
+            services.AddScoped<ICategoryPackageRepo, CategoryPackageRepo>();
             //Fish Package
             services.AddScoped<IFishPackageService, FishPackageService>();
             services.AddScoped<IFishPackageRepo, FishPackageRepo>();
-            
             //Order
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<IOrderRepo, OrderRepo>();
@@ -42,7 +43,6 @@ namespace BusinessObject
             services.AddScoped<ISubImageService, SubImageService>();
             //Address
             services.AddScoped<IAddressRepo, AddressRepo>();
-            
             //Fish 
             services.AddScoped<IFishRepo, FishRepository>();
             services.AddScoped<IFishService, FishService>();
