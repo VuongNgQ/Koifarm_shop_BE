@@ -11,7 +11,9 @@ namespace DataAccess.Enum
     {
         AVAILABLE,
         UNAVAILABLE,
-        SOLDOUT
+        SOLDOUT,
+        RESERVED,
+        RETIRED
     }
     public enum FishStatusEnum
     {
@@ -24,7 +26,9 @@ namespace DataAccess.Enum
         PENDING,
         COMPLETED, 
         CANCELLED, 
-        ONPORT
+        ONPORT,
+        DELIVERED,
+        FAILEDDELIVERY
     }
     public enum ConsignmentStatusEnum
     {
@@ -53,7 +57,8 @@ namespace DataAccess.Enum
         CareConsignment = 0,
         SaleConsignment = 1,
         BuyFish = 2,
-        SellFishBatch = 3
+        SellFishBatch = 3,
+        Refund = 4,
     }
     public enum PaymentMethod
     {
@@ -64,6 +69,8 @@ namespace DataAccess.Enum
     {
         Pending,
         Completed,
-        Failed
+        Failed,
+        REFUNDED,
+        CANCELLED
     }
 }

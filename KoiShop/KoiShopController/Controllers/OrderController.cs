@@ -1,6 +1,7 @@
 ﻿using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
+using BusinessObject.Service;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -179,5 +180,31 @@ namespace KoiShopController.Controllers
                 return BadRequest(result.Message);
             }
         }*/
+        /// <summary>
+        /// Confirm finished Order.
+        /// </summary>
+        /// <param name="orderId">ID of order</param>
+        [HttpPut("complete/{orderId}")]
+        [Authorize(Roles = "Manager,Admin,Staff,Customer")]
+        public async Task<IActionResult> ConfirmOrderCompletion(int orderId)
+        {
+            try
+            {
+                await _service.MarkOrderAsCompleted(orderId);
+                return Ok(new
+                {
+                    Success = true,
+                    Message = "Order has been marked as completed successfully."
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = $"Error while marking order as completed: {ex.Message}"
+                });
+            }
+        }
     }
 }

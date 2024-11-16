@@ -15,11 +15,13 @@ namespace BusinessObject.Model.ResponseDTO
 
     public class PaymentDTO
     {
-        public int PaymentId { get; set; }
-        public int? UserId { get; set; }
+        public int? TransactionId { get; set; }
+
         public TransactionType TransactionType { get; set; }
         public int? RelatedId { get; set; }
         public decimal Amount { get; set; }
+        public PaymentMethod Method { get; set; }
+        public DateTime CreateDate { get; set; }
         public DateTime PaymentDate { get; set; }
         public PaymentStatus Status { get; set; }
         public string? Description { get; set; }

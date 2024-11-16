@@ -133,8 +133,6 @@ namespace BusinessObject.Service
 
             try
             {
-                //var dataStr = Convert.ToString(cbdata["data"]);
-                //var reqMac = Convert.ToString(cbdata["mac"]);
                 var dataStr = cbdata.Data;
                 var reqMac = cbdata.Mac;
                 var mac = HmacHelper.Compute(ZaloPayHMAC.HMACSHA256, _config.Key2, dataStr);
@@ -148,8 +146,6 @@ namespace BusinessObject.Service
                 var isSuccess = cbdata.Type == 1;
                 var dataJson = JsonConvert.DeserializeObject<Dictionary<string, object>>(dataStr);
                 var appTransId = Convert.ToString(dataJson["app_trans_id"]);
-                //var actualReturnCode = dataJson.ContainsKey("return_code") ? Convert.ToInt32(dataJson["return_code"]) : -1;
-                //var isSuccess = actualReturnCode == 1;
 
                 var payment = await _paymentRepo.GetPaymentByTransactionIdAsync(int.Parse(appTransId.Split('_')[1]));
                 if (payment == null)
@@ -166,7 +162,7 @@ namespace BusinessObject.Service
                 var order = await _orderRepo.GetByIdAsync(payment.OrderId.Value);
                 if (order != null)
                 {
-                    order.Status = isSuccess ? OrderStatusEnum.COMPLETED : OrderStatusEnum.CANCELLED;
+                    order.Status = isSuccess ? OrderStatusEnum.ONPORT : OrderStatusEnum.CANCELLED;
                     order.CompleteDate = DateTime.Now;
                     await _orderRepo.UpdateOrder(order);
                 }
