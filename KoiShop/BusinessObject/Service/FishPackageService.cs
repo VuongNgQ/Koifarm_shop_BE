@@ -267,6 +267,54 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+
+        public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var exist = await _repo.GetFishPackage(id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Package found";
+                    return res;
+                }
+                if (ProductStatusEnum.PENDINGPAID.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.PENDINGPAID;
+                }
+                else if (ProductStatusEnum.AVAILABLE.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.AVAILABLE;
+                }
+                else if (ProductStatusEnum.UNAVAILABLE.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.UNAVAILABLE;
+                }
+                else if (ProductStatusEnum.SOLDOUT.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.SOLDOUT;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Invalid Status";
+                    return res;
+                }
+                _repo.Update(exist);
+                res.Success = true;
+                res.Message = "Package Updated Successfully";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change Status:{ex.Message}";
+                return res;
+            }
+        }
+
         public async Task<ServiceResponseFormat<bool>> RestorePackage(int id)
         {
             var res = new ServiceResponseFormat<bool>();

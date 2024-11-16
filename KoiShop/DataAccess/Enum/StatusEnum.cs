@@ -11,6 +11,7 @@ namespace DataAccess.Enum
     {
         AVAILABLE,
         UNAVAILABLE,
+        PENDINGPAID,
         SOLDOUT
     }
     public enum FishStatusEnum
@@ -24,7 +25,7 @@ namespace DataAccess.Enum
         PENDING,
         COMPLETED, 
         CANCELLED, 
-        ONPORT
+        READY
     }
     public enum ConsignmentStatusEnum
     {

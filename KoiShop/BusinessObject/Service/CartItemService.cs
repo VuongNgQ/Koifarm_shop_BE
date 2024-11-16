@@ -93,17 +93,30 @@ namespace BusinessObject.Service
                     res.Message = "You haved added this Package before";
                     return res;
                 }
-                var exist = await _fishPackageRepo.GetByIdAsync(itemDTO.PackageId);
+                var exist = await _fishPackageRepo.GetFishPackage(itemDTO.PackageId);
                 if (exist == null)
                 {
                     res.Success = false;
                     res.Message = "No Package with this Id";
                     return res;
                 }
-                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus))
+                if(exist.CategoryPackages.Count<=0)
                 {
                     res.Success = false;
-                    res.Message = "This Package is SOLD OUT/UNAVAILABLE";
+                    res.Message = "Package Has no fish?";
+                    return res;
+                }
+                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus)
+                    || ProductStatusEnum.PENDINGPAID.Equals(exist.ProductStatus))
+                {
+                    res.Success = false;
+                    res.Message = "This Package is SOLD OUT/UNAVAILABLE/PENDINGPAID";
+                    return res;
+                }
+                if (exist.QuantityInStock < itemDTO.Quantity)
+                {
+                    res.Success = false;
+                    res.Message = "DON'T ADD WITH QUANTITY MORE THAN STOCK!!!";
                     return res;
                 }
                 var cartExist = await _cartRepo.GetByIdAsync(itemDTO.UserCartId);
@@ -114,8 +127,8 @@ namespace BusinessObject.Service
                     return res;
                 }
                 var mapp = _mapper.Map<CartItem>(itemDTO);
-                mapp.Quantity = 1;
-                mapp.TotalPricePerItem = exist.TotalPrice;
+
+                mapp.TotalPricePerItem = exist.TotalPrice*itemDTO.Quantity;
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 res.Success = true;
