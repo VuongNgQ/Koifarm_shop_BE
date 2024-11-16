@@ -23,6 +23,7 @@ namespace DataAccess.Entity
         public ICollection<Feedback>? Feedbacks { get; set; }
         public ICollection<FishConsignment>? FishConsignments { get; set; }
         public ICollection<PasswordResetToken>? PasswordResetTokens { get; set; }
+        public ICollection<UserFishOwnership>? UserFishOwnerships { get; set; }
     }
 
     public enum UserStatusEnum

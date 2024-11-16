@@ -58,9 +58,11 @@ namespace BusinessObject
             //FishConsignment
             services.AddScoped<IFishConsignmentRepo, FishConsignmentRepo>();
             services.AddScoped<IFishConsignmentService, FishConsignmentService>();
-            //Service
+            //PaymentService
             services.AddScoped<IPaymentRepo, PaymentRepo>();
             services.AddScoped<IPaymentService, PaymentService>();
+            //OwnerShip
+            services.AddScoped<IUserFishOwnerShipRepo, UserFishOwnerShipRepo>();
             //Zalo
             services.AddScoped<IZaloPayService, ZaloPayService>();
             return services;
