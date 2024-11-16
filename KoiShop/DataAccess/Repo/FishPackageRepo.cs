@@ -38,7 +38,7 @@ namespace DataAccess.Repo
 
         public async Task<FishPackage> GetFishPackage(int id)
         {
-            return await _context.Set<FishPackage>().FirstOrDefaultAsync(p => p.FishPackageId == id);
+            return await _context.Set<FishPackage>().Include(p=>p.CategoryPackages).FirstOrDefaultAsync(p => p.FishPackageId == id);
         }
 
         public async Task<IEnumerable<FishPackage>> GetFishPackages()
