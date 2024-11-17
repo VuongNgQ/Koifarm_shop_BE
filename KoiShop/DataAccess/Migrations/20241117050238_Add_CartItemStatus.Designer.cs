@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241114082127_Add_Capacity")]
-    partial class Add_Capacity
+    [Migration("20241117050238_Add_CartItemStatus")]
+    partial class Add_CartItemStatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -54,6 +54,9 @@ namespace DataAccess.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartItemId"));
+
+                    b.Property<int>("CartItemStatus")
+                        .HasColumnType("int");
 
                     b.Property<int?>("FishId")
                         .HasColumnType("int");

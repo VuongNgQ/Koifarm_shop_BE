@@ -89,15 +89,15 @@ namespace KoiShopController.Controllers
             return BadRequest(result.Message);
         }
         /// <summary>
-        /// Update Quantity for Fish Item
+        /// Update Quantity for Package Item
         /// </summary>
         /// <param name="id"></param>
         /// <param name="quantity"></param>
         /// <returns></returns>
-        [HttpPut("FishSingle/{id}&&{quantity}")]
+        [HttpPut("PackageQuantity/{id}&&{quantity}")]
         public async Task<IActionResult> UpdateFishQuantity(int id, int quantity)
         {
-            var result = await _service.UpdateFishQuantity(id, quantity);
+            var result = await _service.UpdatePackageQuantity(id, quantity);
             if (result.Success)
             {
                 return Ok(result);

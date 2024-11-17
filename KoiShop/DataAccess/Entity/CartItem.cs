@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DataAccess.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,7 @@ namespace DataAccess.Entity
         public int? PackageId { get; set; }
         public int? Quantity { get; set; }
         public decimal? TotalPricePerItem { get; set; }
+        public CartItemStatus CartItemStatus { get; set; }
         public UserCart? UserCart { get; set; }
         public Fish? Fish { get; set; }
         public FishPackage? Package { get; set; }

@@ -10,10 +10,20 @@ namespace DataAccess.Enum
     public enum ProductStatusEnum
     {
         AVAILABLE,
+        EMPTY,
+        NOTFULL,
         UNAVAILABLE,
+        PENDINGPAID,
         SOLDOUT,
-        RESERVED,
-        RETIRED
+        INCART
+    }
+    public enum CartItemStatus
+    {
+        PENDING_FOR_ORDER,
+        ADDED_IN_ORDER,
+        READY_FOR_ORDER,
+        COMPLETE_AT_ORDER,
+        CANCEL_AT_ORDER
     }
     public enum FishStatusEnum
     {
@@ -26,6 +36,7 @@ namespace DataAccess.Enum
         PENDING,
         COMPLETED, 
         CANCELLED, 
+        READY
         ONPORT,
         DELIVERED,
         FAILEDDELIVERY

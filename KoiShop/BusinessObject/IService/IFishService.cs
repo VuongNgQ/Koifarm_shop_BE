@@ -18,5 +18,6 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<bool>> DeleteFish(int fishId);
         Task<ServiceResponseFormat<bool>> SoldoutFish(int id);
         Task<ServiceResponseFormat<bool>> RestoreFish(int id);
+        Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status);
     }
 }

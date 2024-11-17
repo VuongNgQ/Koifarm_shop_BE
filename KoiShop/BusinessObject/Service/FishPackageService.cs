@@ -63,7 +63,7 @@ namespace BusinessObject.Service
                     }
                 }
                 var mapp = _mapper.Map<FishPackage>(package);
-                mapp.ProductStatus = ProductStatusEnum.AVAILABLE;
+                mapp.ProductStatus = ProductStatusEnum.EMPTY;
                 mapp.ImageUrl = uploadedImageUrl;
                 await _repo.CreatePackage(mapp);
                 /*await UpdatePackageTotalNumberOfFish(mapp.FishPackageId);*/
@@ -139,10 +139,17 @@ namespace BusinessObject.Service
                         res.Message = "You can't add more than Package Capacity";
                         return res;
                     }
+                    else if (currentTotalNumberOfFish + categoryDTO.QuantityOfEach == packageExist.Capacity)
+                    {
+                        packageExist.NumberOfFish = currentTotalNumberOfFish + categoryDTO.QuantityOfEach;
+                        _repo.Update(packageExist);
+                        await ChangeStatus(packageExist.FishPackageId, "AVAILABLE");
+                    }
                     else
                     {
                         packageExist.NumberOfFish = currentTotalNumberOfFish+categoryDTO.QuantityOfEach;
                         _repo.Update(packageExist);
+                        await ChangeStatus(packageExist.FishPackageId, "NOTFULL");
                     }
                     await _categoryPackageRepo.AddAsync(mapp);
                     res.Success = true;
@@ -195,17 +202,22 @@ namespace BusinessObject.Service
                     res.Message = "Cannot update - exceeds package capacity";
                     return res;
                 }
-
-                // Update the existing CategoryPackage's quantity directly
-                targetCategoryPackage.QuantityOfEach = categoryDTO.QuantityOfEach;
-
-                // Update the package's total number of fish
-                packageExist.NumberOfFish = currentTotalNumberOfOtherFish + categoryDTO.QuantityOfEach;
-
-                // Save the changes
-                _repo.Update(packageExist);
-                _categoryPackageRepo.Update(targetCategoryPackage);
-
+                else if (currentTotalNumberOfOtherFish + categoryDTO.QuantityOfEach == packageExist.Capacity)
+                {
+                    targetCategoryPackage.QuantityOfEach = categoryDTO.QuantityOfEach;
+                    packageExist.NumberOfFish = currentTotalNumberOfOtherFish + categoryDTO.QuantityOfEach;
+                    _repo.Update(packageExist);
+                    _categoryPackageRepo.Update(targetCategoryPackage);
+                    await ChangeStatus(packageExist.FishPackageId, "AVAILABLE");
+                }
+                else
+                {
+                    targetCategoryPackage.QuantityOfEach = categoryDTO.QuantityOfEach;
+                    packageExist.NumberOfFish = currentTotalNumberOfOtherFish + categoryDTO.QuantityOfEach;
+                    _repo.Update(packageExist);
+                    _categoryPackageRepo.Update(targetCategoryPackage);
+                    await ChangeStatus(packageExist.FishPackageId, "NOTFULL");
+                }
                 res.Success = true;
                 res.Message = "Update successful";
                 return res;
@@ -267,6 +279,62 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+
+        public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var exist = await _repo.GetFishPackage(id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Package found";
+                    return res;
+                }
+                if (ProductStatusEnum.PENDINGPAID.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.PENDINGPAID;
+                }
+                else if (ProductStatusEnum.AVAILABLE.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.AVAILABLE;
+                }
+                else if (ProductStatusEnum.UNAVAILABLE.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.UNAVAILABLE;
+                }
+                else if (ProductStatusEnum.SOLDOUT.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.SOLDOUT;
+                }
+                else if (ProductStatusEnum.NOTFULL.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.NOTFULL;
+                }
+                else if (ProductStatusEnum.INCART.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    exist.ProductStatus = ProductStatusEnum.INCART;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Invalid Status";
+                    return res;
+                }
+                _repo.Update(exist);
+                res.Success = true;
+                res.Message = "Package Updated Successfully";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change Status:{ex.Message}";
+                return res;
+            }
+        }
+
         public async Task<ServiceResponseFormat<bool>> RestorePackage(int id)
         {
             var res = new ServiceResponseFormat<bool>();

@@ -21,6 +21,7 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<bool>> DeleteCategoryInPackage(int packageId, int categoryId);
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> UpdatePackage(int id, UpdatePackageDTO package);
         Task<ServiceResponseFormat<bool>> DeletePackage(int id);
+        Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status);
         Task<ServiceResponseFormat<bool>> SoldoutPackage(int id);
         Task<ServiceResponseFormat<bool>> RestorePackage(int id);
     }
