@@ -18,5 +18,6 @@ namespace BusinessObject.Model.ResponseDTO
         public string? PackageImage {  get; set; }
         public int? Quantity { get; set; }
         public decimal? TotalPricePerItem { get; set; }
+        public string CartItemStatus { get; set; }
     }
 }

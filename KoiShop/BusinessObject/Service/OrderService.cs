@@ -170,7 +170,7 @@ namespace BusinessObject.Service
                 }
                 if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim()))
                 {
-                    exist.Status = OrderStatusEnum.CANCELLED;
+                    //Update for Fish and Package 
                     if (exist.OrderItems.Count > 0)
                     {
                         foreach (var item in exist.OrderItems)
@@ -185,7 +185,7 @@ namespace BusinessObject.Service
                             if (curQuantity == 0)
                             {
                                 newQuantity = (int)(curQuantity + item.Quantity);
-                                await _packageService.ChangeStatus((int)item.PackageId, ProductStatusEnum.AVAILABLE .ToString());
+                                await _packageService.ChangeStatus((int)item.PackageId, ProductStatusEnum.AVAILABLE.ToString());
                             }
                             else
                             {
@@ -201,8 +201,57 @@ namespace BusinessObject.Service
                         res.Message = "No Item In Order";
                         return res;
                     }
+                    //Change status of items in cart
+                    var cartList = await _cartRepo.GetAll();
+                    var cart = cartList.FirstOrDefault(c => c.UserId == exist.UserId);
+                    if (cart == null)
+                    {
+                        res.Success = false;
+                        res.Message = "No Cart found for the user";
+                        return res;
+                    }
+                    var listItem = await _cartItemRepo.GetAll();
+                    var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
+                    foreach (var cartItem in cartItems)
+                    {
+                        await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.CANCEL_AT_ORDER.ToString());
+                    }
+                    //Change Order status
+                    exist.Status = OrderStatusEnum.CANCELLED;
                 }
                 else if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    //Update Cart Items Status 
+                    var cartList = await _cartRepo.GetAll();
+                    var cart = cartList.FirstOrDefault(c => c.UserId == exist.UserId);
+                    if (cart == null)
+                    {
+                        res.Success = false;
+                        res.Message = "No Cart found for the user";
+                        return res;
+                    }
+                    var listItem = await _cartItemRepo.GetAll();
+                    var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
+                    foreach (var cartItem in cartItems)
+                    {
+                        await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.COMPLETE_AT_ORDER.ToString());
+                        if (cartItem.FishId != null|| cartItem.PackageId != null)
+                        {
+                            if(cartItem.FishId != null)
+                            {
+                                await _fishService.SoldoutFish((int)cartItem.FishId);
+                            }
+                            var packageOfCart = await _packageRepo.GetFishPackage((int)cartItem.PackageId);
+                            if( packageOfCart!=null&&packageOfCart.QuantityInStock == 0)
+                            {
+                                await _packageService.SoldoutPackage((int)cartItem.PackageId);
+                            }
+                        }
+                    }
+                    //Update Order Status 
+                    exist.Status = OrderStatusEnum.COMPLETED;
+                }
+                else if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim()))
                 {
                     var cartList = await _cartRepo.GetAll();
                     var cart = cartList.FirstOrDefault(c => c.UserId == exist.UserId);
@@ -216,24 +265,8 @@ namespace BusinessObject.Service
                     var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
                     foreach (var cartItem in cartItems)
                     {
-                        if (cartItem.FishId != null|| cartItem.PackageId != null)
-                        {
-                            await _cartItemService.DeleteCartItemById(cartItem.CartItemId);
-                            if(cartItem.FishId != null)
-                            {
-                                await _fishService.SoldoutFish((int)cartItem.FishId);
-                            }
-                            var packageOfCart = await _packageRepo.GetFishPackage((int)cartItem.PackageId);
-                            if( packageOfCart!=null&&packageOfCart.QuantityInStock == 0)
-                            {
-                                await _packageService.SoldoutPackage((int)cartItem.PackageId);
-                            }
-                        }
+                        await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.READY_FOR_ORDER.ToString());
                     }
-                    exist.Status = OrderStatusEnum.COMPLETED;
-                }
-                else if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim()))
-                {
                     exist.Status = OrderStatusEnum.READY;
                 }
                 else
@@ -317,16 +350,20 @@ namespace BusinessObject.Service
                     await _repo.AddAsync(mappedOrder);
                     foreach (var cartItem in cartItems)
                     {
-                        OrderItem newItem = new OrderItem
+                        if (CartItemStatus.PENDING_FOR_ORDER.Equals(cartItem.CartItemStatus))
                         {
-                            OrderId = mappedOrder.OrderId,
-                            FishId = cartItem.FishId,
-                            PackageId = cartItem.PackageId,
-                            Quantity = cartItem.Quantity,
-                            Price = cartItem.TotalPricePerItem
-                        };
-                        /*await _repo.AddAsync(mappedOrder);*/
-                        await _orderItemRepo.AddAsync(newItem);
+                            OrderItem newItem = new OrderItem
+                            {
+                                OrderId = mappedOrder.OrderId,
+                                FishId = cartItem.FishId,
+                                PackageId = cartItem.PackageId,
+                                Quantity = cartItem.Quantity,
+                                Price = cartItem.TotalPricePerItem
+                            };
+                            /*await _repo.AddAsync(mappedOrder);*/
+                            await _orderItemRepo.AddAsync(newItem);
+                            await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.ADDED_IN_ORDER.ToString());
+                        }
                     }
                     // 4. Update Order Total Price
                     await _orderItemService.UpdateOrderTotalPrice(mappedOrder.OrderId);

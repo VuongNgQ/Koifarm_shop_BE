@@ -35,7 +35,56 @@ namespace BusinessObject.Service
             _fishService = fishService;
             _fishPackageService = fishPackageService;
         }
-
+        public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                var items=await _repo.GetAll();
+                var exist = items.FirstOrDefault(i => i.CartItemId == id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Item found";
+                    return res;
+                }
+                if (exist.CartItemStatus == CartItemStatus.CANCEL_AT_ORDER ||
+                    exist.CartItemStatus == CartItemStatus.COMPLETE_AT_ORDER)
+                {
+                    res.Success = false;
+                    res.Message = "This Item is Done at Order so you can't change it anymore";
+                    return res;
+                }
+                if (CartItemStatus.CANCEL_AT_ORDER.ToString().Equals(status.ToUpper().Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    exist.CartItemStatus=CartItemStatus.CANCEL_AT_ORDER;
+                }
+                else if (CartItemStatus.COMPLETE_AT_ORDER.ToString().Equals(status.ToUpper().Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    exist.CartItemStatus = CartItemStatus.COMPLETE_AT_ORDER;
+                }
+                else if (CartItemStatus.READY_FOR_ORDER.ToString().Equals(status.ToUpper().Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    exist.CartItemStatus = CartItemStatus.READY_FOR_ORDER;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Invalid Status/Order is Pending";
+                    return res;
+                }
+                _repo.Update(exist);
+                res.Success = true;
+                res.Message = "Item Updated Successfully";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to change Status:{ex.Message}";
+                return res;
+            }
+        }
         public async Task<ServiceResponseFormat<ResponseCartItemDTO>> CreateFishItem(CreateFishItemDTO itemDTO)
         {
             var res = new ServiceResponseFormat<ResponseCartItemDTO>();
@@ -55,10 +104,11 @@ namespace BusinessObject.Service
                     res.Message = "No fish with this Id";
                     return res;
                 }
-                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus))
+                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus)
+                    || ProductStatusEnum.PENDINGPAID.Equals(exist.ProductStatus))
                 {
                     res.Success = false;
-                    res.Message = "This fish is SOLD OUT/UNAVAILABLE";
+                    res.Message = "This fish is SOLD OUT/UNAVAILABLE/PENDINGPAID";
                     return res;
                 }
                 var cartExist = await _cartRepo.GetByIdAsync(itemDTO.UserCartId);
@@ -71,8 +121,9 @@ namespace BusinessObject.Service
                 var mapp = _mapper.Map<CartItem>(itemDTO);
                 mapp.Quantity = 1;
                 mapp.TotalPricePerItem = exist.Price;
+                mapp.CartItemStatus = CartItemStatus.PENDING_FOR_ORDER;
                 await _repo.AddAsync(mapp);
-                await _fishService.ChangeStatus(itemDTO.FishId, ProductStatusEnum.PENDINGPAID.ToString());
+                await _fishService.ChangeStatus(itemDTO.FishId, ProductStatusEnum.INCART.ToString());
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 result.TotalPricePerItem=exist.Price;
                 res.Success = true;
@@ -114,10 +165,11 @@ namespace BusinessObject.Service
                     return res;
                 }
                 if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus)
-                    || ProductStatusEnum.PENDINGPAID.Equals(exist.ProductStatus))
+                    || ProductStatusEnum.PENDINGPAID.Equals(exist.ProductStatus)
+                    ||ProductStatusEnum.NOTFULL.Equals(exist.ProductStatus))
                 {
                     res.Success = false;
-                    res.Message = "This Package is SOLD OUT/UNAVAILABLE/PENDINGPAID";
+                    res.Message = "This Package is SOLD OUT/UNAVAILABLE/PENDINGPAID/NOTFULL";
                     return res;
                 }
                 if (exist.QuantityInStock < itemDTO.Quantity)
@@ -150,13 +202,14 @@ namespace BusinessObject.Service
                 {
                     packageForCart.QuantityInStock = newQuantity;
                     _fishPackageRepo.Update(packageForCart);
-                    await _fishPackageService.ChangeStatus(itemDTO.PackageId, ProductStatusEnum.PENDINGPAID.ToString());
+                    await _fishPackageService.ChangeStatus(itemDTO.PackageId, ProductStatusEnum.INCART.ToString());
                 }
                 else
                 {
                     packageForCart.QuantityInStock = newQuantity;
                     _fishPackageRepo.Update(packageForCart);
                 }
+                mapp.CartItemStatus=CartItemStatus.PENDING_FOR_ORDER;
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 res.Success = true;
@@ -183,6 +236,23 @@ namespace BusinessObject.Service
                     res.Success = false;
                     res.Message = "No Item";
                     return res;
+                }
+                else if (exist.CartItemStatus!=CartItemStatus.PENDING_FOR_ORDER)
+                {
+                    if (exist.CartItemStatus == CartItemStatus.COMPLETE_AT_ORDER ||
+                    exist.CartItemStatus == CartItemStatus.CANCEL_AT_ORDER)
+                    {
+                        _repo.Remove(exist);
+                        res.Success = true;
+                        res.Message = "Delete Item Successfully";
+                        return res;
+                    }
+                    else
+                    {
+                        res.Success = false;
+                        res.Message = "This item is not PENDING/COMPLETE/CANCEL so you can't delete it";
+                        return res;
+                    }
                 }
                 else
                 {
@@ -303,7 +373,7 @@ namespace BusinessObject.Service
             }
         }
 
-        public async Task<ServiceResponseFormat<bool>> UpdateFishQuantity(int id, int? quantity)
+        public async Task<ServiceResponseFormat<bool>> UpdatePackageQuantity(int id, int? quantity)
         {
             var res = new ServiceResponseFormat<bool>();
             bool isUpdated = false;
@@ -311,22 +381,66 @@ namespace BusinessObject.Service
             try
             {
                 var exist = await _repo.GetByIdAsync(id);
+                int quantityInCart = exist.Quantity ?? 0;
+                int quantityDTO = quantity ?? 0;
                 if (exist != null)
                 {
-                    if (exist.FishId == null)
+                    if (exist.PackageId == null)
                     {
                         res.Success = false;
-                        res.Message = "You can only update the quantity for fish items.";
+                        res.Message = "You can only update the quantity for Package items.";
                         return res;
                     }
 
                     // Check and update the quantity if provided
                     if (quantity.HasValue && quantity.Value != exist.Quantity)
                     {
-                        var fish=await _fishRepo.GetFishByIdAsync((int)exist.FishId);
+                        var package=await _fishPackageRepo.GetFishPackage((int)exist.PackageId);
                         exist.Quantity = quantity.Value;
-                        exist.TotalPricePerItem = quantity.Value * (fish.Price ?? 0);
-                        isUpdated = true;
+                        exist.TotalPricePerItem = quantity.Value * (package.TotalPrice ?? 0);
+                        var packageForCart = await _fishPackageRepo.GetFishPackage((int)exist.PackageId);
+                        int curQuantity = (int)packageForCart.QuantityInStock;
+                        int newQuantity =0;
+                        
+                        if (quantityInCart > quantityDTO)
+                        {
+                            newQuantity = curQuantity + (quantityInCart-quantityDTO);
+                            
+                            if (curQuantity == 0)
+                            {
+                                packageForCart.QuantityInStock = newQuantity;
+                                _fishPackageRepo.Update(packageForCart);
+                                await _fishPackageService.ChangeStatus((int)exist.PackageId, ProductStatusEnum.AVAILABLE.ToString());
+                            }
+                            else
+                            {
+                                packageForCart.QuantityInStock = newQuantity;
+                                _fishPackageRepo.Update(packageForCart);
+                            }
+                            isUpdated = true;
+                        }
+                        if(quantityInCart < quantityDTO)
+                        {
+                            newQuantity = curQuantity - (quantityDTO-quantityInCart);
+                            if (newQuantity < 0)
+                            {
+                                res.Success = false;
+                                res.Message = "Exceed the package quantity??";
+                                return res;
+                            }
+                            else if (newQuantity == 0)
+                            {
+                                packageForCart.QuantityInStock = newQuantity;
+                                _fishPackageRepo.Update(packageForCart);
+                                await _fishPackageService.ChangeStatus((int)exist.PackageId, ProductStatusEnum.INCART.ToString());
+                            }
+                            else
+                            {
+                                packageForCart.QuantityInStock = newQuantity;
+                                _fishPackageRepo.Update(packageForCart);
+                            }
+                            isUpdated = true;
+                        }
                     }
 
                     // If nothing was updated, return a message

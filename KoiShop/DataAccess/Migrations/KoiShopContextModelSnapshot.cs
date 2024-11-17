@@ -52,6 +52,9 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CartItemId"));
 
+                    b.Property<int>("CartItemStatus")
+                        .HasColumnType("int");
+
                     b.Property<int?>("FishId")
                         .HasColumnType("int");
 
