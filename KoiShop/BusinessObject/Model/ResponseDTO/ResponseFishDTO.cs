@@ -23,4 +23,12 @@ namespace BusinessObject.Model.ResponseDTO
         public string Status { get; set; }
         public string ProductStatus { get; set; }
     }
+    public class FishBoughtenDTO
+    {
+        public int FishId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public decimal Price { get; set; }
+        public DateTime PurchaseDate { get; set; }
+    }
 }

@@ -13,7 +13,7 @@ namespace BusinessObject.Model.RequestDTO
     }
     public class CreateConsignmentDTO
     {
-        public int? UserId { get; set; }
+        public int UserId { get; set; }
         public int? FishId { get; set; }
         public ConsignmentPurpose Purpose { get; set; }
         public bool IsFromShop { get; set; }
@@ -28,7 +28,7 @@ namespace BusinessObject.Model.RequestDTO
     public class ApproveConsignmentDTO
     {
         public int ConsignmentId { get; set; }
-        public decimal? AgreedPrice { get; set; } // Giá thỏa thuận (chỉ cho ký gửi bán)
-        public decimal? DepositAmount { get; set; } // Tiền cọc (chỉ cho ký gửi chăm sóc)
+        public decimal? AgreedPrice { get; set; }
+        public decimal? DepositAmount { get; set; }
     }
 }

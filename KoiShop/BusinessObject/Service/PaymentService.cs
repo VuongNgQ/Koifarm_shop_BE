@@ -2,18 +2,24 @@
 using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
+using BusinessObject.Model.ResponseDTO;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using DataAccess.Repo;
+using AutoMapper;
+using Azure;
 
 namespace BusinessObject.Service
 {
     public class PaymentService : IPaymentService
     {
         private readonly IPaymentRepo _paymentRepository;
+        private readonly IMapper _mapper;
 
-        public PaymentService(IPaymentRepo paymentRepository)
+        public PaymentService(IPaymentRepo paymentRepository, IMapper mapper)
         {
             _paymentRepository = paymentRepository;
+            _mapper = mapper;
         }
 
         public async Task<Payment?> GetPaymentByIdAsync(int id)
@@ -21,9 +27,29 @@ namespace BusinessObject.Service
             return await _paymentRepository.GetPaymentByIdAsync(id);
         }
 
-        public async Task<List<Payment>?> GetPaymentByUserIdAsync(int id)
+        public async Task<ServiceResponseFormat<List<PaymentDTO>>> GetPaymentByUserIdAsync(int id)
         {
-            return await _paymentRepository.GetPaymentByUserIdAsync(id);
+            var response = new ServiceResponseFormat<List<PaymentDTO>>();
+            try
+            {
+                var payments = await _paymentRepository.GetPaymentByUserIdAsync(id);
+
+                if (payments == null)
+                {
+                    throw new Exception("Payment not found.");
+                }
+                
+                response.Data = _mapper.Map<List<PaymentDTO>>(payments);
+                response.Success = true;
+                response.Message = "Payments successfully retrieved.";
+            }
+            catch (Exception ex)
+            {
+
+                response.Success = false;
+                response.Message = $"Error getting transaction: {ex.Message}";
+            }
+            return response;
         }
 
         public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()

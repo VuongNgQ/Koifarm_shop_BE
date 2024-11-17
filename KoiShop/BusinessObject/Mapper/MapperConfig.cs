@@ -8,6 +8,7 @@ using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
 using BusinessObject.Model.ResponseDTO;
 using DataAccess.Entity;
+using DataAccess.Enum;
 namespace BusinessObject.Mapper
 {
     public class MapperConfig:Profile
@@ -100,7 +101,15 @@ namespace BusinessObject.Mapper
             CreateMap<FishConsignment, FishConsignmentDTO>().ReverseMap();
             CreateMap<FishConsignment, CreateConsignmentDTO>().ReverseMap();
             // Trong MapperConfig, thêm mapping cho Payment
-            CreateMap<Payment, PaymentDTO>().ReverseMap();
+            CreateMap<Payment, PaymentDTO>()
+                .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.TransactionId))
+                .ForMember(dest => dest.RelatedId, opt => opt.MapFrom(src =>
+                    src.TransactionType == TransactionType.BuyFish ? src.OrderId : src.FishConsignmentId))
+                .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreatedDate ?? DateTime.MinValue))
+                .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate ?? DateTime.MinValue))
+                .ForMember(dest => dest.Method, opt => opt.MapFrom(src => src.Order.PaymentMethod))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.PaymentStatus))
+                .ReverseMap();
             CreateMap<Payment, CreatePaymentDTO>().ReverseMap();
             CreateMap<Payment, UpdatePaymentDTO>().ReverseMap();
         }

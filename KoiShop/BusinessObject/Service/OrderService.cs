@@ -35,12 +35,13 @@ namespace BusinessObject.Service
         private readonly IOrderItemService _orderItemService;
         private readonly IFishPackageService _packageService;
         private readonly IFishService _fishService;
+        private readonly IUserFishOwnerShipRepo _ownerShipRepo;
         public OrderService(IOrderRepo repo, 
             IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo
             , IUserRepo userRepo, IOrderItemRepo itemRepo, ICartRepo cartRepo
             , ICartItemRepo cartItemRepo, IOrderItemRepo orderItemRepo, ICartItemService cartItemService
             , IOrderItemService orderItemService, IFishPackageService packageService, IFishService fishService
-            , IFishPackageRepo packageRepo)
+            , IFishPackageRepo packageRepo, IUserFishOwnerShipRepo ownerShipRepo)
         {
             _repo = repo;
             _mapper = mapper;
@@ -56,6 +57,7 @@ namespace BusinessObject.Service
             _packageService = packageService;
             _fishService = fishService;
             _packageRepo = packageRepo;
+            _ownerShipRepo = ownerShipRepo;
         }
         public async Task<ServiceResponseFormat<bool>> FinishOrder(int id)
         {
@@ -517,7 +519,7 @@ namespace BusinessObject.Service
                         }
                     }
 
-                    
+
 
                     // Check and update IsSent
                     if (orderDTO.IsSent != exist.IsSent)
@@ -574,6 +576,33 @@ namespace BusinessObject.Service
                 res.Message = $"Fail to update Order: {ex.Message}";
                 return res;
             }
+        }
+        public async Task MarkOrderAsCompleted(int orderId)//Minh
+        {
+            var order = await _repo.GetByIdAsync(orderId);
+
+            if (order == null || order.Status != OrderStatusEnum.PENDING)
+                throw new Exception("Order not found or already processed.");
+
+            order.Status = OrderStatusEnum.COMPLETED;
+            order.CompleteDate = DateTime.Now;
+
+            foreach (var item in order.OrderItems)
+            {
+                if (item.FishId.HasValue)
+                {
+                    var ownership = new UserFishOwnership
+                    {
+                        UserId = order.UserId.Value,
+                        FishId = item.FishId.Value,
+                        PurchaseDate = DateTime.Now
+                    };
+
+                    await _ownerShipRepo.AddAsync(ownership);
+                }
+            }
+
+            await _repo.UpdateOrder(order);
         }
     }
 }

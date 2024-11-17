@@ -17,20 +17,6 @@ namespace KoiShopController.Controllers
             _consignmentService = consignmentService;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateConsignment([FromBody] CreateConsignmentDTO consignmentDto)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var result = await _consignmentService.CreateConsignmentAsync(consignmentDto);
-            if (!result.Success)
-            {
-                return BadRequest(result.Message);
-            }
-            return Ok(result.Data);
-        }
-
         [HttpGet("{id}")]
         public async Task<IActionResult> GetConsignmentById(int id)
         {
@@ -60,6 +46,20 @@ namespace KoiShopController.Controllers
             {
                 return NotFound(result);
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateConsignment([FromBody] CreateConsignmentDTO consignmentDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _consignmentService.CreateConsignmentAsync(consignmentDto);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Data);
         }
 
         [HttpPut("update")]

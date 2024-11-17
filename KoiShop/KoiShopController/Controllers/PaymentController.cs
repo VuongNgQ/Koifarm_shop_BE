@@ -33,10 +33,10 @@ namespace KoiShopController.Controllers
         [HttpGet("getPayment/{id}")]
         public async Task<IActionResult> GetPaymentByUserId(int id)
         {
-            var payment = await _paymentService.GetPaymentByUserIdAsync(id);
-            if (payment != null)
-                return Ok(payment);
-            return NotFound("Payment not found.");
+            var payments = await _paymentService.GetPaymentByUserIdAsync(id);
+            if (payments != null)
+                return Ok(payments);
+            return NotFound("Payments not found.");
         }
 
         [HttpGet("all")]
@@ -109,11 +109,16 @@ namespace KoiShopController.Controllers
         [HttpPost("zalopay-callback")]
         public async Task<IActionResult> ZaloPayCallback([FromBody] ZaloPayCallbackRequestDTO cbdata)
         {
-            var result = await _zaloPayService.HandleCallbackAsync(cbdata);
-            
+            try
+            {
+                var result = await _zaloPayService.HandleCallbackAsync(cbdata);
                 return Ok(result);
-            
-            //return BadRequest(new { message = "Xác thực hoặc cập nhật không thành công" });
+            }
+            catch (Exception)
+            {
+
+                return BadRequest(new { message = "Xác thực hoặc cập nhật không thành công" });
+            }
         }
     }
 }

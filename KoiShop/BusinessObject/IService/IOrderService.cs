@@ -20,5 +20,6 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status);
         Task<ServiceResponseFormat<bool>> FinishOrder(int id);
         Task<ServiceResponseFormat<bool>> CancelOrder(int id);
+        Task MarkOrderAsCompleted(int orderId);
     }
 }
