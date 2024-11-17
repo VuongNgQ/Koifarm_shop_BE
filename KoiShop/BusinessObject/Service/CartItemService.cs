@@ -21,13 +21,19 @@ namespace BusinessObject.Service
         private readonly IFishRepo _fishRepo;
         private readonly IFishPackageRepo _fishPackageRepo;
         private readonly ICartRepo _cartRepo;
-        public CartItemService(ICartItemRepo repo, IMapper mapper, IFishRepo fishRepo, IFishPackageRepo fishPackageRepo, ICartRepo cartRepo)
+
+        private readonly IFishService _fishService;
+        private readonly IFishPackageService _fishPackageService;
+        public CartItemService(ICartItemRepo repo, IMapper mapper, IFishRepo fishRepo, IFishPackageRepo fishPackageRepo, ICartRepo cartRepo
+            , IFishService fishService, IFishPackageService fishPackageService)
         {
             _mapper = mapper;
             _repo = repo;
             _fishRepo = fishRepo;
             _fishPackageRepo = fishPackageRepo;
             _cartRepo = cartRepo;
+            _fishService = fishService;
+            _fishPackageService = fishPackageService;
         }
 
         public async Task<ServiceResponseFormat<ResponseCartItemDTO>> CreateFishItem(CreateFishItemDTO itemDTO)
@@ -66,6 +72,7 @@ namespace BusinessObject.Service
                 mapp.Quantity = 1;
                 mapp.TotalPricePerItem = exist.Price;
                 await _repo.AddAsync(mapp);
+                await _fishService.ChangeStatus(itemDTO.FishId, ProductStatusEnum.PENDINGPAID.ToString());
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 result.TotalPricePerItem=exist.Price;
                 res.Success = true;
@@ -129,6 +136,27 @@ namespace BusinessObject.Service
                 var mapp = _mapper.Map<CartItem>(itemDTO);
 
                 mapp.TotalPricePerItem = exist.TotalPrice*itemDTO.Quantity;
+
+                var packageForCart = await _fishPackageRepo.GetFishPackage(itemDTO.PackageId);
+                int curQuantity = (int)packageForCart.QuantityInStock;
+                int newQuantity = curQuantity - itemDTO.Quantity;
+                if (newQuantity < 0)
+                {
+                    res.Success = false;
+                    res.Message = "Exceed the package quantity??";
+                    return res;
+                }
+                else if (newQuantity == 0)
+                {
+                    packageForCart.QuantityInStock = newQuantity;
+                    _fishPackageRepo.Update(packageForCart);
+                    await _fishPackageService.ChangeStatus(itemDTO.PackageId, ProductStatusEnum.PENDINGPAID.ToString());
+                }
+                else
+                {
+                    packageForCart.QuantityInStock = newQuantity;
+                    _fishPackageRepo.Update(packageForCart);
+                }
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 res.Success = true;
@@ -158,7 +186,29 @@ namespace BusinessObject.Service
                 }
                 else
                 {
-                    _repo.Remove(exist);
+                    if (exist.FishId != null)
+                    {
+                        await _fishService.RestoreFish((int)exist.FishId);
+                        _repo.Remove(exist);
+                    }
+                    else
+                    {
+                        var packageForCart = await _fishPackageRepo.GetFishPackage((int)exist.PackageId);
+                        int curQuantity = (int)packageForCart.QuantityInStock;
+                        int newQuantity = 0;
+                        if (curQuantity == 0)
+                        {
+                            newQuantity = (int)(curQuantity + exist.Quantity);
+                            await _fishPackageService.ChangeStatus((int)exist.PackageId, ProductStatusEnum.AVAILABLE.ToString());
+                        }
+                        else
+                        {
+                            newQuantity = (int)(curQuantity + exist.Quantity);
+                        }
+                        packageForCart.QuantityInStock = newQuantity;
+                        _fishPackageRepo.Update(packageForCart);
+                        _repo.Remove(exist);
+                    }
                     res.Success = true;
                     res.Message = "Delete Item Successfully";
                     return res;

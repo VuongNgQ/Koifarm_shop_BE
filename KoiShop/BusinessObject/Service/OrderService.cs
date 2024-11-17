@@ -325,33 +325,6 @@ namespace BusinessObject.Service
                             Quantity = cartItem.Quantity,
                             Price = cartItem.TotalPricePerItem
                         };
-                        if (newItem.FishId != null)
-                        {
-                            await _fishService.ChangeStatus((int)newItem.FishId, ProductStatusEnum.PENDINGPAID.ToString());
-                        }
-                        if (newItem.PackageId != null)
-                        {
-                            var packageForOrder = await _packageRepo.GetFishPackage((int)newItem.PackageId);
-                            int curQuantity =(int) packageForOrder.QuantityInStock;
-                            int newQuantity =(int) (curQuantity - newItem.Quantity);
-                            if (newQuantity < 0)
-                            {
-                                res.Success = false;
-                                res.Message = "Exceed the package quantity??";
-                                return res;
-                            }
-                            else if (newQuantity==0)
-                            {
-                                packageForOrder.QuantityInStock = newQuantity;
-                                _packageRepo.Update(packageForOrder);
-                                await _packageService.ChangeStatus((int)newItem.PackageId, ProductStatusEnum.PENDINGPAID.ToString());
-                            }
-                            else
-                            {
-                                packageForOrder.QuantityInStock = newQuantity;
-                                _packageRepo.Update(packageForOrder);
-                            }
-                        }
                         /*await _repo.AddAsync(mappedOrder);*/
                         await _orderItemRepo.AddAsync(newItem);
                     }
