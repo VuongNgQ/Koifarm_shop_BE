@@ -90,6 +90,26 @@ namespace KoiShopController.Controllers
                 return NotFound(result.Message);
             }
         }
+
+        /// <summary>
+        /// Get Order by UserID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        [HttpGet("user/{userId}")]
+        public async Task<IActionResult> GetByUserId(int userId)
+        {
+            var result = await _service.GetOrdersByUserIdAsync(userId);
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound(result.Message);
+            }
+        }
+
         /// <summary>
         /// Delete Order by Order ID
         /// </summary>

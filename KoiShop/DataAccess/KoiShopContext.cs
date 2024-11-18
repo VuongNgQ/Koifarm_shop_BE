@@ -202,6 +202,8 @@ namespace DataAccess
                 .WithMany(u => u.UserFishOwnerships)
                 .HasForeignKey(o => o.FishId)
                 .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<UserFishOwnership>()
+                .HasKey(ufo => ufo.OwnershipId);
             base.OnModelCreating(modelBuilder);
         }
 

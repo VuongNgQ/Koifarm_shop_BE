@@ -10,7 +10,7 @@ namespace DataAccess.Entity
     public class Payment
     {
         public int PaymentId { get; set; }
-        public TransactionType TransactionType { get; set; }
+        public TransactionPurpose TransactionType { get; set; }
         public int? OrderId { get; set; }
         public Order? Order { get; set; }
         public int? FishConsignmentId { get; set; }

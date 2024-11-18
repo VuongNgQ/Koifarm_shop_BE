@@ -1,6 +1,7 @@
 ﻿using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
 using DataAccess.Entity;
+using DataAccess.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,7 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<List<FishConsignmentDTO>>> GetAllConsignmentsAsync();
         Task<ServiceResponseFormat<FishConsignmentDTO>> GetConsignmentsByUserIdAsync(int userId);
         Task<ServiceResponseFormat<FishConsignmentDTO>> UpdateConsignmentAsync(FishConsignmentDTO consignmentDto);
+        Task<ServiceResponseFormat<FishConsignmentDTO>> UpdateConsignmentStatusAsync(int consignmentId, ConsignmentStatusEnum newStatus, string? description = null);
+
     }
 }

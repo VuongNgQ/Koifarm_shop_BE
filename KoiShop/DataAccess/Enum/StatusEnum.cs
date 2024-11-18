@@ -15,7 +15,8 @@ namespace DataAccess.Enum
         UNAVAILABLE,
         PENDINGPAID,
         SOLDOUT,
-        INCART
+        INCART,
+        PENDINGAPPROVAL
     }
     public enum CartItemStatus
     {
@@ -36,7 +37,7 @@ namespace DataAccess.Enum
         PENDING,
         COMPLETED, 
         CANCELLED, 
-        READY
+        READY,
         ONPORT,
         DELIVERED,
         FAILEDDELIVERY
@@ -45,6 +46,7 @@ namespace DataAccess.Enum
     {
         PendingApproval,
         Approved,
+        PriceAgreed,
         Rejected,
         Completed
     }
@@ -63,7 +65,12 @@ namespace DataAccess.Enum
         Care = 0,
         Sale = 1
     }
-    public enum TransactionType
+    public enum ConsignmentType
+    {
+        Offline = 0,
+        Online = 1
+    }
+    public enum TransactionPurpose
     {
         CareConsignment = 0,
         SaleConsignment = 1,

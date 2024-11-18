@@ -604,5 +604,15 @@ namespace BusinessObject.Service
 
             await _repo.UpdateOrder(order);
         }
+        public async Task<ServiceResponseFormat<ResponseOrderDTO>> GetOrdersByUserIdAsync(int userId)
+        {
+            var orders = await _repo.GetOrdersByUserId(userId);
+
+            if (orders == null || !orders.Any())
+                throw new KeyNotFoundException("No orders found for the specified user.");
+
+            return _mapper.Map<ServiceResponseFormat<ResponseOrderDTO>>(orders);
+        }
+
     }
 }

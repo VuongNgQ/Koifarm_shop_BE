@@ -11,6 +11,7 @@ namespace DataAccess.IRepo
     {
         Task<IEnumerable<Order>> GetAllOrder();
         Task<Order> GetByIdWithItemsAsync(int id);
+        Task<IEnumerable<Order>> GetOrdersByUserId(int userId);
         Task UpdateOrder(Order order);
     }
 }
