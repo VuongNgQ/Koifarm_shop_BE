@@ -15,7 +15,7 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<PaginationModel<ResponseOrderDTO>>> GetOrders(int page, int pageSize,
             string? search, string sort);
         Task<ServiceResponseFormat<ResponseOrderDTO>> GetOrderById(int id);
-        Task<ServiceResponseFormat<ResponseOrderDTO>> GetOrdersByUserIdAsync(int userId);
+        Task<ServiceResponseFormat<IEnumerable<ResponseOrderDTO>>> GetOrdersByUserIdAsync(int userId);
         Task<ServiceResponseFormat<ResponseOrderDTO>> UpdateOrder(int id, UpdateOrderDTO orderDTO);
         Task<ServiceResponseFormat<bool>> DeleteOrder(int id);
         Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status);

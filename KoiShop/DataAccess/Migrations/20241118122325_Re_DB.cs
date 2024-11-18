@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Add_CartItemStatus : Migration
+    public partial class Re_DB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -190,7 +190,7 @@ namespace DataAccess.Migrations
                     UserId = table.Column<int>(type: "int", nullable: true),
                     FishId = table.Column<int>(type: "int", nullable: true),
                     Purpose = table.Column<int>(type: "int", nullable: false),
-                    IsFromShop = table.Column<bool>(type: "bit", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
                     CreateDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TransferDate = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -306,6 +306,32 @@ namespace DataAccess.Migrations
                     table.PrimaryKey("PK_UserCarts", x => x.UserCartId);
                     table.ForeignKey(
                         name: "FK_UserCarts_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "UserId");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "userFishOwnerships",
+                columns: table => new
+                {
+                    OwnershipId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    FishId = table.Column<int>(type: "int", nullable: false),
+                    PurchaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_userFishOwnerships", x => x.OwnershipId);
+                    table.ForeignKey(
+                        name: "FK_userFishOwnerships_Fish_FishId",
+                        column: x => x.FishId,
+                        principalTable: "Fish",
+                        principalColumn: "FishId");
+                    table.ForeignKey(
+                        name: "FK_userFishOwnerships_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "UserId");
@@ -547,6 +573,16 @@ namespace DataAccess.Migrations
                 filter: "[UserId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_userFishOwnerships_FishId",
+                table: "userFishOwnerships",
+                column: "FishId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_userFishOwnerships_UserId",
+                table: "userFishOwnerships",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_RoleId",
                 table: "Users",
                 column: "RoleId");
@@ -578,6 +614,9 @@ namespace DataAccess.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserAddresses");
+
+            migrationBuilder.DropTable(
+                name: "userFishOwnerships");
 
             migrationBuilder.DropTable(
                 name: "UserCarts");
