@@ -164,13 +164,16 @@ namespace BusinessObject.Service
                     return res;
                 }
                 if(exist.Status==OrderStatusEnum.COMPLETED||
-                    exist.Status == OrderStatusEnum.CANCELLED)
+                    exist.Status == OrderStatusEnum.CANCELLED||
+                    exist.Status == OrderStatusEnum.FAILEDDELIVERY||
+                    exist.Status == OrderStatusEnum.DELIVERED)
                 {
                     res.Success = false;
                     res.Message = "This Order is Done so you can't change it anymore";
                     return res;
                 }
-                if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim()))
+                if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim())
+                    || OrderStatusEnum.FAILEDDELIVERY.ToString().Equals(status.ToUpper().Trim()))
                 {
                     //Update for Fish and Package 
                     if (exist.OrderItems.Count > 0)
@@ -181,20 +184,23 @@ namespace BusinessObject.Service
                             {
                                 await _fishService.RestoreFish((int)item.FishId);
                             }
-                            var packageForOrder = await _packageRepo.GetFishPackage((int)item.PackageId);
-                            int curQuantity = (int)packageForOrder.QuantityInStock;
-                            int newQuantity = 0;
-                            if (curQuantity == 0)
+                            if (item.PackageId != null)
                             {
-                                newQuantity = (int)(curQuantity + item.Quantity);
-                                await _packageService.ChangeStatus((int)item.PackageId, ProductStatusEnum.AVAILABLE.ToString());
+                                var packageForOrder = await _packageRepo.GetFishPackage((int)item.PackageId);
+                                int curQuantity = (int)packageForOrder.QuantityInStock;
+                                int newQuantity = 0;
+                                if (curQuantity == 0)
+                                {
+                                    newQuantity = (int)(curQuantity + item.Quantity);
+                                    await _packageService.ChangeStatus((int)item.PackageId, ProductStatusEnum.AVAILABLE.ToString());
+                                }
+                                if(curQuantity>0)
+                                {
+                                    newQuantity = (int)(curQuantity + item.Quantity);
+                                }
+                                packageForOrder.QuantityInStock = newQuantity;
+                                _packageRepo.Update(packageForOrder);
                             }
-                            else
-                            {
-                                newQuantity = (int)(curQuantity + item.Quantity);
-                            }
-                            packageForOrder.QuantityInStock = newQuantity;
-                            _packageRepo.Update(packageForOrder);
                         }
                     }
                     else
@@ -219,9 +225,18 @@ namespace BusinessObject.Service
                         await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.CANCEL_AT_ORDER.ToString());
                     }
                     //Change Order status
-                    exist.Status = OrderStatusEnum.CANCELLED;
+                    if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim()))
+                    {
+                        exist.Status = OrderStatusEnum.CANCELLED;
+                    }
+                    else
+                    {
+                        exist.Status = OrderStatusEnum.FAILEDDELIVERY;
+                    }
+                    exist.CompleteDate = DateTime.Now;
                 }
-                else if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()))
+                else if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim())||
+                    OrderStatusEnum.DELIVERED.ToString().Equals(status.ToUpper().Trim()))
                 {
                     //Update Cart Items Status 
                     var cartList = await _cartRepo.GetAll();
@@ -234,26 +249,38 @@ namespace BusinessObject.Service
                     }
                     var listItem = await _cartItemRepo.GetAll();
                     var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
-                    foreach (var cartItem in cartItems)
+                    if (cartItems.Count > 0)
                     {
-                        await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.COMPLETE_AT_ORDER.ToString());
-                        if (cartItem.FishId != null|| cartItem.PackageId != null)
+                        foreach (var cartItem in cartItems)
                         {
-                            if(cartItem.FishId != null)
+                            await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.COMPLETE_AT_ORDER.ToString());
+                            if (cartItem.FishId != null)
                             {
                                 await _fishService.SoldoutFish((int)cartItem.FishId);
                             }
-                            var packageOfCart = await _packageRepo.GetFishPackage((int)cartItem.PackageId);
-                            if( packageOfCart!=null&&packageOfCart.QuantityInStock == 0)
+                            if (cartItem.PackageId != null)
                             {
-                                await _packageService.SoldoutPackage((int)cartItem.PackageId);
+                                var packageOfCart = await _packageRepo.GetFishPackage((int)cartItem.PackageId);
+                                if (packageOfCart != null && packageOfCart.QuantityInStock == 0)
+                                {
+                                    await _packageService.SoldoutPackage((int)cartItem.PackageId);
+                                }
                             }
                         }
                     }
                     //Update Order Status 
-                    exist.Status = OrderStatusEnum.COMPLETED;
+                    if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()))
+                    {
+                        exist.Status = OrderStatusEnum.COMPLETED;
+                    }
+                    else
+                    {
+                        exist.Status = OrderStatusEnum.DELIVERED;
+                    }
+                    exist.CompleteDate = DateTime.Now;
                 }
-                else if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim()))
+                else if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim())||
+                    OrderStatusEnum.ONPORT.ToString().Equals(status.ToUpper().Trim()))
                 {
                     var cartList = await _cartRepo.GetAll();
                     var cart = cartList.FirstOrDefault(c => c.UserId == exist.UserId);
@@ -269,7 +296,15 @@ namespace BusinessObject.Service
                     {
                         await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.READY_FOR_ORDER.ToString());
                     }
-                    exist.Status = OrderStatusEnum.READY;
+                    if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim()))
+                    {
+                        exist.Status = OrderStatusEnum.READY;
+                    }
+                    else
+                    {
+                        exist.Status = OrderStatusEnum.ONPORT;
+                    }
+                    
                 }
                 else
                 {
@@ -392,11 +427,14 @@ namespace BusinessObject.Service
                 var exist = await _repo.GetByIdWithItemsAsync(id); 
                 if (exist != null)
                 {
-                    if(exist.Status != OrderStatusEnum.CANCELLED)
+                    if((exist.Status == OrderStatusEnum.PENDING||
+                        exist.Status == OrderStatusEnum.READY||
+                        exist.Status == OrderStatusEnum.ONPORT)&&exist.OrderItems.Count>0)
                     {
                         res.Success = false;
-                        res.Message = "You can't delete the COMPLETE/PENDING/READY Orders";
+                        res.Message = "You can't delete the PENDING/ONPORT/READY Orders";
                         res.Data = false;
+                        return res;
                     }
                     var addressOfOrder = await _addressRepo.GetByIdAsync((int)exist.AddressId);
                     if (exist.OrderItems != null && exist.OrderItems.Any())
@@ -407,7 +445,7 @@ namespace BusinessObject.Service
                     _repo.Remove(exist);
                     
                     res.Success = true;
-                    res.Message = "Order and associated items deleted successfully";
+                    res.Message = "Order deleted successfully";
                     res.Data = true;
                 }
                 else
@@ -423,7 +461,6 @@ namespace BusinessObject.Service
                 res.Message = $"Failed to delete order: {ex.Message}";
                 res.Data = false;
             }
-
             return res;
         }
 
@@ -604,14 +641,35 @@ namespace BusinessObject.Service
 
             await _repo.UpdateOrder(order);
         }
-        public async Task<ServiceResponseFormat<ResponseOrderDTO>> GetOrdersByUserIdAsync(int userId)
+        public async Task<ServiceResponseFormat<IEnumerable<ResponseOrderDTO>>> GetOrdersByUserIdAsync(int userId)
         {
-            var orders = await _repo.GetOrdersByUserId(userId);
-
-            if (orders == null || !orders.Any())
-                throw new KeyNotFoundException("No orders found for the specified user.");
-
-            return _mapper.Map<ServiceResponseFormat<ResponseOrderDTO>>(orders);
+            var res = new ServiceResponseFormat<IEnumerable<ResponseOrderDTO>>();
+            try
+            {
+                var orders = await _repo.GetAllOrder();
+                var userOrders=orders.Where(o=>o.UserId==userId);
+                if (!userOrders.Any())
+                {
+                    res.Success=false;
+                    res.Message = $"No Order for this User Id: {userId}";
+                    return res;
+                }
+                else
+                {
+                    var mapp=_mapper.Map<IEnumerable<ResponseOrderDTO>>(userOrders);
+                    res.Success = true;
+                    res.Message = $"Get Order successfully with this User ID: {userId}";
+                    res.Data=mapp;
+                    return res;
+                }
+            }
+            catch(Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to get Order: {ex.Message}";
+                return res;
+            }
+            
         }
 
     }

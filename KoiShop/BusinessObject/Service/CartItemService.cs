@@ -67,6 +67,10 @@ namespace BusinessObject.Service
                 {
                     exist.CartItemStatus = CartItemStatus.READY_FOR_ORDER;
                 }
+                else if (CartItemStatus.ADDED_IN_ORDER.ToString().Equals(status.ToUpper().Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    exist.CartItemStatus = CartItemStatus.ADDED_IN_ORDER;
+                }
                 else
                 {
                     res.Success = false;
@@ -104,8 +108,7 @@ namespace BusinessObject.Service
                     res.Message = "No fish with this Id";
                     return res;
                 }
-                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus)
-                    || ProductStatusEnum.PENDINGPAID.Equals(exist.ProductStatus))
+                if (!ProductStatusEnum.AVAILABLE.Equals(exist.ProductStatus))
                 {
                     res.Success = false;
                     res.Message = "This fish is SOLD OUT/UNAVAILABLE/PENDINGPAID";
@@ -164,12 +167,10 @@ namespace BusinessObject.Service
                     res.Message = "Package Has no fish?";
                     return res;
                 }
-                if (ProductStatusEnum.UNAVAILABLE.Equals(exist.ProductStatus) || ProductStatusEnum.SOLDOUT.Equals(exist.ProductStatus)
-                    || ProductStatusEnum.PENDINGPAID.Equals(exist.ProductStatus)
-                    ||ProductStatusEnum.NOTFULL.Equals(exist.ProductStatus))
+                if (!ProductStatusEnum.AVAILABLE.Equals(exist.ProductStatus))
                 {
                     res.Success = false;
-                    res.Message = "This Package is SOLD OUT/UNAVAILABLE/PENDINGPAID/NOTFULL";
+                    res.Message = "This Package is Not AVAILABLE";
                     return res;
                 }
                 if (exist.QuantityInStock < itemDTO.Quantity)

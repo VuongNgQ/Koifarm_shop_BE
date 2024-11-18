@@ -264,6 +264,14 @@ namespace BusinessObject.Service
                     else
                     {
                         packageExist.NumberOfFish = currentTotalNumberOfOtherFish;
+                        if (currentTotalNumberOfOtherFish < packageExist.Capacity)
+                        {
+                            packageExist.ProductStatus = ProductStatusEnum.NOTFULL;
+                        }
+                        if (currentTotalNumberOfOtherFish == 0)
+                        {
+                            packageExist.ProductStatus = ProductStatusEnum.EMPTY;
+                        }
                         _categoryPackageRepo.Remove(deletingCategory);
                         _repo.Update(packageExist);
                     }
