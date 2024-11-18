@@ -29,6 +29,18 @@ namespace DataAccess.Repo
                 .Include(o => o.OrderItems) // Includes OrderItems for the specified Order
                 .FirstOrDefaultAsync(o => o.OrderId == id);
         }
+        public async Task<IEnumerable<Order>> GetOrdersByUserId(int userId)
+        {
+            return await _context.Orders
+                .Where(o => o.UserId == userId) // Lọc theo UserId
+                .Include(o => o.Address)        // Bao gồm Address
+                .Include(o => o.User)           // Bao gồm User
+                .Include(o => o.OrderItems)     // Bao gồm OrderItems
+                .ThenInclude(oi => oi.Fish)     // Bao gồm Fish từ OrderItems
+                .Include(o => o.OrderItems)
+                .ThenInclude(oi => oi.Package)  // Bao gồm Package từ OrderItems
+                .ToListAsync();
+        }
         public async Task UpdateOrder(Order order)
         {
             _context.Orders.Update(order);

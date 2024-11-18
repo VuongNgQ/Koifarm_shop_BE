@@ -10,7 +10,7 @@ namespace BusinessObject.Model.ResponseDTO
     public class ResponseConsignmentTypeDTO
     {
         public int ConsignmentTypeId { get; set; }
-        public string Name { get; set; }
+        public string? Name { get; set; }
     }
 
     public class FishConsignmentDTO
@@ -19,7 +19,7 @@ namespace BusinessObject.Model.ResponseDTO
         public int UserId { get; set; }
         public int? FishId { get; set; }
         public ConsignmentPurpose Purpose { get; set; }
-        public bool IsFromShop { get; set; }
+        public ConsignmentType Type { get; set; }
         public decimal? Price { get; set; }
         public decimal? DepositAmount { get; set; }
         public DateTime? CreateDate { get; set; }
@@ -28,6 +28,5 @@ namespace BusinessObject.Model.ResponseDTO
         public string? ConditionDescription { get; set; }
         public ConsignmentStatusEnum ConsignmentStatus { get; set; }
         public List<string>? ImageUrls { get; set; }
-        public string? VideoUrl { get; set; }
     }
 }

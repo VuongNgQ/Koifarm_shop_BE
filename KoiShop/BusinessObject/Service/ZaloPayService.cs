@@ -67,7 +67,7 @@ namespace BusinessObject.Service
                 OrderId = orderId,
                 TransactionId = app_trans_id,
                 Currency = "VND",
-                TransactionType = TransactionType.BuyFish,
+                TransactionType = TransactionPurpose.BuyFish,
                 PaymentStatus = PaymentStatus.Pending,
                 Description = "KoiFarmShop - Thanh toán đơn hàng #" + app_trans_id
             };

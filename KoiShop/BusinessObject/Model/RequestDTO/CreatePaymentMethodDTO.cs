@@ -14,7 +14,7 @@ namespace BusinessObject.Model.RequestDTO
     public class CreatePaymentDTO
     {
         public int? UserId { get; set; }
-        public TransactionType TransactionType { get; set; }
+        public TransactionPurpose TransactionType { get; set; }
         public int? RelatedId { get; set; }
         public decimal Amount { get; set; }
         public PaymentStatus Status { get; set; }

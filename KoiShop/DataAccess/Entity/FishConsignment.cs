@@ -12,8 +12,8 @@ namespace DataAccess.Entity
         public int FishConsignmentId { get; set; }
         public int? UserId { get; set; }
         public int? FishId { get; set; }
-        public ConsignmentPurpose Purpose { get; set; }
-        public bool IsFromShop { get; set; }
+        public ConsignmentPurpose Purpose { get; set; } //Care, Sale
+        public ConsignmentType Type { get; set; }
         public decimal? Price { get; set; }
         public DateTime? CreateDate { get; set; } = DateTime.Now;
         public DateTime? TransferDate { get; set; }

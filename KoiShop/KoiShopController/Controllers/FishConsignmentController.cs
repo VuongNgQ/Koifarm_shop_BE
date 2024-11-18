@@ -32,6 +32,10 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> GetAllConsignments()
         {
             var result = await _consignmentService.GetAllConsignmentsAsync();
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
             return Ok(result.Data);
         }
         [HttpGet("user/{userId}")]
@@ -73,10 +77,10 @@ namespace KoiShopController.Controllers
             return Ok(response);
         }
 
-        [HttpPost("approve/{id}")]
-        public async Task<IActionResult> ApproveConsignment(int id, [FromBody] ApproveConsignmentDTO approveDTO)
+        [HttpPost("approve/{consignmentId}")]
+        public async Task<IActionResult> ApproveConsignment(int consignmentId, [FromBody] ApproveConsignmentDTO approveDTO)
         {
-            var response = await _consignmentService.ApproveConsignmentAsync(id, approveDTO);
+            var response = await _consignmentService.ApproveConsignmentAsync(consignmentId, approveDTO);
             if (!response.Success)
             {
                 return BadRequest(response);

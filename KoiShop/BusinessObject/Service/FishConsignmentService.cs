@@ -19,87 +19,159 @@ namespace BusinessObject.Service
         private readonly IMapper _mapper;
         private readonly IUserFishOwnerShipRepo _ownerShipRepo;
 
-        public FishConsignmentService(IFishConsignmentRepo consignmentRepo, IMapper mapper, IPaymentService paymentService, IFishRepo fishRepo)
+        public FishConsignmentService(IFishConsignmentRepo consignmentRepo, IMapper mapper, IPaymentService paymentService, IFishRepo fishRepo, IUserFishOwnerShipRepo ownerShipRepo)
         {
             _consignmentRepo = consignmentRepo;
             _mapper = mapper;
             _paymentService = paymentService;
             _fishRepo = fishRepo;
+            _ownerShipRepo = ownerShipRepo;
         }
 
+        //public async Task<ServiceResponseFormat<FishConsignmentDTO>> CreateConsignmentAsync(CreateConsignmentDTO consignmentDTO)
+        //{
+        //    var response = new ServiceResponseFormat<FishConsignmentDTO>();
+
+        //    try
+        //    {
+        //        var consignment = _mapper.Map<FishConsignment>(consignmentDTO);
+        //        consignment.CreateDate = DateTime.Now;
+        //        consignment.ConsignmentStatus = ConsignmentStatusEnum.PendingApproval;
+
+        //        switch (consignmentDTO.Purpose)
+        //        {
+        //            case ConsignmentPurpose.Care:
+        //                if (consignmentDTO.FishId == null)
+        //                {
+        //                    response.Success = false;
+        //                    response.Message = "Fish is required for care consignments.";
+        //                    return response;
+        //                }
+
+        //                var ownedFish = await _ownerShipRepo.GetOwnershipByUserAndFishAsync(consignmentDTO.UserId, consignmentDTO.FishId.Value);
+        //                if (ownedFish == null)
+        //                {
+        //                    response.Success = false;
+        //                    response.Message = "The selected fish does not belong to the user.";
+        //                    return response;
+        //                }
+        //                break;
+
+        //            case ConsignmentPurpose.Sale:
+        //                break;
+
+        //            default:
+        //                response.Success = false;
+        //                response.Message = "Invalid consignment type.";
+        //                return response;
+        //        }
+        //        await _consignmentRepo.AddFishConsignmentAsync(consignment);
+
+        //        response.Data = _mapper.Map<FishConsignmentDTO>(consignment);
+        //        response.Success = true;
+        //        response.Message = "Consignment created successfully.";
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        response.Success = false;
+        //        response.Message = $"Error creating consignment: {ex.Message}";
+        //    }
+
+        //    return response;
+        //}
         public async Task<ServiceResponseFormat<FishConsignmentDTO>> CreateConsignmentAsync(CreateConsignmentDTO consignmentDTO)
         {
             var response = new ServiceResponseFormat<FishConsignmentDTO>();
 
             try
             {
-                var consignment = _mapper.Map<FishConsignment>(consignmentDTO);
-                consignment.CreateDate = DateTime.Now;
-                consignment.ConsignmentStatus = ConsignmentStatusEnum.PendingApproval;
-
                 if (consignmentDTO.Purpose == ConsignmentPurpose.Care)
                 {
-                    if (consignmentDTO.FishId == null)
-                    {
-                        response.Success = false;
-                        response.Message = "Fish is required for care consignments.";
-                        return response;
-                    }
-                    var ownedFish = await _ownerShipRepo.GetOwnershipByUserAndFishAsync(consignmentDTO.UserId, consignmentDTO.FishId.Value);
-                    if (ownedFish == null)
-                    {
-                        response.Success = false;
-                        response.Message = "The selected fish does not belong to the user.";
-                        return response;
-                    }
+                    response = await HandleCareConsignmentAsync(consignmentDTO as CreateCareConsignmentDTO);
                 }
                 else if (consignmentDTO.Purpose == ConsignmentPurpose.Sale)
                 {
-                    if (consignmentDTO.FishId != null)
-                    {
-                        var fishOwnership = await _ownerShipRepo.GetOwnershipByUserAndFishAsync(consignmentDTO.UserId, consignmentDTO.FishId.Value);
-                        if (fishOwnership == null)
-                        {
-                            response.Success = false;
-                            response.Message = "The selected fish does not belong to the user or was not purchased from the shop.";
-                            return response;
-                        }
-                    }
-                    else
-                    {
-                        consignment.FishId = null;
-                    }
+                    response = await HandleSaleConsignmentAsync(consignmentDTO as CreateSaleConsignmentDTO);
                 }
                 else
                 {
                     response.Success = false;
                     response.Message = "Invalid consignment type.";
-                    return response;
                 }
-                //if (consignmentDTO.IsFromShop)
-                //{
-                //    if (consignmentDTO.FishId == null)
-                //    {
-                //        response.Success = false;
-                //        response.Message = "Fish is required when consignment is from shop.";
-                //        return response;
-                //    }
-                //}
-                //else
-                //{
-                //    consignment.FishId = null;
-                //}
-                await _consignmentRepo.AddFishConsignmentAsync(consignment);
-
-                response.Data = _mapper.Map<FishConsignmentDTO>(consignment);
-                response.Success = true;
-                response.Message = "Consignment created successfully.";
             }
             catch (Exception ex)
             {
                 response.Success = false;
                 response.Message = $"Error creating consignment: {ex.Message}";
             }
+
+            return response;
+        }
+
+        private async Task<ServiceResponseFormat<FishConsignmentDTO>> HandleCareConsignmentAsync(CreateCareConsignmentDTO dto)
+        {
+            var response = new ServiceResponseFormat<FishConsignmentDTO>();
+
+            var ownedFish = await _ownerShipRepo.GetOwnershipByUserAndFishAsync(dto.UserId, dto.FishId);
+            if (ownedFish == null)
+            {
+                response.Success = false;
+                response.Message = "The selected fish does not belong to the user.";
+                return response;
+            }
+
+            var consignment = new FishConsignment
+            {
+                UserId = dto.UserId,
+                FishId = dto.FishId,
+                Purpose = ConsignmentPurpose.Care,
+                ConditionDescription = dto.ConditionDescription,
+                ConsignmentStatus = ConsignmentStatusEnum.PendingApproval,
+                TransferDate = dto.TransferDate,
+                ReceiveDate = dto.ReceiveDate
+            };
+
+            await _consignmentRepo.AddFishConsignmentAsync(consignment);
+
+            response.Data = _mapper.Map<FishConsignmentDTO>(consignment);
+            response.Success = true;
+            response.Message = "Care consignment created successfully.";
+
+            return response;
+        }
+
+        private async Task<ServiceResponseFormat<FishConsignmentDTO>> HandleSaleConsignmentAsync(CreateSaleConsignmentDTO dto)
+        {
+            var response = new ServiceResponseFormat<FishConsignmentDTO>();
+
+            var fish = new Fish
+            {
+                Name = dto.FishInfo.Name,
+                Age = dto.FishInfo.Age,
+                Gender = dto.FishInfo.Gender,
+                Size = dto.FishInfo.Size,
+                CategoryId = dto.FishInfo.CategoryId,
+                ImageUrl = dto.FishInfo.ImageUrl,
+                Status = FishStatusEnum.GOOD,
+                ProductStatus = ProductStatusEnum.PENDINGAPPROVAL
+            };
+
+            await _fishRepo.AddFishAsync(fish);
+
+            var consignment = new FishConsignment
+            {
+                UserId = dto.UserId,
+                FishId = fish.FishId,
+                Purpose = ConsignmentPurpose.Sale,
+                ConditionDescription = dto.ConditionDescription,
+                ConsignmentStatus = ConsignmentStatusEnum.PendingApproval
+            };
+
+            await _consignmentRepo.AddFishConsignmentAsync(consignment);
+
+            response.Data = _mapper.Map<FishConsignmentDTO>(consignment);
+            response.Success = true;
+            response.Message = "Sale consignment created successfully.";
 
             return response;
         }
@@ -111,55 +183,28 @@ namespace BusinessObject.Service
             try
             {
                 var consignment = await _consignmentRepo.GetFishConsignmentByIdAsync(consignmentId);
-                if (consignment == null)
+                if (consignment == null || consignment.ConsignmentStatus != ConsignmentStatusEnum.PendingApproval)
                 {
                     response.Success = false;
-                    response.Message = "Consignment not found.";
+                    response.Message = "Consignment not found or already processed.";
                     return response;
                 }
 
                 switch (consignment.Purpose)
                 {
                     case ConsignmentPurpose.Care:
-                        if (!consignment.IsFromShop)
-                        {
-                            var newFish = new Fish { /* Các thuộc tính dựa trên consignment */ };
-                            await _fishRepo.AddFishAsync(newFish);
-                            consignment.FishId = newFish.FishId;
-                        }
 
                         consignment.ConsignmentStatus = ConsignmentStatusEnum.Approved;
                         await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
-                        await _paymentService.CreateDepositPaymentAsync(
-                            consignment.UserId.Value, consignment.FishConsignmentId, approveDto.DepositAmount.Value, "Deposit for care consignment"
-                        );
+                        //await _paymentService.CreateDepositPaymentAsync(
+                        //    consignment.UserId.Value, consignment.FishConsignmentId, approveDto.DepositAmount.Value, "Deposit for care consignment"
+                        //);
                         response.Message = "Care consignment approved with deposit payment.";
                         break;
 
                     case ConsignmentPurpose.Sale:
-                        if (consignment.FishId == null)
-                        {
-                            var newFish = new Fish { /* Các thuộc tính dựa trên consignment */ };
-                            await _fishRepo.AddFishAsync(newFish);
-                            consignment.FishId = newFish.FishId;
-                        }
-                        else
-                        {
-                            var fish = await _fishRepo.GetFishByIdAsync(consignment.FishId.Value);
-                            if (fish == null)
-                            {
-                                response.Success = false;
-                                response.Message = "Fish linked to the consignment not found.";
-                                return response;
-                            }
-
-                            fish.Price = approveDto.AgreedPrice;
-                            fish.ProductStatus = ProductStatusEnum.AVAILABLE;
-                            await _fishRepo.UpdateFishAsync(fish);
-                        }
-
                         consignment.Price = approveDto.AgreedPrice;
-                        consignment.ConsignmentStatus = ConsignmentStatusEnum.Approved;
+                        consignment.ConsignmentStatus = ConsignmentStatusEnum.PriceAgreed;
                         await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
                         response.Message = "Sale consignment approved with agreed price.";
                         break;
@@ -236,12 +281,22 @@ namespace BusinessObject.Service
 
         public async Task<ServiceResponseFormat<List<FishConsignmentDTO>>> GetAllConsignmentsAsync()
         {
-            var consignments = await _consignmentRepo.GetAllFishConsignmentAsync();
-            return new ServiceResponseFormat<List<FishConsignmentDTO>>
+            var response = new ServiceResponseFormat<List<FishConsignmentDTO>>();
+
+            try
             {
-                Data = _mapper.Map<List<FishConsignmentDTO>>(consignments),
-                Success = true
-            };
+                var consignments = await _consignmentRepo.GetAllFishConsignmentAsync();
+
+                response.Data = _mapper.Map<List<FishConsignmentDTO>>(consignments);
+                response.Success = true;
+                response.Message = "Consignments retrieved successfully.";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error: {ex.Message}";
+            }
+            return response;
         }
 
         public async Task<ServiceResponseFormat<FishConsignmentDTO>> UpdateConsignmentAsync(FishConsignmentDTO consignmentDto)
@@ -264,6 +319,19 @@ namespace BusinessObject.Service
             }
 
             return response;
+        }
+
+        public async Task<ServiceResponseFormat<FishConsignmentDTO>> UpdateConsignmentStatusAsync(int consignmentId, ConsignmentStatusEnum newStatus, string? description = null)
+        {
+            var consignment = await _consignmentRepo.GetFishConsignmentByIdAsync(consignmentId);
+            if (consignment == null)
+                return new ServiceResponseFormat<FishConsignmentDTO> { Success = false, Message = "Consignment not found." };
+
+            consignment.ConsignmentStatus = newStatus;
+            consignment.ConditionDescription = description;
+
+            await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
+            return new ServiceResponseFormat<FishConsignmentDTO> { Success = true, Message = "Status updated successfully." };
         }
         public async Task<ServiceResponseFormat<FishConsignmentDTO>> GetConsignmentsByUserIdAsync(int userId)
         {

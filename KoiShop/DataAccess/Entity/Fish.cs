@@ -23,5 +23,6 @@ namespace DataAccess.Entity
         
         public ICollection<FishConsignment>? Consignments { get; set; }
         public ICollection<SubImage>? SubImages { get; set; }
+        public ICollection<UserFishOwnership>? UserFishOwnerships { get; set; }
     }
 }

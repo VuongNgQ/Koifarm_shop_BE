@@ -104,7 +104,7 @@ namespace BusinessObject.Mapper
             CreateMap<Payment, PaymentDTO>()
                 .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.TransactionId))
                 .ForMember(dest => dest.RelatedId, opt => opt.MapFrom(src =>
-                    src.TransactionType == TransactionType.BuyFish ? src.OrderId : src.FishConsignmentId))
+                    src.TransactionType == TransactionPurpose.BuyFish ? src.OrderId : src.FishConsignmentId))
                 .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreatedDate ?? DateTime.MinValue))
                 .ForMember(dest => dest.PaymentDate, opt => opt.MapFrom(src => src.PaymentDate ?? DateTime.MinValue))
                 .ForMember(dest => dest.Method, opt => opt.MapFrom(src => src.Order.PaymentMethod))

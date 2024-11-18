@@ -38,6 +38,7 @@ namespace DataAccess
         
         public DbSet<UserAddress> UserAddresses { get; set; }
         public DbSet<Payment> Payments { get; set; }
+        public DbSet<UserFishOwnership> userFishOwnerships { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -189,6 +190,20 @@ namespace DataAccess
                 .HasOne(p => p.User)
                 .WithMany(u => u.PasswordResetTokens)
                 .HasForeignKey(p => p.UserId);
+            // User and OwnerShip (one-to-many)
+            modelBuilder.Entity<UserFishOwnership>()
+                .HasOne(o => o.User)
+                .WithMany(u => u.UserFishOwnerships)
+                .HasForeignKey(o => o.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            // Fish and OwnerShip (one-to-many)
+            modelBuilder.Entity<UserFishOwnership>()
+                .HasOne(o => o.Fish)
+                .WithMany(u => u.UserFishOwnerships)
+                .HasForeignKey(o => o.FishId)
+                .OnDelete(DeleteBehavior.NoAction);
+            modelBuilder.Entity<UserFishOwnership>()
+                .HasKey(ufo => ufo.OwnershipId);
             base.OnModelCreating(modelBuilder);
         }
 
