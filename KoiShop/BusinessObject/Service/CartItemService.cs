@@ -71,6 +71,10 @@ namespace BusinessObject.Service
                 {
                     exist.CartItemStatus = CartItemStatus.ADDED_IN_ORDER;
                 }
+                else if (CartItemStatus.TAKEN_BY_OTHERS.ToString().Equals(status.ToUpper().Trim(), StringComparison.OrdinalIgnoreCase))
+                {
+                    exist.CartItemStatus = CartItemStatus.TAKEN_BY_OTHERS;
+                }
                 else
                 {
                     res.Success = false;
@@ -95,7 +99,7 @@ namespace BusinessObject.Service
             try
             {
                 var items=await _repo.GetAllAsync();
-                if(items.Any(i=>i.FishId==itemDTO.FishId))
+                if(items.Any(i=>i.FishId==itemDTO.FishId && i.UserCartId == itemDTO.UserCartId))
                 {
                     res.Success = false;
                     res.Message = "You haved added this Fish before, now you can only update Quantity inside";
@@ -126,7 +130,6 @@ namespace BusinessObject.Service
                 mapp.TotalPricePerItem = exist.Price;
                 mapp.CartItemStatus = CartItemStatus.PENDING_FOR_ORDER;
                 await _repo.AddAsync(mapp);
-                await _fishService.ChangeStatus(itemDTO.FishId, ProductStatusEnum.INCART.ToString());
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 result.TotalPricePerItem=exist.Price;
                 res.Success = true;
@@ -148,7 +151,8 @@ namespace BusinessObject.Service
             try
             {
                 var items = await _repo.GetAllAsync();
-                if (items.Any(i => i.PackageId == itemDTO.PackageId&&i.UserCartId==itemDTO.UserCartId))
+                if (items.Any(i => i.PackageId == itemDTO.PackageId&&i.UserCartId==itemDTO.UserCartId&&
+                (i.CartItemStatus==CartItemStatus.PENDING_FOR_ORDER||i.CartItemStatus==CartItemStatus.ADDED_IN_ORDER)))
                 {
                     res.Success = false;
                     res.Message = "You haved added this Package before";
@@ -193,7 +197,7 @@ namespace BusinessObject.Service
                 var packageForCart = await _fishPackageRepo.GetFishPackage(itemDTO.PackageId);
                 int curQuantity = (int)packageForCart.QuantityInStock;
                 int newQuantity = curQuantity - itemDTO.Quantity;
-                if (newQuantity < 0)
+                /*if (newQuantity < 0)
                 {
                     res.Success = false;
                     res.Message = "Exceed the package quantity??";
@@ -209,6 +213,12 @@ namespace BusinessObject.Service
                 {
                     packageForCart.QuantityInStock = newQuantity;
                     _fishPackageRepo.Update(packageForCart);
+                }*/
+                if (newQuantity < 0)
+                {
+                    res.Success = false;
+                    res.Message = "Exceed the package quantity??";
+                    return res;
                 }
                 mapp.CartItemStatus=CartItemStatus.PENDING_FOR_ORDER;
                 await _repo.AddAsync(mapp);
@@ -429,12 +439,11 @@ namespace BusinessObject.Service
                                 res.Message = "Exceed the package quantity??";
                                 return res;
                             }
-                            else if (newQuantity == 0)
+                            /*else if (newQuantity == 0)
                             {
                                 packageForCart.QuantityInStock = newQuantity;
                                 _fishPackageRepo.Update(packageForCart);
-                                await _fishPackageService.ChangeStatus((int)exist.PackageId, ProductStatusEnum.INCART.ToString());
-                            }
+                            }*/
                             else
                             {
                                 packageForCart.QuantityInStock = newQuantity;

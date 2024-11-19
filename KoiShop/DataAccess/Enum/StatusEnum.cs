@@ -15,7 +15,6 @@ namespace DataAccess.Enum
         UNAVAILABLE,
         PENDINGPAID,
         SOLDOUT,
-        INCART,
         PENDINGAPPROVAL
     }
     public enum CartItemStatus
@@ -24,7 +23,8 @@ namespace DataAccess.Enum
         ADDED_IN_ORDER,
         READY_FOR_ORDER,
         COMPLETE_AT_ORDER,
-        CANCEL_AT_ORDER
+        CANCEL_AT_ORDER,
+        TAKEN_BY_OTHERS
     }
     public enum FishStatusEnum
     {

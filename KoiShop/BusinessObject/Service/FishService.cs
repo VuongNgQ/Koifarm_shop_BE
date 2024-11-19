@@ -55,10 +55,7 @@ namespace BusinessObject.Service
                 {
                     exist.ProductStatus = ProductStatusEnum.SOLDOUT;
                 }
-                else if (ProductStatusEnum.INCART.ToString().Equals(status.ToUpper().Trim()))
-                {
-                    exist.ProductStatus = ProductStatusEnum.INCART;
-                }
+                
                 else
                 {
                     res.Success = false;
