@@ -320,10 +320,7 @@ namespace BusinessObject.Service
                 {
                     exist.ProductStatus = ProductStatusEnum.NOTFULL;
                 }
-                else if (ProductStatusEnum.INCART.ToString().Equals(status.ToUpper().Trim()))
-                {
-                    exist.ProductStatus = ProductStatusEnum.INCART;
-                }
+                
                 else
                 {
                     res.Success = false;

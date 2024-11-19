@@ -30,6 +30,7 @@ namespace BusinessObject.Service
         private readonly ICartItemRepo _cartItemRepo;
         private readonly IOrderItemRepo _orderItemRepo;
         private readonly IFishPackageRepo _packageRepo;
+        private readonly IFishRepo _fishRepo;
 
         private readonly ICartItemService _cartItemService;
         private readonly IOrderItemService _orderItemService;
@@ -41,7 +42,7 @@ namespace BusinessObject.Service
             , IUserRepo userRepo, IOrderItemRepo itemRepo, ICartRepo cartRepo
             , ICartItemRepo cartItemRepo, IOrderItemRepo orderItemRepo, ICartItemService cartItemService
             , IOrderItemService orderItemService, IFishPackageService packageService, IFishService fishService
-            , IFishPackageRepo packageRepo, IUserFishOwnerShipRepo ownerShipRepo)
+            , IFishPackageRepo packageRepo, IUserFishOwnerShipRepo ownerShipRepo, IFishRepo fishRepo)
         {
             _repo = repo;
             _mapper = mapper;
@@ -52,13 +53,17 @@ namespace BusinessObject.Service
             _cartRepo = cartRepo;
             _cartItemRepo = cartItemRepo;
             _orderItemRepo = orderItemRepo;
+            _packageRepo = packageRepo;
+            _ownerShipRepo = ownerShipRepo;
+            _fishRepo = fishRepo;
+
             _cartItemService = cartItemService;
             _orderItemService = orderItemService;
             _packageService = packageService;
             _fishService = fishService;
-            _packageRepo = packageRepo;
-            _ownerShipRepo = ownerShipRepo;
+            
         }
+        #region Change status(da hell?)
         public async Task<ServiceResponseFormat<bool>> FinishOrder(int id)
         {
             var res = new ServiceResponseFormat<bool>();
@@ -150,6 +155,9 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+        #endregion
+
+        #region Change Status of the Order and update the thing inside (Fish, Package)
         public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
         {
             var res = new ServiceResponseFormat<bool>();
@@ -324,11 +332,9 @@ namespace BusinessObject.Service
                 return res;
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="orderDTO"></param>
-        /// <returns></returns>
+        #endregion
+
+        #region Create Order and Items (with item at specific Status from the Cart)
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> CreateOrderWithItems(CreateOrderDTO orderDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderDTO>();
@@ -389,6 +395,38 @@ namespace BusinessObject.Service
                     {
                         if (CartItemStatus.PENDING_FOR_ORDER.Equals(cartItem.CartItemStatus))
                         {
+
+                            //check if someone has taken the item 
+                            if (cartItem.FishId != null)
+                            {
+                                var fishTaken = await _fishRepo.GetFishByIdAsync((int)cartItem.FishId);
+                                if (fishTaken.ProductStatus != ProductStatusEnum.AVAILABLE)
+                                {
+                                    await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.TAKEN_BY_OTHERS.ToString());
+                                    res.Success = false;
+                                    res.Message = "That fish has been taken by other:)))))";
+                                    return res;
+                                }
+                            }
+                            else if (cartItem.PackageId != null)
+                            {
+                                var packageTaken = await _packageRepo.GetFishPackage((int)cartItem.PackageId);
+                                var quantityPackageTaken = packageTaken.QuantityInStock;
+                                if (packageTaken.ProductStatus != ProductStatusEnum.AVAILABLE)
+                                {
+                                    await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.TAKEN_BY_OTHERS.ToString());
+                                    res.Success = false;
+                                    res.Message = "That Package has been taken by other:)))))";
+                                    return res;
+                                }
+                                if (quantityPackageTaken < cartItem.Quantity)
+                                {
+                                    res.Success = false;
+                                    res.Message = $"Now it's only {quantityPackageTaken} package(s) left";
+                                    return res;
+                                }
+                            }
+
                             OrderItem newItem = new OrderItem
                             {
                                 OrderId = mappedOrder.OrderId,
@@ -397,9 +435,37 @@ namespace BusinessObject.Service
                                 Quantity = cartItem.Quantity,
                                 Price = cartItem.TotalPricePerItem
                             };
+
                             /*await _repo.AddAsync(mappedOrder);*/
                             await _orderItemRepo.AddAsync(newItem);
                             await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.ADDED_IN_ORDER.ToString());
+                            if (newItem.FishId != null)
+                            {
+                                await _fishService.ChangeStatus((int)newItem.FishId, ProductStatusEnum.PENDINGPAID.ToString());
+                            }
+                            if (newItem.PackageId!=null)
+                            {
+                                var packageForCart = await _packageRepo.GetFishPackage((int)newItem.PackageId);
+                                int curQuantity = (int)packageForCart.QuantityInStock;
+                                int newQuantity = curQuantity - (int)newItem.Quantity;
+                                if (newQuantity < 0)
+                                {
+                                    res.Success = false;
+                                    res.Message = "Exceed the package quantity??";
+                                    return res;
+                                }
+                                else if (newQuantity == 0)
+                                {
+                                    packageForCart.QuantityInStock = newQuantity;
+                                    _packageRepo.Update(packageForCart);
+                                    await _packageService.ChangeStatus((int)newItem.PackageId, ProductStatusEnum.PENDINGPAID.ToString());
+                                }
+                                else
+                                {
+                                    packageForCart.QuantityInStock = newQuantity;
+                                    _packageRepo.Update(packageForCart);
+                                }
+                            }
                         }
                     }
                     // 4. Update Order Total Price
@@ -418,6 +484,9 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+        #endregion
+
+        #region Delete the order(only for Specific Order Status )
         public async Task<ServiceResponseFormat<bool>> DeleteOrder(int id)
         {
             var res = new ServiceResponseFormat<bool>();
@@ -463,8 +532,9 @@ namespace BusinessObject.Service
             }
             return res;
         }
+        #endregion
 
-
+        #region Get Order By Order ID
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> GetOrderById(int id)
         {
             var res = new ServiceResponseFormat<ResponseOrderDTO>();
@@ -493,7 +563,9 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+        #endregion
 
+        #region Get all orders and also search, sort
         public async Task<ServiceResponseFormat<PaginationModel<ResponseOrderDTO>>> GetOrders(int page, int pageSize, string? search, string sort)
         {
             var res = new ServiceResponseFormat<PaginationModel<ResponseOrderDTO>>();
@@ -533,7 +605,9 @@ namespace BusinessObject.Service
             }
             return res;
         }
+        #endregion
 
+        #region Update the order (not the items in order)
         public async Task<ServiceResponseFormat<ResponseOrderDTO>> UpdateOrder(int id, UpdateOrderDTO orderDTO)
         {
             var res = new ServiceResponseFormat<ResponseOrderDTO>();
@@ -614,6 +688,8 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+        #endregion
+
         public async Task MarkOrderAsCompleted(int orderId)//Minh
         {
             var order = await _repo.GetByIdAsync(orderId);
@@ -641,6 +717,7 @@ namespace BusinessObject.Service
 
             await _repo.UpdateOrder(order);
         }
+        #region Get Order base on the User ID 
         public async Task<ServiceResponseFormat<IEnumerable<ResponseOrderDTO>>> GetOrdersByUserIdAsync(int userId)
         {
             var res = new ServiceResponseFormat<IEnumerable<ResponseOrderDTO>>();
@@ -671,6 +748,6 @@ namespace BusinessObject.Service
             }
             
         }
-
+        #endregion
     }
 }
