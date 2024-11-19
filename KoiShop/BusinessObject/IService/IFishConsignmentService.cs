@@ -12,12 +12,13 @@ namespace BusinessObject.IService
 {
     public interface IFishConsignmentService
     {
-        Task<ServiceResponseFormat<FishConsignmentDTO>> CreateConsignmentAsync(CreateConsignmentDTO consignmentDto);
+        Task<ServiceResponseFormat<int>> CreateCareConsignmentAsync(CareConsignmentDTO consignmentDto);
+        Task<ServiceResponseFormat<int>> CreateSaleConsignmentAsync(SaleConsignmentDTO consignmentDto);
         Task<ServiceResponseFormat<bool>> ApproveConsignmentAsync(int consignmentId, ApproveConsignmentDTO approveDto);
         Task<ServiceResponseFormat<bool>> CompleteSaleConsignmentAsync(int consignmentId);
-        Task<ServiceResponseFormat<FishConsignmentDTO>> GetConsignmentByIdAsync(int consignmentId);
+        Task<ServiceResponseFormat<object>> GetConsignmentByIdAsync(int consignmentId);
         Task<ServiceResponseFormat<List<FishConsignmentDTO>>> GetAllConsignmentsAsync();
-        Task<ServiceResponseFormat<FishConsignmentDTO>> GetConsignmentsByUserIdAsync(int userId);
+        Task<ServiceResponseFormat<List<object>>> GetConsignmentsByUserIdAsync(int userId);
         Task<ServiceResponseFormat<FishConsignmentDTO>> UpdateConsignmentAsync(FishConsignmentDTO consignmentDto);
         Task<ServiceResponseFormat<FishConsignmentDTO>> UpdateConsignmentStatusAsync(int consignmentId, ConsignmentStatusEnum newStatus, string? description = null);
 

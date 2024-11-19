@@ -98,8 +98,30 @@ namespace BusinessObject.Mapper
             CreateMap<SubImage, CreatePackageSubImageDTO>().ReverseMap();
             CreateMap<SubImage, ResponseSubImageDTO>().ReverseMap();
             //Fish Consignment
-            CreateMap<FishConsignment, FishConsignmentDTO>().ReverseMap();
-            CreateMap<FishConsignment, CreateConsignmentDTO>().ReverseMap();
+            CreateMap<FishConsignment, FishConsignmentDTO>()
+                .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate ?? DateTime.MinValue))
+                .ForMember(dest => dest.TransferDate, opt => opt.MapFrom(src => src.TransferDate ?? DateTime.MinValue))
+                .ForMember(dest => dest.ReceiveDate, opt => opt.MapFrom(src => src.ReceiveDate ?? DateTime.MinValue))
+                .ReverseMap();
+            CreateMap<FishConsignment, FishConsignmentCareResponseDTO>()
+                .ForMember(dest => dest.TransferDate, opt => opt.MapFrom(src => src.TransferDate ?? DateTime.MinValue))
+                .ForMember(dest => dest.ReceiveDate, opt => opt.MapFrom(src => src.ReceiveDate.HasValue ? src.ReceiveDate.Value.ToString("yyyy-MM-ddTHH:mm:ss")
+               : "Pending"))
+                .ForMember(dest => dest.ConsignmentStatus, opt => opt.MapFrom(src => Enum.GetName(typeof(ConsignmentStatusEnum), src.ConsignmentStatus)))
+                .ReverseMap();
+            CreateMap<FishConsignment, FishConsignmentSaleResponseDTO>()
+                .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate ?? DateTime.MinValue))
+                .ForMember(dest => dest.ConsignmentStatus, opt => opt.MapFrom(src => Enum.GetName(typeof(ConsignmentStatusEnum), src.ConsignmentStatus)))
+                .ReverseMap();
+            CreateMap<Fish, FishInfoDTO>()
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => Enum.GetName(typeof(FishGenderEnum), src.Gender)))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Enum.GetName(typeof(FishStatusEnum), src.Status)))
+                .ReverseMap();
+            CreateMap<Fish, FishInfoResponseDTO>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
+                .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => Enum.GetName(typeof(FishGenderEnum), src.Gender)))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => Enum.GetName(typeof(FishStatusEnum), src.Status)))
+                .ReverseMap();
             // Trong MapperConfig, thêm mapping cho Payment
             CreateMap<Payment, PaymentDTO>()
                 .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(src => src.TransactionId))

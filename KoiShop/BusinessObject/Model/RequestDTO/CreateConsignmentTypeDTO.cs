@@ -11,24 +11,23 @@ namespace BusinessObject.Model.RequestDTO
     {
         public int UserId { get; set; }
         public ConsignmentType Type { get; set; }
-        public ConsignmentPurpose Purpose { get; set; }
         public string? ConditionDescription { get; set; }
         public decimal? Price { get; set; }
     }
-    public class CreateCareConsignmentDTO : CreateConsignmentDTO
+    public class CareConsignmentDTO : CreateConsignmentDTO
     {
         public int FishId { get; set; }
         public DateTime? TransferDate { get; set; }
         public DateTime? ReceiveDate { get; set; }
     }
-    public class CreateSaleConsignmentDTO : CreateConsignmentDTO
+    public class SaleConsignmentDTO : CreateConsignmentDTO
     {
-        public FishInfoDTO FishInfo { get; set; }
+        public FishInfoDTO? FishInfo { get; set; }
     }
     public class FishInfoDTO
     {
         public string? Name { get; set; }
-        public int? CategoryId { get; set; }
+        public int CategoryId { get; set; }
         public int? Age { get; set; }
         public FishGenderEnum Gender { get; set; }
         public FishStatusEnum Status { get; set; }
@@ -38,6 +37,6 @@ namespace BusinessObject.Model.RequestDTO
     public class ApproveConsignmentDTO
     {
         public decimal AgreedPrice { get; set; }
-        public decimal? DepositAmount { get; set; }
+        public decimal FishSaleAmount { get; set; }
     }
 }
