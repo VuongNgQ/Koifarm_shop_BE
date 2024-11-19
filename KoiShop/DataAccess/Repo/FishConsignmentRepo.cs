@@ -21,6 +21,7 @@ namespace DataAccess.Repo
             return await _context.FishConsignments
                 .Include(fc => fc.User)
                 .Include(fc => fc.Fish)
+                .ThenInclude(f => f.Category)
                 .Include(fc => fc.Payments)
                 .FirstOrDefaultAsync(fc => fc.FishConsignmentId == id);
         }
@@ -34,7 +35,11 @@ namespace DataAccess.Repo
         }
         public async Task<IEnumerable<FishConsignment>> GetConsignmentsByUserIdAsync(int userId)
         {
-            return await _context.FishConsignments.Where(c => c.UserId == userId).ToListAsync();
+            return await _context.FishConsignments
+                .Where(c => c.UserId == userId)
+                .Include(fc => fc.Fish).ThenInclude(f => f.Category)
+                .Include(fc => fc.Payments)
+                .ToListAsync();
         }
         public async Task<FishConsignment?> AddFishConsignmentAsync(FishConsignment consignment)
         {

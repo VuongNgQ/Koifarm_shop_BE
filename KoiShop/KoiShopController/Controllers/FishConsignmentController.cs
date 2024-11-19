@@ -16,7 +16,11 @@ namespace KoiShopController.Controllers
         {
             _consignmentService = consignmentService;
         }
-
+        /// <summary>
+        /// Get consignment by consignmentId.
+        /// <param name="id">Consignment Id</param>
+        /// </summary>
+        /// <returns>The consignment information.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetConsignmentById(int id)
         {
@@ -28,6 +32,10 @@ namespace KoiShopController.Controllers
             return Ok(result.Data);
         }
 
+        /// <summary>
+        /// Get all consignment.
+        /// </summary>
+        /// <returns>The list of consignment.</returns>
         [HttpGet]
         public async Task<IActionResult> GetAllConsignments()
         {
@@ -38,6 +46,12 @@ namespace KoiShopController.Controllers
             }
             return Ok(result.Data);
         }
+
+        /// <summary>
+        /// Get list of consignment by userId.
+        /// <param name="userId">User Id</param>
+        /// </summary>
+        /// <returns>The list of consignment information.</returns>
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetConsignmentsByUserId(int userId)
         {
@@ -48,22 +62,41 @@ namespace KoiShopController.Controllers
             }
             else
             {
-                return NotFound(result);
+                return BadRequest(result.Message);
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> CreateConsignment([FromBody] CreateConsignmentDTO consignmentDto)
+        /// <summary>
+        /// Create care consignment with boughten fish.
+        /// <param name="consignmentDto">Details of Consignment</param>
+        /// </summary>
+        /// <returns>.</returns>
+        [HttpPost("care")]
+        public async Task<IActionResult> CreateCareConsignment([FromBody] CareConsignmentDTO consignmentDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var result = await _consignmentService.CreateConsignmentAsync(consignmentDto);
+            var result = await _consignmentService.CreateCareConsignmentAsync(consignmentDto);
             if (!result.Success)
             {
                 return BadRequest(result.Message);
             }
-            return Ok(result.Data);
+            return Ok(result.Message);
+        }
+
+        [HttpPost("sale")]
+        public async Task<IActionResult> CreateSaleConsignment([FromBody] SaleConsignmentDTO consignmentDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var result = await _consignmentService.CreateSaleConsignmentAsync(consignmentDto);
+            if (!result.Success)
+            {
+                return BadRequest(result.Message);
+            }
+            return Ok(result.Message);
         }
 
         [HttpPut("update")]
