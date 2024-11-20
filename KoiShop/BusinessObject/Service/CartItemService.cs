@@ -224,7 +224,7 @@ namespace BusinessObject.Service
                 await _repo.AddAsync(mapp);
                 var result = _mapper.Map<ResponseCartItemDTO>(mapp);
                 res.Success = true;
-                res.Message = "Create Item Successfully";
+                res.Message = $"Create Item Successfully, now it's only {newQuantity} package(s) left";
                 res.Data = result;
                 return res;
             }
@@ -391,8 +391,13 @@ namespace BusinessObject.Service
 
             try
             {
+                if (quantity <= 0)
+                {
+                    res.Success = false;
+                    res.Message = "Quantity must be bigger than 0";
+                    return res;
+                }
                 var exist = await _repo.GetByIdAsync(id);
-                int quantityInCart = exist.Quantity ?? 0;
                 int quantityDTO = quantity ?? 0;
                 if (exist != null)
                 {
@@ -404,30 +409,45 @@ namespace BusinessObject.Service
                     }
 
                     // Check and update the quantity if provided
-                    if (quantity.HasValue && quantity.Value != exist.Quantity)
+                    int newQuantity = 0;
+                    if (quantity.HasValue)
                     {
                         var package=await _fishPackageRepo.GetFishPackage((int)exist.PackageId);
-                        exist.Quantity = quantity.Value;
-                        exist.TotalPricePerItem = quantity.Value * (package.TotalPrice ?? 0);
-                        var packageForCart = await _fishPackageRepo.GetFishPackage((int)exist.PackageId);
-                        int curQuantity = (int)packageForCart.QuantityInStock;
-                        int newQuantity =0;
-                        
-                        if (quantityInCart > quantityDTO)
+                        int curQuantity = (int)package.QuantityInStock;
+                        if (curQuantity > 0)
                         {
-                            newQuantity = curQuantity + (quantityInCart-quantityDTO);
-                            
-                            if (curQuantity == 0)
+                            if(quantityDTO==exist.Quantity)
                             {
-                                packageForCart.QuantityInStock = newQuantity;
-                                _fishPackageRepo.Update(packageForCart);
-                                await _fishPackageService.ChangeStatus((int)exist.PackageId, ProductStatusEnum.AVAILABLE.ToString());
+                                isUpdated = false;
                             }
                             else
                             {
-                                packageForCart.QuantityInStock = newQuantity;
-                                _fishPackageRepo.Update(packageForCart);
+                                if (curQuantity < quantityDTO)
+                                {
+                                    res.Success = false;
+                                    res.Message = "Exceed the package quantity??";
+                                    return res;
+                                }
+                                else
+                                {
+                                    exist.Quantity = quantity.Value;
+                                    exist.TotalPricePerItem = quantity.Value * (package.TotalPrice ?? 0);
+                                    newQuantity = curQuantity - quantityDTO;
+                                    isUpdated = true;
+                                }
                             }
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Package has already taken, now you can't buy this so you should delete it from cart";
+                            return res;
+                        }
+                        
+                        /*if (quantityInCart > quantityDTO)
+                        {
+                            newQuantity = curQuantity + (quantityInCart-quantityDTO);
+                            packageForCart.QuantityInStock = newQuantity;
                             isUpdated = true;
                         }
                         if(quantityInCart < quantityDTO)
@@ -439,18 +459,17 @@ namespace BusinessObject.Service
                                 res.Message = "Exceed the package quantity??";
                                 return res;
                             }
-                            /*else if (newQuantity == 0)
+                            *//*else if (newQuantity == 0)
                             {
                                 packageForCart.QuantityInStock = newQuantity;
                                 _fishPackageRepo.Update(packageForCart);
-                            }*/
+                            }*//*
                             else
                             {
                                 packageForCart.QuantityInStock = newQuantity;
-                                _fishPackageRepo.Update(packageForCart);
                             }
                             isUpdated = true;
-                        }
+                        }*/
                     }
 
                     // If nothing was updated, return a message
@@ -464,7 +483,7 @@ namespace BusinessObject.Service
                     // Save the changes if any updates were applied
                     _repo.Update(exist);
                     res.Success = true;
-                    res.Message = "Quantity updated successfully.";
+                    res.Message = $"Quantity updated successfully, now it's only {newQuantity} package(s) left";
                     return res;
                 }
                 else
@@ -482,6 +501,33 @@ namespace BusinessObject.Service
             }
         }
 
-
+        public async Task<ServiceResponseFormat<bool>>UpdateOrderIdForItem(int id, int orderId)
+        {
+            var res=new ServiceResponseFormat<bool>();
+            try
+            {
+                var exist = await _repo.GetByIdAsync(id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Order";
+                    return res;
+                }
+                else
+                {
+                    exist.OrderId = orderId;
+                    _repo.Update(exist);
+                    res.Success = true;
+                    res.Message = "Update Successfully";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to update Item:{ex.Message}";
+                return res;
+            }
+        }
     }
 }

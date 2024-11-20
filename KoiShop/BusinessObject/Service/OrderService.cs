@@ -165,6 +165,7 @@ namespace BusinessObject.Service
             {
                 var orders = await _repo.GetAllOrder();
                 var exist = orders.FirstOrDefault(o => o.OrderId == id);
+                var itemsInOrder=await _orderItemService.GetItemByOrderId(id);
                 if (exist == null)
                 {
                     res.Success = false;
@@ -227,7 +228,7 @@ namespace BusinessObject.Service
                         return res;
                     }
                     var listItem = await _cartItemRepo.GetAll();
-                    var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
+                    var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId&&c.OrderId==id).ToList();
                     foreach (var cartItem in cartItems)
                     {
                         await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.CANCEL_AT_ORDER.ToString());
@@ -256,7 +257,7 @@ namespace BusinessObject.Service
                         return res;
                     }
                     var listItem = await _cartItemRepo.GetAll();
-                    var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
+                    var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId && c.OrderId == id).ToList();
                     if (cartItems.Count > 0)
                     {
                         foreach (var cartItem in cartItems)
@@ -299,7 +300,7 @@ namespace BusinessObject.Service
                         return res;
                     }
                     var listItem = await _cartItemRepo.GetAll();
-                    var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId).ToList();
+                    var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId && c.OrderId == id).ToList();
                     foreach (var cartItem in cartItems)
                     {
                         await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.READY_FOR_ORDER.ToString());
@@ -438,6 +439,8 @@ namespace BusinessObject.Service
 
                             /*await _repo.AddAsync(mappedOrder);*/
                             await _orderItemRepo.AddAsync(newItem);
+                            cartItem.OrderId= mappedOrder.OrderId;
+                            await _cartItemService.UpdateOrderIdForItem(cartItem.CartItemId, mappedOrder.OrderId);
                             await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.ADDED_IN_ORDER.ToString());
                             if (newItem.FishId != null)
                             {

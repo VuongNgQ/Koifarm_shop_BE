@@ -19,5 +19,6 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<bool>> UpdatePackageQuantity(int id ,int? quantity);
         Task<ServiceResponseFormat<IEnumerable<ResponseCartItemDTO>>> GetItemByCartId(int id);
         Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status);
+        Task<ServiceResponseFormat<bool>> UpdateOrderIdForItem(int id, int orderId);
     }
 }
