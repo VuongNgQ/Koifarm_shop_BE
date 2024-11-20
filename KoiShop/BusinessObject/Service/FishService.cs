@@ -55,6 +55,7 @@ namespace BusinessObject.Service
                 {
                     exist.ProductStatus = ProductStatusEnum.SOLDOUT;
                 }
+                
                 else
                 {
                     res.Success = false;
@@ -371,6 +372,37 @@ namespace BusinessObject.Service
             response.Message = "Fish deleted successfully";
             response.Data = true;
             return response;
+        }
+        public async Task<ServiceResponseFormat<IEnumerable<ResponseFishDTO>>> GetDisplayableFish()
+        {
+            var res = new ServiceResponseFormat<IEnumerable<ResponseFishDTO>>();
+            try
+            {
+                var list = await _fishRepository.GetAllAsync();
+                var displayable = list.Where(l => l.ProductStatus.Equals(ProductStatusEnum.AVAILABLE) ||
+                l.ProductStatus.Equals(ProductStatusEnum.UNAVAILABLE) ||
+                l.ProductStatus.Equals(ProductStatusEnum.SOLDOUT));
+                if (displayable.Any())
+                {
+                    var mapp = _mapper.Map<IEnumerable<ResponseFishDTO>>(displayable);
+                    res.Success = true;
+                    res.Data = mapp;
+                    res.Message = "Get Packages Successfully";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "No Package";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to get Packages: {ex.Message}";
+                return res;
+            }
         }
     }
 }

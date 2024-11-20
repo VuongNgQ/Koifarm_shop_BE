@@ -33,7 +33,20 @@ namespace KoiShopController.Controllers
             }
             return NotFound(result.Message);
         }
-
+        /// <summary>
+        /// Get Fishes to display for customer
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Displayable")]
+        public async Task<IActionResult> GetDisplayableFishes()
+        {
+            var result = await _fishService.GetDisplayableFish();
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+            return NotFound(result.Message);
+        }
         /// <summary>
         /// Get a list of all fishes belonging to a specific categoryID.
         /// </summary>

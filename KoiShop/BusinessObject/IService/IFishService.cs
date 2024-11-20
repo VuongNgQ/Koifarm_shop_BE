@@ -11,6 +11,7 @@ namespace BusinessObject.IService
     public interface IFishService
     {
         Task<ServiceResponseFormat<List<ResponseFishDTO>>> GetAllFishes();
+        Task<ServiceResponseFormat<IEnumerable<ResponseFishDTO>>> GetDisplayableFish();
         Task<ServiceResponseFormat<List<ResponseFishDTO>>> GetFishByCategoryId(int categoryId);
         Task<ServiceResponseFormat<ResponseFishDTO>> GetFishById(int fishId);
         Task<ServiceResponseFormat<ResponseFishDTO>> CreateFish(CreateFishDTO createFishDto);

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    [Migration("20241117050238_Add_CartItemStatus")]
-    partial class Add_CartItemStatus
+    [Migration("20241120085443_Fix_OrderItem")]
+    partial class Fix_OrderItem
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -61,6 +61,9 @@ namespace DataAccess.Migrations
                     b.Property<int?>("FishId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("PackageId")
                         .HasColumnType("int");
 
@@ -76,6 +79,8 @@ namespace DataAccess.Migrations
                     b.HasKey("CartItemId");
 
                     b.HasIndex("FishId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("PackageId");
 
@@ -233,9 +238,6 @@ namespace DataAccess.Migrations
                     b.Property<string>("ImageUrls")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsFromShop")
-                        .HasColumnType("bit");
-
                     b.Property<decimal?>("Price")
                         .HasColumnType("decimal(18,2)");
 
@@ -247,6 +249,9 @@ namespace DataAccess.Migrations
 
                     b.Property<DateTime?>("TransferDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
@@ -584,11 +589,44 @@ namespace DataAccess.Migrations
                     b.ToTable("UserCarts");
                 });
 
+            modelBuilder.Entity("DataAccess.Entity.UserFishOwnership", b =>
+                {
+                    b.Property<int>("OwnershipId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OwnershipId"));
+
+                    b.Property<int>("FishId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PurchaseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OwnershipId");
+
+                    b.HasIndex("FishId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("userFishOwnerships");
+                });
+
             modelBuilder.Entity("DataAccess.Entity.CartItem", b =>
                 {
                     b.HasOne("DataAccess.Entity.Fish", "Fish")
                         .WithMany("CartItems")
                         .HasForeignKey("FishId");
+
+                    b.HasOne("DataAccess.Entity.Order", "Order")
+                        .WithMany("CartItems")
+                        .HasForeignKey("OrderId");
 
                     b.HasOne("DataAccess.Entity.FishPackage", "Package")
                         .WithMany("CartItems")
@@ -599,6 +637,8 @@ namespace DataAccess.Migrations
                         .HasForeignKey("UserCartId");
 
                     b.Navigation("Fish");
+
+                    b.Navigation("Order");
 
                     b.Navigation("Package");
 
@@ -782,6 +822,25 @@ namespace DataAccess.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DataAccess.Entity.UserFishOwnership", b =>
+                {
+                    b.HasOne("DataAccess.Entity.Fish", "Fish")
+                        .WithMany("UserFishOwnerships")
+                        .HasForeignKey("FishId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("DataAccess.Entity.User", "User")
+                        .WithMany("UserFishOwnerships")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Fish");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DataAccess.Entity.Address", b =>
                 {
                     b.Navigation("Orders");
@@ -805,6 +864,8 @@ namespace DataAccess.Migrations
                     b.Navigation("OrderItems");
 
                     b.Navigation("SubImages");
+
+                    b.Navigation("UserFishOwnerships");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.FishConsignment", b =>
@@ -825,6 +886,8 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entity.Order", b =>
                 {
+                    b.Navigation("CartItems");
+
                     b.Navigation("Feedbacks");
 
                     b.Navigation("OrderItems");
@@ -851,6 +914,8 @@ namespace DataAccess.Migrations
 
                     b.Navigation("UserCart")
                         .IsRequired();
+
+                    b.Navigation("UserFishOwnerships");
                 });
 
             modelBuilder.Entity("DataAccess.Entity.UserCart", b =>

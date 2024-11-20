@@ -18,8 +18,11 @@ namespace DataAccess.Entity
         public OrderStatusEnum Status { get; set; }
         public PaymentMethod PaymentMethod { get; set; }
         public bool? IsSent { get; set; }
+
         public User? User { get; set; }
         public Address? Address { get; set; }
+
+        public ICollection<CartItem>? CartItems { get; set; }
         public ICollection<OrderItem>? OrderItems { get; set; }
         public ICollection<Feedback>? Feedbacks { get; set; }
         public ICollection<Payment>? Payments { get; set; }

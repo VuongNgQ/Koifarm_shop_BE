@@ -16,6 +16,9 @@ namespace DataAccess.Entity
         public int? Quantity { get; set; }
         public decimal? TotalPricePerItem { get; set; }
         public CartItemStatus CartItemStatus { get; set; }
+        public int? OrderId { get; set; }
+
+        public Order Order { get; set; }
         public UserCart? UserCart { get; set; }
         public Fish? Fish { get; set; }
         public FishPackage? Package { get; set; }
