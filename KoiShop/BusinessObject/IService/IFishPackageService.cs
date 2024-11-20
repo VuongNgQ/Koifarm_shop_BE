@@ -15,6 +15,7 @@ namespace BusinessObject.IService
     {
         Task<ServiceResponseFormat<PaginationModel<ResponseFishPackageDTO>>> GetFishPackages(int page, int pageSize,
             string? search, string sort);
+        Task<ServiceResponseFormat<IEnumerable<ResponseFishPackageDTO>>> GetDisplayablePackage();
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> GetFishPackage(int id);
         Task<ServiceResponseFormat<ResponseFishPackageDTO>> CreatePackage(CreateFishPackageDTO package);
         Task<ServiceResponseFormat<bool>> AddFishToPackage(CreateCategoryPackageDTO categoryDTO);
