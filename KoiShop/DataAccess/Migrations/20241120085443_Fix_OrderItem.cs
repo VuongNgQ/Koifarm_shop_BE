@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace DataAccess.Migrations
 {
     /// <inheritdoc />
-    public partial class Re_DB : Migration
+    public partial class Fix_OrderItem : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -443,7 +443,8 @@ namespace DataAccess.Migrations
                     PackageId = table.Column<int>(type: "int", nullable: true),
                     Quantity = table.Column<int>(type: "int", nullable: true),
                     TotalPricePerItem = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    CartItemStatus = table.Column<int>(type: "int", nullable: false)
+                    CartItemStatus = table.Column<int>(type: "int", nullable: false),
+                    OrderId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -459,6 +460,11 @@ namespace DataAccess.Migrations
                         principalTable: "Fish",
                         principalColumn: "FishId");
                     table.ForeignKey(
+                        name: "FK_CartItems_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "OrderId");
+                    table.ForeignKey(
                         name: "FK_CartItems_UserCarts_UserCartId",
                         column: x => x.UserCartId,
                         principalTable: "UserCarts",
@@ -469,6 +475,11 @@ namespace DataAccess.Migrations
                 name: "IX_CartItems_FishId",
                 table: "CartItems",
                 column: "FishId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CartItems_OrderId",
+                table: "CartItems",
+                column: "OrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CartItems_PackageId",

@@ -58,6 +58,9 @@ namespace DataAccess.Migrations
                     b.Property<int?>("FishId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("PackageId")
                         .HasColumnType("int");
 
@@ -73,6 +76,8 @@ namespace DataAccess.Migrations
                     b.HasKey("CartItemId");
 
                     b.HasIndex("FishId");
+
+                    b.HasIndex("OrderId");
 
                     b.HasIndex("PackageId");
 
@@ -616,6 +621,10 @@ namespace DataAccess.Migrations
                         .WithMany("CartItems")
                         .HasForeignKey("FishId");
 
+                    b.HasOne("DataAccess.Entity.Order", "Order")
+                        .WithMany("CartItems")
+                        .HasForeignKey("OrderId");
+
                     b.HasOne("DataAccess.Entity.FishPackage", "Package")
                         .WithMany("CartItems")
                         .HasForeignKey("PackageId");
@@ -625,6 +634,8 @@ namespace DataAccess.Migrations
                         .HasForeignKey("UserCartId");
 
                     b.Navigation("Fish");
+
+                    b.Navigation("Order");
 
                     b.Navigation("Package");
 
@@ -872,6 +883,8 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Entity.Order", b =>
                 {
+                    b.Navigation("CartItems");
+
                     b.Navigation("Feedbacks");
 
                     b.Navigation("OrderItems");
