@@ -1,4 +1,5 @@
 ﻿using DataAccess.Enum;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace BusinessObject.Model.RequestDTO
         public FishGenderEnum Gender { get; set; }
         public FishStatusEnum Status { get; set; }
         public decimal? Size { get; set; }
-        public string? ImageUrl { get; set; }
+        public IFormFile? ImageUrl { get; set; }
     }
     public class ApproveConsignmentDTO
     {

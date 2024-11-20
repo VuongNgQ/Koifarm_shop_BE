@@ -2,6 +2,7 @@
 using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
+using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
@@ -179,6 +180,16 @@ namespace BusinessObject.Service
 
             try
             {
+                var imageService = new CloudinaryService();
+                string uploadedImageUrl = string.Empty;
+
+                if (dto.FishInfo.ImageUrl != null)
+                {
+                    using (var stream = dto.FishInfo.ImageUrl.OpenReadStream())
+                    {
+                        uploadedImageUrl = await imageService.UploadImageAsync(stream, dto.FishInfo.ImageUrl.FileName);
+                    }
+                }
                 var fish = new Fish
                 {
                     Name = dto.FishInfo.Name,
@@ -186,7 +197,7 @@ namespace BusinessObject.Service
                     Gender = dto.FishInfo.Gender,
                     Size = dto.FishInfo.Size,
                     CategoryId = dto.FishInfo.CategoryId,
-                    ImageUrl = dto.FishInfo.ImageUrl,
+                    ImageUrl = uploadedImageUrl,
                     Status = FishStatusEnum.GOOD,
                     ProductStatus = ProductStatusEnum.PENDINGAPPROVAL
                 };
@@ -246,8 +257,8 @@ namespace BusinessObject.Service
                     case ConsignmentPurpose.Sale:
                         consignment.Price = approveDto.AgreedPrice;
                         consignment.ConsignmentStatus = ConsignmentStatusEnum.PriceAgreed;
-                        consignment.Fish.Price = approveDto.FishSaleAmount;
-                        await _fishRepo.UpdateFishAsync(consignment.Fish);
+                        //consignment.Fish.Price = approveDto.FishSaleAmount;
+                        //await _fishRepo.UpdateFishAsync(consignment.Fish);
                         await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
                         response.Message = "Sale consignment approved with agreed price.";
                         break;
@@ -391,30 +402,32 @@ namespace BusinessObject.Service
             await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
             return new ServiceResponseFormat<FishConsignmentDTO> { Success = true, Message = "Status updated successfully." };
         }
-        public async Task<ServiceResponseFormat<List<object>>> GetConsignmentsByUserIdAsync(int userId)
+        public async Task<ServiceResponseFormat<List<FishConsignmentDTO>>> GetConsignmentsByUserIdAsync(int userId)
         {
-            var response = new ServiceResponseFormat<List<object>>();
+            var response = new ServiceResponseFormat<List<FishConsignmentDTO>>();
 
             try
             {
                 var consignments = await _consignmentRepo.GetConsignmentsByUserIdAsync(userId);
-                var mappedConsignments = consignments.Select(consignment =>
-                {
-                    if (consignment.Purpose == ConsignmentPurpose.Care)
-                    {
-                        return (object)_mapper.Map<FishConsignmentCareResponseDTO>(consignment);
-                    }
-                    else if (consignment.Purpose == ConsignmentPurpose.Sale)
-                    {
-                        var saleDto = _mapper.Map<FishConsignmentSaleResponseDTO>(consignment);
-                        saleDto.FishInfo = _mapper.Map<FishInfoResponseDTO>(consignment.Fish);
-                        return (object)saleDto;
-                    }
-                    return null;
-                }).Where(dto => dto != null).ToList();
+                //var mappedConsignments = consignments.Select(consignment =>
+                //{
+                //    if (consignment.Purpose == ConsignmentPurpose.Care)
+                //    {
+                //        return (object)_mapper.Map<FishConsignmentCareResponseDTO>(consignment);
+                //    }
+                //    else if (consignment.Purpose == ConsignmentPurpose.Sale)
+                //    {
+                //        var saleDto = _mapper.Map<FishConsignmentSaleResponseDTO>(consignment);
+                //        saleDto.FishInfo = _mapper.Map<FishInfoResponseDTO>(consignment.Fish);
+                //        return (object)saleDto;
+                //    }
+                //    return null;
+                //}).Where(dto => dto != null).ToList();
+                //response.Data = mappedConsignments;
 
-
-                response.Data = mappedConsignments;
+                response.Data = _mapper.Map<List<FishConsignmentDTO>>(consignments);
+                response.Success = true;
+                response.Message = "Consignments retrieved successfully.";
             }
             catch (Exception ex)
             {
