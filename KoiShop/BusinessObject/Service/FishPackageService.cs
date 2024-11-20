@@ -8,6 +8,7 @@ using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
 using DataAccess.Repo;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,16 +20,18 @@ namespace BusinessObject.Service
     public class FishPackageService:IFishPackageService
     {
         private readonly IFishPackageRepo _repo;
+        private readonly IFishRepo _fishRepo;
         private readonly IMapper _mapper;
         private readonly ICategoryPackageRepo _categoryPackageRepo;
         private readonly ICategoryRepo _categoryRepo;
         public FishPackageService(IFishPackageRepo repo, IMapper mapper, ICategoryPackageRepo categoryPackageRepo
-            , ICategoryRepo categoryRepo)
+            , ICategoryRepo categoryRepo, IFishRepo fishRepo)
         {
             _mapper = mapper;
             _repo = repo;
             _categoryPackageRepo = categoryPackageRepo;
             _categoryRepo = categoryRepo;
+            _fishRepo = fishRepo;
         }
         public async Task UpdatePackageTotalNumberOfFish(int packageId)
         {
@@ -618,5 +621,121 @@ namespace BusinessObject.Service
                 return res;
             }
         }
+        public async Task<ServiceResponseFormat<PaginationModel<ResponseFishAndPackageDTO>>> SearchFishAndPackages(
+    int page, int pageSize, string? search, string sort,
+    string? productStatus = null, decimal? minSize = null, decimal? maxSize = null,
+    decimal? minPrice = null, decimal? maxPrice = null)
+        {
+            var res = new ServiceResponseFormat<PaginationModel<ResponseFishAndPackageDTO>>();
+            try
+            {
+                // Fetch data from Fish and FishPackage
+                var fishList = await _fishRepo.GetAllAsync(); // Fetch all Fish
+                var packageList = await _repo.GetFishPackages(); // Fetch all Packages
+
+                // Map Fish to Response DTO
+                var fishMapped = fishList.Select(f => new ResponseFishAndPackageDTO
+                {
+                    FishId = f.FishId,
+                    Name = f.Name,
+                    Price = f.Price,
+                    MinSize = f.Size,
+                    MaxSize = f.Size,
+                    ProductStatus = f.ProductStatus.ToString(), // Convert Enum to String
+                    Description = f.Description,
+                    IsPackage = false
+                });
+
+
+                // Map FishPackage to Response DTO
+                var packageMapped = packageList.Select(p => new ResponseFishAndPackageDTO
+                {
+                    FishPackageId = p.FishPackageId,
+                    Name = p.Name,
+                    Price = p.TotalPrice,
+                    MinSize = p.MinSize,
+                    MaxSize = p.MaxSize,
+                    NumberOfFish = p.NumberOfFish,
+                    ProductStatus = p.ProductStatus.ToString(),
+                    Description = p.Description,
+                    IsPackage = true
+                });
+
+                // Combine both Fish and Package into a single list
+                var combinedList = fishMapped.Concat(packageMapped);
+
+                // Apply Search
+                if (!string.IsNullOrEmpty(search))
+                {
+                    combinedList = combinedList.Where(item =>
+                        (item.Name != null && item.Name.Contains(search, StringComparison.OrdinalIgnoreCase)) ||
+                        item.ProductStatus.ToString().Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        (item.Description != null && item.Description.Contains(search, StringComparison.OrdinalIgnoreCase)));
+                }
+
+                // Apply filtering for product status
+                if (!string.IsNullOrEmpty(productStatus))
+                {
+                    if (Enum.TryParse<ProductStatusEnum>(productStatus, true, out var parsedStatus))
+                    {
+                        combinedList = combinedList.Where(item => Enum.TryParse<ProductStatusEnum>(item.ProductStatus, out var status) && status == parsedStatus);
+                    }
+                    else
+                    {
+                        res.Success = false;
+                        res.Message = $"Invalid ProductStatus: {productStatus}";
+                        return res;
+                    }
+                }
+
+
+                if (minSize.HasValue)
+                {
+                    combinedList = combinedList.Where(item => item.MinSize >= minSize.Value || item.MaxSize >= minSize.Value);
+                }
+
+                if (maxSize.HasValue)
+                {
+                    combinedList = combinedList.Where(item => item.MaxSize <= maxSize.Value || item.MinSize <= maxSize.Value);
+                }
+
+                if (minPrice.HasValue)
+                {
+                    combinedList = combinedList.Where(item => item.Price >= minPrice.Value);
+                }
+
+                if (maxPrice.HasValue)
+                {
+                    combinedList = combinedList.Where(item => item.Price <= maxPrice.Value);
+                }
+
+                // Apply Sorting
+                combinedList = sort.ToLower().Trim() switch
+                {
+                    "name" => combinedList.OrderBy(e => e.Name),
+                    "price" => combinedList.OrderBy(e => e.Price),
+                    "minsize" => combinedList.OrderBy(e => e.MinSize),
+                    "maxsize" => combinedList.OrderBy(e => e.MaxSize),
+                    "fishinpackage" => combinedList.OrderBy(e => e.NumberOfFish), // Only applicable to packages
+                    _ => combinedList.OrderBy(e => e.FishId ?? e.FishPackageId) // Default sort by ID
+                };
+
+                // Apply Pagination
+                var paginationResult = await Pagination.GetPaginationEnum(combinedList, page, pageSize);
+
+                res.Success = true;
+                res.Message = "Search completed successfully with filters";
+                res.Data = paginationResult;
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Failed to search Fish and Packages: {ex.Message}";
+                return res;
+            }
+        }
+
+
     }
 }
