@@ -676,14 +676,22 @@ namespace BusinessObject.Service
                 // Apply filtering for product status
                 if (!string.IsNullOrEmpty(productStatus))
                 {
-                    if (Enum.TryParse<ProductStatusEnum>(productStatus, true, out var parsedStatus))
+                    if (ProductStatusEnum.AVAILABLE.ToString().Equals(productStatus, StringComparison.OrdinalIgnoreCase))
                     {
-                        combinedList = combinedList.Where(item => Enum.TryParse<ProductStatusEnum>(item.ProductStatus, out var status) && status == parsedStatus);
+                        combinedList = combinedList.Where(item => item.ProductStatus.Equals(ProductStatusEnum.AVAILABLE.ToString()));
+                    }
+                    if (ProductStatusEnum.SOLDOUT.ToString().Equals(productStatus, StringComparison.OrdinalIgnoreCase))
+                    {
+                        combinedList = combinedList.Where(item => item.ProductStatus.Equals(ProductStatusEnum.SOLDOUT.ToString()));
+                    }
+                    if (ProductStatusEnum.UNAVAILABLE.ToString().Equals(productStatus, StringComparison.OrdinalIgnoreCase))
+                    {
+                        combinedList = combinedList.Where(item => item.ProductStatus.Equals(ProductStatusEnum.UNAVAILABLE.ToString()));
                     }
                     else
                     {
                         res.Success = false;
-                        res.Message = $"Invalid ProductStatus: {productStatus}";
+                        res.Message = $"Invalid Status: {productStatus}";
                         return res;
                     }
                 }
@@ -721,12 +729,21 @@ namespace BusinessObject.Service
                 };
 
                 // Apply Pagination
-                var paginationResult = await Pagination.GetPaginationEnum(combinedList, page, pageSize);
+                if (combinedList.Any())
+                {
+                    var paginationResult = await Pagination.GetPaginationEnum(combinedList, page, pageSize);
 
-                res.Success = true;
-                res.Message = "Search completed successfully with filters";
-                res.Data = paginationResult;
-                return res;
+                    res.Success = true;
+                    res.Message = "Search completed successfully with filters";
+                    res.Data = paginationResult;
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "No Record";
+                    return res;
+                }
             }
             catch (Exception ex)
             {
@@ -736,6 +753,36 @@ namespace BusinessObject.Service
             }
         }
 
-
+        public async Task<ServiceResponseFormat<IEnumerable<ResponseFishPackageDTO>>> GetDisplayablePackage()
+        {
+            var res = new ServiceResponseFormat<IEnumerable<ResponseFishPackageDTO>>();
+            try
+            {
+                var list = await _repo.GetFishPackages();
+                var displayable = list.Where(l => l.ProductStatus.Equals(ProductStatusEnum.AVAILABLE)||
+                l.ProductStatus.Equals(ProductStatusEnum.UNAVAILABLE) ||
+                l.ProductStatus.Equals(ProductStatusEnum.SOLDOUT));
+                if(displayable.Any())
+                {
+                    var mapp = _mapper.Map<IEnumerable<ResponseFishPackageDTO>>(displayable);
+                    res.Success = true;
+                    res.Data = mapp;
+                    res.Message = "Get Packages Successfully";
+                    return res;
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "No Package";
+                    return res;
+                }
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Fail to get Packages: {ex.Message}";
+                return res;
+            }
+        }
     }
 }

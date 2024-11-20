@@ -51,6 +51,20 @@ namespace KoiShopController.Controllers
             return Ok(result);
         }
         /// <summary>
+        /// Get Packages to display for customers
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Displayable")]
+        public async Task<IActionResult> GetDisplayablePackages()
+        {
+            var result = await _service.GetDisplayablePackage();
+            if (result == null)
+            {
+                return NotFound();
+            }
+            return Ok(result);
+        }
+        /// <summary>
         /// Create an empty package
         /// </summary>
         /// <param name="packageDTO"></param>

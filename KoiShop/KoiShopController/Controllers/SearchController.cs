@@ -21,7 +21,7 @@ namespace KoiShopController.Controllers
         /// <param name="pageSize"></param>
         /// <param name="search"></param>
         /// <param name="sort">name, price, minsize, maxsize, fishinpackage</param>
-        /// <param name="productStatus">AVAILABLE, EMPTY, NOTFULL, UNAVAILABLE, PENDINGPAID, SOLDOUT, PENDINGAPPROVAL</param>
+        /// <param name="productStatus">AVAILABLE, UNAVAILABLE, SOLDOUT</param>
         /// <param name="minSize"></param>
         /// <param name="maxSize"></param>
         /// <param name="minPrice"></param>
