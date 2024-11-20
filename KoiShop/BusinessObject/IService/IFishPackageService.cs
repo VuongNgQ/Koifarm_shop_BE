@@ -2,6 +2,7 @@
 using BusinessObject.Model.RequestDTO.UpdateReq.Entity;
 using BusinessObject.Model.ResponseDTO;
 using DataAccess.Entity;
+using DataAccess.Enum;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,5 +25,9 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status);
         Task<ServiceResponseFormat<bool>> SoldoutPackage(int id);
         Task<ServiceResponseFormat<bool>> RestorePackage(int id);
+        Task<ServiceResponseFormat<PaginationModel<ResponseFishAndPackageDTO>>> SearchFishAndPackages(
+    int page, int pageSize, string? search, string sort,
+    string? productStatus = null, decimal? minSize = null, decimal? maxSize = null,
+    decimal? minPrice = null, decimal? maxPrice = null);
     }
 }
