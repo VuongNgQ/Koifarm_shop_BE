@@ -13,16 +13,16 @@ namespace BusinessObject.Model.ResponseDTO
         public int FishConsignmentId { get; set; }
         public int UserId { get; set; }
         public int? FishId { get; set; }
-        public ConsignmentPurpose Purpose { get; set; }
-        public ConsignmentType Type { get; set; }
-        public decimal? Price { get; set; }
-        public decimal? DepositAmount { get; set; }
+        public string? Purpose { get; set; }
+        //public ConsignmentType Type { get; set; }
+        //public decimal? Price { get; set; }
+        //public decimal? DepositAmount { get; set; }
         public DateTime? CreateDate { get; set; }
-        public DateTime? TransferDate { get; set; }
-        public DateTime? ReceiveDate { get; set; }
+        //public DateTime? TransferDate { get; set; }
+        //public DateTime? ReceiveDate { get; set; }
         public string? ConditionDescription { get; set; }
-        public ConsignmentStatusEnum ConsignmentStatus { get; set; }
-        public List<string>? ImageUrls { get; set; }
+        public string? ConsignmentStatus { get; set; }
+        //public string? ImageUrls { get; set; }
     }
     public class FishConsignmentCareResponseDTO
     {
@@ -30,10 +30,12 @@ namespace BusinessObject.Model.ResponseDTO
         public int UserId { get; set; }
         public int FishId { get; set; }
         public string? ConditionDescription { get; set; }
+        public DateTime? CreateDate { get; set; }
         public DateTime? TransferDate { get; set; }
         public DateTime? ReceiveDate { get; set; }
-        public ConsignmentStatusEnum ConsignmentStatus { get; set; }
-        public List<string>? ImageUrls { get; set; }
+        public string? Type { get; set; }
+        public string? ConsignmentStatus { get; set; }
+        public string? ImageUrls { get; set; }
     }
     public class FishConsignmentSaleResponseDTO
     {
@@ -42,9 +44,10 @@ namespace BusinessObject.Model.ResponseDTO
         public decimal? Price { get; set; }
         public string? ConditionDescription { get; set; }
         public DateTime? CreateDate { get; set; }
+        public DateTime? TransferDate { get; set; }
         public FishInfoResponseDTO? FishInfo { get; set; }
+        public string? Type { get; set; }
         public string? ConsignmentStatus { get; set; }
-        public List<string>? ImageUrls { get; set; }
     }
     public class FishInfoResponseDTO
     {
@@ -54,7 +57,6 @@ namespace BusinessObject.Model.ResponseDTO
         public string? Gender { get; set; }
         public string? Status { get; set; }
         public decimal? Size { get; set; }
-        public decimal? price { get; set; }
         public string? ImageUrl { get; set; }
     }
 }

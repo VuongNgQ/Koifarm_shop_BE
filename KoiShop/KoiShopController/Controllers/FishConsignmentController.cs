@@ -18,8 +18,8 @@ namespace KoiShopController.Controllers
         }
         /// <summary>
         /// Get consignment by consignmentId.
-        /// <param name="id">Consignment Id</param>
         /// </summary>
+        /// <param name="id">Consignment Id</param>
         /// <returns>The consignment information.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetConsignmentById(int id)
@@ -49,8 +49,8 @@ namespace KoiShopController.Controllers
 
         /// <summary>
         /// Get list of consignment by userId.
-        /// <param name="userId">User Id</param>
         /// </summary>
+        /// <param name="userId">User Id</param>
         /// <returns>The list of consignment information.</returns>
         [HttpGet("user/{userId}")]
         public async Task<IActionResult> GetConsignmentsByUserId(int userId)
@@ -67,12 +67,12 @@ namespace KoiShopController.Controllers
         }
 
         /// <summary>
-        /// Create care consignment with boughten fish.
-        /// <param name="consignmentDto">Details of Consignment</param>
+        /// Create care consignment request with boughten fish.
         /// </summary>
+        /// <param name="consignmentDto">Details of Consignment</param>
         /// <returns>.</returns>
         [HttpPost("care")]
-        public async Task<IActionResult> CreateCareConsignment([FromBody] CareConsignmentDTO consignmentDto)
+        public async Task<IActionResult> CreateCareConsignment([FromForm] CareConsignmentDTO consignmentDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -85,8 +85,13 @@ namespace KoiShopController.Controllers
             return Ok(result.Message);
         }
 
+        /// <summary>
+        /// Create sale consignment request.
+        /// </summary>
+        /// <param name="consignmentDto">Details of Consignment</param>
+        /// <returns>.</returns>
         [HttpPost("sale")]
-        public async Task<IActionResult> CreateSaleConsignment([FromBody] SaleConsignmentDTO consignmentDto)
+        public async Task<IActionResult> CreateSaleConsignment([FromForm] SaleConsignmentDTO consignmentDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -99,6 +104,7 @@ namespace KoiShopController.Controllers
             return Ok(result.Message);
         }
 
+
         [HttpPut("update")]
         public async Task<IActionResult> UpdateConsignment([FromBody] FishConsignmentDTO consignmentDto)
         {
@@ -110,6 +116,12 @@ namespace KoiShopController.Controllers
             return Ok(response);
         }
 
+        /// <summary>
+        /// Approve consignment request.
+        /// </summary>
+        /// /// <param name="consignmentId">Consignment Id</param>
+        /// <param name="approveDTO">Price( for sale)</param>
+        /// <returns>.</returns>
         [HttpPost("approve/{consignmentId}")]
         public async Task<IActionResult> ApproveConsignment(int consignmentId, [FromBody] ApproveConsignmentDTO approveDTO)
         {

@@ -21,7 +21,7 @@ namespace DataAccess.Entity
         public ConsignmentStatusEnum ConsignmentStatus { get; set; }
         public int? FishStatusId { get; set; }
         public string? ConditionDescription { get; set; }
-        public List<string>? ImageUrls { get; set; } = new List<string>();
+        public string? ImageUrls { get; set; }
         public User? User { get; set; }
         public Fish? Fish { get; set; }
         public ICollection<Payment> Payments { get; set; } = new List<Payment>();
