@@ -158,7 +158,7 @@ namespace BusinessObject.Service
         #endregion
 
         #region Change Status of the Order and update the thing inside (Fish, Package)
-        public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
+        /*public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
         {
             var res = new ServiceResponseFormat<bool>();
             try
@@ -174,8 +174,7 @@ namespace BusinessObject.Service
                 }
                 if(exist.Status==OrderStatusEnum.COMPLETED||
                     exist.Status == OrderStatusEnum.CANCELLED||
-                    exist.Status == OrderStatusEnum.FAILEDDELIVERY||
-                    exist.Status == OrderStatusEnum.DELIVERED)
+                    exist.Status == OrderStatusEnum.FAILEDDELIVERY)
                 {
                     res.Success = false;
                     res.Message = "This Order is Done so you can't change it anymore";
@@ -237,12 +236,22 @@ namespace BusinessObject.Service
                     if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim()))
                     {
                         exist.Status = OrderStatusEnum.CANCELLED;
+                        exist.CompleteDate = DateTime.Now;
                     }
                     else
                     {
-                        exist.Status = OrderStatusEnum.FAILEDDELIVERY;
+                        if (exist.Status == OrderStatusEnum.ONPORT)
+                        {
+                            exist.Status = OrderStatusEnum.FAILEDDELIVERY;
+                            exist.CompleteDate = DateTime.Now;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order status must be delivered First";
+                            return res;
+                        }
                     }
-                    exist.CompleteDate = DateTime.Now;
                 }
                 else if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim())||
                     OrderStatusEnum.DELIVERED.ToString().Equals(status.ToUpper().Trim()))
@@ -263,30 +272,36 @@ namespace BusinessObject.Service
                         foreach (var cartItem in cartItems)
                         {
                             await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.COMPLETE_AT_ORDER.ToString());
-                            if (cartItem.FishId != null)
-                            {
-                                await _fishService.SoldoutFish((int)cartItem.FishId);
-                            }
-                            if (cartItem.PackageId != null)
-                            {
-                                var packageOfCart = await _packageRepo.GetFishPackage((int)cartItem.PackageId);
-                                if (packageOfCart != null && packageOfCart.QuantityInStock == 0)
-                                {
-                                    await _packageService.SoldoutPackage((int)cartItem.PackageId);
-                                }
-                            }
                         }
                     }
                     //Update Order Status 
                     if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()))
                     {
-                        exist.Status = OrderStatusEnum.COMPLETED;
+                        if (exist.Status == OrderStatusEnum.DELIVERED)
+                        {
+                            exist.Status = OrderStatusEnum.COMPLETED;
+                            exist.CompleteDate = DateTime.Now;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order status must be delivered First";
+                            return res;
+                        }
                     }
                     else
                     {
-                        exist.Status = OrderStatusEnum.DELIVERED;
-                    }
-                    exist.CompleteDate = DateTime.Now;
+                        if (exist.Status == OrderStatusEnum.ONPORT)
+                        {
+                            exist.Status = OrderStatusEnum.DELIVERED;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order status must be Onport First";
+                            return res;
+                        }
+                    }   
                 }
                 else if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim())||
                     OrderStatusEnum.ONPORT.ToString().Equals(status.ToUpper().Trim()))
@@ -304,14 +319,44 @@ namespace BusinessObject.Service
                     foreach (var cartItem in cartItems)
                     {
                         await _cartItemService.ChangeStatus(cartItem.CartItemId, CartItemStatus.READY_FOR_ORDER.ToString());
+                        if (cartItem.FishId != null)
+                        {
+                            await _fishService.SoldoutFish((int)cartItem.FishId);
+                        }
+                        if (cartItem.PackageId != null)
+                        {
+                            var packageOfCart = await _packageRepo.GetFishPackage((int)cartItem.PackageId);
+                            if (packageOfCart != null && packageOfCart.QuantityInStock == 0)
+                            {
+                                await _packageService.SoldoutPackage((int)cartItem.PackageId);
+                            }
+                        }
                     }
                     if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim()))
                     {
-                        exist.Status = OrderStatusEnum.READY;
+                        if (exist.Status == OrderStatusEnum.PENDING)
+                        {
+                            exist.Status = OrderStatusEnum.READY;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order status must be Pending";
+                            return res;
+                        }
                     }
                     else
                     {
-                        exist.Status = OrderStatusEnum.ONPORT;
+                        if (exist.Status == OrderStatusEnum.READY)
+                        {
+                            exist.Status = OrderStatusEnum.ONPORT;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order status must be Ready First";
+                            return res;
+                        }
                     }
                     
                 }
@@ -332,7 +377,180 @@ namespace BusinessObject.Service
                 res.Message = $"Fail to change Status:{ex.Message}";
                 return res;
             }
+        }*/
+        public async Task<ServiceResponseFormat<bool>> ChangeStatus(int id, string status)
+        {
+            var res = new ServiceResponseFormat<bool>();
+            try
+            {
+                // Fetch the order
+                var orders = await _repo.GetAllOrder();
+                var exist = orders.FirstOrDefault(o => o.OrderId == id);
+                if (exist == null)
+                {
+                    res.Success = false;
+                    res.Message = "No Order found";
+                    return res;
+                }
+
+                // Validate the current status
+                if (exist.Status == OrderStatusEnum.COMPLETED ||
+                    exist.Status == OrderStatusEnum.CANCELLED ||
+                    exist.Status == OrderStatusEnum.FAILEDDELIVERY)
+                {
+                    res.Success = false;
+                    res.Message = "This Order is finalized and cannot be changed.";
+                    return res;
+                }
+
+                // Fetch items in the order
+                var items = await _orderItemRepo.GetAllAsync();
+                var itemsInOrder=items.Where(o => o.OrderId == id).ToList();
+                /*var itemsInOrder = await _orderItemService.GetItemByOrderId(id);*/
+                if (itemsInOrder == null || !itemsInOrder.Any())
+                {
+                    res.Success = false;
+                    res.Message = "No items in the order to process.";
+                    return res;
+                }
+
+                // Handle cancellation or failed delivery
+                if (OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim()) ||
+                    OrderStatusEnum.FAILEDDELIVERY.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    foreach (var item in itemsInOrder)
+                    {
+                        // Restore Fish stock
+                        if (item.FishId != null)
+                        {
+                            await _fishService.RestoreFish((int)item.FishId);
+                        }
+
+                        // Restore Package stock
+                        if (item.PackageId != null)
+                        {
+                            var package = await _packageRepo.GetFishPackage((int)item.PackageId);
+                            if (package != null)
+                            {
+                                package.QuantityInStock = (package.QuantityInStock ?? 0) + item.Quantity;
+                                await _packageService.ChangeStatus(package.FishPackageId, ProductStatusEnum.AVAILABLE.ToString());
+                                _packageRepo.Update(package);
+                            }
+                        }
+                    }
+
+                    // Update cart item statuses
+                    await UpdateCartItemsStatus((int)exist.UserId, id, CartItemStatus.CANCEL_AT_ORDER);
+
+                    // Update order status
+                    exist.Status = OrderStatusEnum.CANCELLED.ToString().Equals(status.ToUpper().Trim())
+                        ? OrderStatusEnum.CANCELLED
+                        : OrderStatusEnum.FAILEDDELIVERY;
+                    exist.CompleteDate = DateTime.Now;
+                }
+                // Handle ready or on-port statuses
+                else if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim()) ||
+                         OrderStatusEnum.ONPORT.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    await UpdateCartItemsStatus((int)exist.UserId, id, CartItemStatus.READY_FOR_ORDER);
+
+                    if (OrderStatusEnum.READY.ToString().Equals(status.ToUpper().Trim()))
+                    {
+                        if (exist.Status == OrderStatusEnum.PENDING)
+                        {
+                            exist.Status = OrderStatusEnum.READY;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order must be in Pending status to set to Ready.";
+                            return res;
+                        }
+                    }
+                    else if (OrderStatusEnum.ONPORT.ToString().Equals(status.ToUpper().Trim()))
+                    {
+                        if (exist.Status == OrderStatusEnum.READY)
+                        {
+                            exist.Status = OrderStatusEnum.ONPORT;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order must be in Ready status to set to On-Port.";
+                            return res;
+                        }
+                    }
+                }
+                // Handle completed or delivered statuses
+                else if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()) ||
+                         OrderStatusEnum.DELIVERED.ToString().Equals(status.ToUpper().Trim()))
+                {
+                    await UpdateCartItemsStatus((int)exist.UserId, id, CartItemStatus.COMPLETE_AT_ORDER);
+
+                    if (OrderStatusEnum.COMPLETED.ToString().Equals(status.ToUpper().Trim()))
+                    {
+                        if (exist.Status == OrderStatusEnum.DELIVERED)
+                        {
+                            exist.Status = OrderStatusEnum.COMPLETED;
+                            exist.CompleteDate = DateTime.Now;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order must be Delivered to mark as Completed.";
+                            return res;
+                        }
+                    }
+                    else if (OrderStatusEnum.DELIVERED.ToString().Equals(status.ToUpper().Trim()))
+                    {
+                        if (exist.Status == OrderStatusEnum.ONPORT)
+                        {
+                            exist.Status = OrderStatusEnum.DELIVERED;
+                        }
+                        else
+                        {
+                            res.Success = false;
+                            res.Message = "Order must be On-Port to mark as Delivered.";
+                            return res;
+                        }
+                    }
+                }
+                else
+                {
+                    res.Success = false;
+                    res.Message = "Invalid status.";
+                    return res;
+                }
+
+                // Update the order
+                _repo.Update(exist);
+                res.Success = true;
+                res.Message = "Order status updated successfully.";
+                return res;
+            }
+            catch (Exception ex)
+            {
+                res.Success = false;
+                res.Message = $"Failed to change status: {ex.Message}";
+                return res;
+            }
         }
+
+        private async Task UpdateCartItemsStatus(int userId, int orderId, CartItemStatus status)
+        {
+            var cartList = await _cartRepo.GetAll();
+            var cart = cartList.FirstOrDefault(c => c.UserId == userId);
+            if (cart == null) return;
+
+            var listItem = await _cartItemRepo.GetAll();
+            var cartItems = listItem.Where(c => c.UserCartId == cart.UserCartId && c.OrderId == orderId).ToList();
+
+            foreach (var cartItem in cartItems)
+            {
+                await _cartItemService.ChangeStatus(cartItem.CartItemId, status.ToString());
+            }
+        }
+
         #endregion
 
         #region Create Order and Items (with item at specific Status from the Cart)
@@ -697,7 +915,7 @@ namespace BusinessObject.Service
         {
             var order = await _repo.GetByIdAsync(orderId);
 
-            if (order == null || order.Status != OrderStatusEnum.PENDING)
+            if (order == null || order.Status != OrderStatusEnum.DELIVERED)
                 throw new Exception("Order not found or already processed.");
 
             order.Status = OrderStatusEnum.COMPLETED;
