@@ -24,6 +24,7 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<bool>> UpdateListingStatusAsync(int consignmentId, ListingStatusUpdateDTO statusUpdateDto);
         Task<ServiceResponseFormat<FishConsignmentDTO>> UpdateConsignmentAsync(FishConsignmentDTO consignmentDto);
         Task<ServiceResponseFormat<FishConsignmentDTO>> UpdateConsignmentStatusAsync(int consignmentId, ConsignmentStatusEnum newStatus, string? description = null);
+        Task CompleteCareConsignmentAsync(int consignmentId);
 
     }
 }
