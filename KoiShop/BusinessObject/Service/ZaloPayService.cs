@@ -162,7 +162,7 @@ namespace BusinessObject.Service
                 var order = await _orderRepo.GetByIdAsync(payment.OrderId.Value);
                 if (order != null)
                 {
-                    order.Status = isSuccess ? OrderStatusEnum.ONPORT : OrderStatusEnum.CANCELLED;
+                    order.Status = isSuccess ? OrderStatusEnum.READY : OrderStatusEnum.CANCELLED;
                     order.CompleteDate = DateTime.Now;
                     await _orderRepo.UpdateOrder(order);
                 }

@@ -37,10 +37,7 @@ namespace DataAccess.Enum
         PENDING,
         COMPLETED, 
         CANCELLED, 
-        READY,
-        ONPORT,
-        DELIVERED,
-        FAILEDDELIVERY
+        READY
     }
     public enum ConsignmentStatusEnum
     {
