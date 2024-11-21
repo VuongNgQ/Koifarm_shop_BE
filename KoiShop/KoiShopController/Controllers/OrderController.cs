@@ -205,7 +205,6 @@ namespace KoiShopController.Controllers
         /// </summary>
         /// <param name="orderId">ID of order</param>
         [HttpPut("complete/{orderId}")]
-        [Authorize(Roles = "Manager,Admin,Staff,Customer")]
         public async Task<IActionResult> ConfirmOrderCompletion(int orderId)
         {
             try

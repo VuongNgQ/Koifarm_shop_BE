@@ -1,6 +1,7 @@
 ﻿using BusinessObject.IService;
 using BusinessObject.Model.RequestDTO;
 using BusinessObject.Model.ResponseDTO;
+using BusinessObject.Service;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -107,7 +108,7 @@ namespace KoiShopController.Controllers
         /// <summary>
         /// Approve consignment request.
         /// </summary>
-        /// /// <param name="consignmentId">Consignment Id</param>
+        /// <param name="consignmentId">Consignment Id</param>
         /// <param name="approveDTO">Price( for sale)</param>
         /// <returns>.</returns>
         [HttpPost("approve/{consignmentId}")]
@@ -132,6 +133,70 @@ namespace KoiShopController.Controllers
             }
             return Ok(response);
         }
+
+        /// <summary>
+        /// List a fish consignment for sale.
+        /// </summary>
+        /// <param name="consignmentId">The ID of the consignment to list.</param>
+        /// <returns>Success or failure response.</returns>
+        [HttpPost("list-for-sale/{consignmentId}")]
+        public async Task<IActionResult> ListFishForSale(int consignmentId)
+        {
+            if (consignmentId <= 0)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Invalid consignment ID."
+                });
+            }
+            var result = await _consignmentService.ListFishForSaleAsync(consignmentId);
+            if (!result.Success)
+            {
+                return BadRequest(new
+                {
+                    result.Success,
+                    result.Message
+                });
+            }
+            return Ok(new
+            {
+                result.Success,
+                result.Data,
+                result.Message
+            });
+        }
+        [HttpPut("{consignmentId}/update-status")]
+        public async Task<IActionResult> UpdateListingStatus(int consignmentId, [FromForm] ListingStatusUpdateDTO dto)
+        {
+            if (consignmentId <= 0)
+            {
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Invalid consignment ID."
+                });
+            }
+
+            var result = await _consignmentService.UpdateListingStatusAsync(consignmentId, dto);
+
+            if (!result.Success)
+            {
+                return BadRequest(new
+                {
+                    result.Success,
+                    result.Message
+                });
+            }
+
+            return Ok(new
+            {
+                result.Success,
+                result.Data,
+                result.Message
+            });
+        }
+
 
         [HttpPost("{id}/complete-sale")]
         public async Task<IActionResult> CompleteSaleConsignment(int id)

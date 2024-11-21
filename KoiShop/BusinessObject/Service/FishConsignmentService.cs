@@ -259,7 +259,70 @@ namespace BusinessObject.Service
 
             return response;
         }
+        public async Task<ServiceResponseFormat<bool>> UpdateListingStatusAsync(int consignmentId, ListingStatusUpdateDTO statusUpdateDto)
+        {
+            var response = new ServiceResponseFormat<bool>();
 
+            try
+            {
+                var consignment = await _consignmentRepo.GetFishConsignmentByIdAsync(consignmentId);
+                if (consignment == null)
+                {
+                    response.Success = false;
+                    response.Message = "Consignment not found.";
+                    return response;
+                }
+                if (consignment.ConsignmentStatus != ConsignmentStatusEnum.OnProcessing)
+                {
+                    response.Success = false;
+                    response.Message = "Consignment is not currently listed.";
+                    return response;
+                }
+                var fish = await _fishRepo.GetFishByIdAsync(consignment.FishId);
+                if (fish == null)
+                {
+                    response.Success = false;
+                    response.Message = "Fish associated with consignment not found.";
+                    return response;
+                }
+
+                switch (statusUpdateDto.NewStatus)
+                {
+                    case ListingStatusEnum.SOLD:
+                        consignment.ConsignmentStatus = ConsignmentStatusEnum.Sold;
+                        fish.ProductStatus = ProductStatusEnum.SOLDOUT;
+                        break;
+
+                    case ListingStatusEnum.WITHDRAWN:
+                        consignment.ConsignmentStatus = ConsignmentStatusEnum.Withdrawn;
+                        fish.ProductStatus = ProductStatusEnum.UNAVAILABLE;
+                        break;
+
+                    case ListingStatusEnum.EXPIRED:
+                        consignment.ConsignmentStatus = ConsignmentStatusEnum.Completed;
+                        fish.ProductStatus = ProductStatusEnum.UNAVAILABLE;
+                        break;
+
+                    default:
+                        response.Success = false;
+                        response.Message = "Unsupported listing status.";
+                        return response;
+                }
+                await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
+                await _fishRepo.UpdateFishAsync(fish);
+
+                response.Success = true;
+                response.Data = true;
+                response.Message = $"Consignment status updated to {statusUpdateDto.NewStatus}.";
+            }
+            catch (Exception ex)
+            {
+                response.Success = false;
+                response.Message = $"Error updating listing status: {ex.Message}";
+            }
+
+            return response;
+        }
 
         public async Task<ServiceResponseFormat<bool>> CompleteSaleConsignmentAsync(int consignmentId)
         {

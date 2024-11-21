@@ -12,6 +12,7 @@ namespace DataAccess.IRepo
         Task<FishConsignment?> GetFishConsignmentByIdAsync(int id);
         Task<IEnumerable<FishConsignment>> GetAllFishConsignmentAsync();
         Task<IEnumerable<FishConsignment>> GetConsignmentsByUserIdAsync(int userId);
+        Task<FishConsignment?> GetConsignmentByFishIdAsync(int fishId);
         Task<FishConsignment?> AddFishConsignmentAsync(FishConsignment consignment);
         Task<FishConsignment?> UpdateFishConsignmentAsync(FishConsignment consignment);
         Task DeleteFishConsignmentAsync(int id);

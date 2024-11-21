@@ -97,21 +97,6 @@ namespace BusinessObject.Service
             return response;
         }
 
-        public async Task<Payment> CreateDepositPaymentAsync(int userId, int relatedId, decimal amount, string description)
-        {
-            var payment = new Payment
-            {
-                TransactionType = TransactionPurpose.CareConsignment,
-                FishConsignmentId = relatedId,
-                Amount = amount,
-                PaymentDate = DateTime.Now,
-                PaymentStatus = PaymentStatus.Pending,
-                Description = description
-            };
-
-            return await _paymentRepository.AddPaymentAsync(payment);
-        }
-
         public async Task<Payment> CreateSalePaymentAsync(int userId, int relatedId, decimal amount, string description)
         {
             var payment = new Payment
@@ -151,20 +136,5 @@ namespace BusinessObject.Service
             };
             return await _paymentRepository.AddPaymentAsync(payment);
         }
-
-        public async Task<Payment> CompleteSalePaymentToCustomerAsync(int userId, int relatedId, decimal amount, string description)
-        {
-            var payment = new Payment
-            {
-                TransactionType = TransactionPurpose.SaleConsignment,
-                FishConsignmentId = relatedId,
-                Amount = amount,
-                PaymentDate = DateTime.Now,
-                PaymentStatus = PaymentStatus.Completed,
-                Description = description
-            };
-            return await _paymentRepository.AddPaymentAsync(payment);
-        }
-
     }
 }

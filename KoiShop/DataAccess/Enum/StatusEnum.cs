@@ -45,6 +45,8 @@ namespace DataAccess.Enum
         Approved,
         OnProcessing,
         Rejected,
+        Sold,
+        Withdrawn,
         Completed,
         Cancelled
     }

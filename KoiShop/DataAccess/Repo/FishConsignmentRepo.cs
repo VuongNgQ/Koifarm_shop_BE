@@ -1,4 +1,5 @@
 ﻿using DataAccess.Entity;
+using DataAccess.Enum;
 using DataAccess.IRepo;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -42,6 +43,12 @@ namespace DataAccess.Repo
                 .Include(fc => fc.Payments)
                 .ToListAsync();
         }
+        public async Task<FishConsignment?> GetConsignmentByFishIdAsync(int fishId)
+        {
+            return await _context.FishConsignments
+                .FirstOrDefaultAsync(c => c.FishId == fishId);
+        }
+
         public async Task<FishConsignment?> AddFishConsignmentAsync(FishConsignment consignment)
         {
             await _context.FishConsignments.AddAsync(consignment);

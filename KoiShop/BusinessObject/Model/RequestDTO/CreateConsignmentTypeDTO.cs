@@ -45,4 +45,15 @@ namespace BusinessObject.Model.RequestDTO
         public decimal CommissionFee { get; set; }
         public int ConsignmentDurationMonths { get; set; }
     }
+    public class ListingStatusUpdateDTO
+    {
+        public ListingStatusEnum NewStatus { get; set; }
+    }
+    public enum ListingStatusEnum
+    {
+        SOLD,
+        WITHDRAWN,   // Rút khỏi danh sách bán
+        EXPIRED      // Hết hạn
+    }
+
 }
