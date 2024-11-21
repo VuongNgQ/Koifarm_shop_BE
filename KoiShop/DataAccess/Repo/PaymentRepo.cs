@@ -31,7 +31,7 @@ namespace DataAccess.Repo
         }
         public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
         {
-            return await _context.Payments
+            return await _context.Payments.Include(p => p.Order)
                 .ToListAsync();
         }
         public async Task<Payment?> GetPaymentByTransactionIdAsync(int transactionId)

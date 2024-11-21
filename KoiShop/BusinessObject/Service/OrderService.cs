@@ -37,12 +37,13 @@ namespace BusinessObject.Service
         private readonly IFishPackageService _packageService;
         private readonly IFishService _fishService;
         private readonly IUserFishOwnerShipRepo _ownerShipRepo;
+        private readonly IFishConsignmentRepo _consignmentRepo;
         public OrderService(IOrderRepo repo, 
             IMapper mapper, IAddressRepo addressRepo, IUserAddressRepo uaRepo
             , IUserRepo userRepo, IOrderItemRepo itemRepo, ICartRepo cartRepo
             , ICartItemRepo cartItemRepo, IOrderItemRepo orderItemRepo, ICartItemService cartItemService
             , IOrderItemService orderItemService, IFishPackageService packageService, IFishService fishService
-            , IFishPackageRepo packageRepo, IUserFishOwnerShipRepo ownerShipRepo, IFishRepo fishRepo)
+            , IFishPackageRepo packageRepo, IUserFishOwnerShipRepo ownerShipRepo, IFishRepo fishRepo, IFishConsignmentRepo consignmentRepo)
         {
             _repo = repo;
             _mapper = mapper;
@@ -61,7 +62,7 @@ namespace BusinessObject.Service
             _orderItemService = orderItemService;
             _packageService = packageService;
             _fishService = fishService;
-            
+            _consignmentRepo = consignmentRepo;
         }
         #region Change status(da hell?)
         public async Task<ServiceResponseFormat<bool>> FinishOrder(int id)
@@ -673,21 +674,34 @@ namespace BusinessObject.Service
 
         public async Task MarkOrderAsCompleted(int orderId)//Minh
         {
-            var order = await _repo.GetByIdAsync(orderId);
-
+            var order = await _repo.GetByIdWithItemsAsync(orderId);
             if (order == null || order.Status != OrderStatusEnum.READY)
+            {
                 throw new Exception("Order not found or already processed.");
+            }
             foreach (var item in order.OrderItems)
             {
                 if (item.FishId.HasValue)
                 {
+                    var consignment = await _consignmentRepo.GetConsignmentByFishIdAsync(item.FishId.Value);
+                    if (consignment != null)
+                    {
+                        consignment.ConsignmentStatus = ConsignmentStatusEnum.Sold;
+                        consignment.Earned = consignment.FinalPrice - (consignment.CommissionFee ?? 0) - (consignment.ServiceFee ?? 0);
+                        await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
+                    }
+                    var fish = await _fishRepo.GetFishByIdAsync(item.FishId.Value);
+                    if (fish != null)
+                    {
+                        fish.ProductStatus = ProductStatusEnum.SOLDOUT;
+                        await _fishRepo.UpdateFishAsync(fish);
+                    }
                     var ownership = new UserFishOwnership
                     {
                         UserId = order.UserId.Value,
                         FishId = item.FishId.Value,
                         PurchaseDate = DateTime.Now
                     };
-
                     await _ownerShipRepo.AddAsync(ownership);
                 }
             }

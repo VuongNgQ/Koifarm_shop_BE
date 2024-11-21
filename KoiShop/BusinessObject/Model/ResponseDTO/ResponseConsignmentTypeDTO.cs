@@ -23,6 +23,7 @@ namespace BusinessObject.Model.ResponseDTO
         public int FishConsignmentId { get; set; }
         public int UserId { get; set; }
         public string? UserName {  get; set; }
+        public string? Purpose { get; set; }
         public int FishId { get; set; }
         public string? ConditionDescription { get; set; }
         public DateTime? CreateDate { get; set; }
@@ -39,6 +40,7 @@ namespace BusinessObject.Model.ResponseDTO
         public int FishConsignmentId { get; set; }
         public int UserId { get; set; }
         public string? UserName { get; set; }
+        public string? Purpose { get; set; }
         public decimal? InitialPrice { get; set; }
         public decimal? FinalPrice { get; set; }
         public decimal? ServiceFee { get; set; }

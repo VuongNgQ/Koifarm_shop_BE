@@ -18,6 +18,7 @@ namespace DataAccess.Entity
         public decimal? FinalPrice { get; set; }
         public decimal? ServiceFee { get; set; }
         public decimal? CommissionFee { get; set; }
+        public decimal? Earned { get; set; }
         public DateTime? CreateDate { get; set; } = DateTime.Now;
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
