@@ -65,7 +65,7 @@ namespace BusinessObject.Service
                     ConsignmentStatus = ConsignmentStatusEnum.PendingApproval,
                     StartDate = dto.TransferDate,
                     EndDate = dto.ReceiveDate,
-                    InitialPrice = dto.Price
+                    FinalPrice = dto.Price
                 };
 
                 await _consignmentRepo.AddFishConsignmentAsync(consignment);
@@ -162,7 +162,6 @@ namespace BusinessObject.Service
                 switch (consignment.Purpose)
                 {
                     case ConsignmentPurpose.Care:
-
                         consignment.ConsignmentStatus = ConsignmentStatusEnum.Approved;
                         await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
                         response.Message = "Care consignment approved.";
@@ -331,12 +330,6 @@ namespace BusinessObject.Service
             try
             {
                 var consignment = await _consignmentRepo.GetFishConsignmentByIdAsync(consignmentId);
-                if (consignment == null || consignment.ConsignmentStatus != ConsignmentStatusEnum.Sold)
-                {
-                    response.Success = false;
-                    response.Message = "Consignment not found or not in PendingPayment status.";
-                    return response;
-                }
                 string invoiceUrl = string.Empty;
                 if (invoice.InvoiceFile != null)
                 {
@@ -346,10 +339,38 @@ namespace BusinessObject.Service
                         invoiceUrl = await imageService.UploadImageAsync(stream, invoice.InvoiceFile.FileName);
                     }
                 }
-                consignment.ImageUrls = invoiceUrl;
-                consignment.ConsignmentStatus = ConsignmentStatusEnum.Completed;
-                consignment.EndDate = DateTime.Now;
-                await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
+                switch (consignment.Purpose)
+                {
+                    case ConsignmentPurpose.Care:
+                        if (consignment == null || consignment.ConsignmentStatus == ConsignmentStatusEnum.Completed)
+                            throw new Exception("Consignment not found or already completed");
+
+                        consignment.ConsignmentStatus = ConsignmentStatusEnum.Completed;
+                        consignment.EndDate = DateTime.Now;
+                        consignment.ImageUrls = invoiceUrl;
+                        await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
+                        response.Message = "Care consignment completed.";
+                        break;
+
+                    case ConsignmentPurpose.Sale:
+                        if (consignment == null || consignment.ConsignmentStatus != ConsignmentStatusEnum.Sold)
+                        {
+                            response.Success = false;
+                            response.Message = "Consignment not found or not in sold status.";
+                            return response;
+                        }
+                        consignment.ImageUrls = invoiceUrl;
+                        consignment.ConsignmentStatus = ConsignmentStatusEnum.Completed;
+                        consignment.EndDate = DateTime.Now;
+                        await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
+                        response.Message = "Sale consignment completed with earned price transfered.";
+                        break;
+
+                    default:
+                        response.Success = false;
+                        response.Message = "Unsupported consignment purpose.";
+                        return response;
+                }
                 response.Success = true;
                 response.Message = "Consignment marked as completed with invoice uploaded.";
             }
@@ -497,12 +518,17 @@ namespace BusinessObject.Service
             }
             return response;
         }
-        private decimal CalculateServiceFee(decimal? size)
+        public async Task CompleteCareConsignmentAsync(int consignmentId)
         {
-            if (size == null) return 0;
-            decimal baseFee = 20000;                      // Phí cơ bản
-            decimal sizeMultiplier = size.Value * 10000;   // Tăng phí theo kích thước
-            return baseFee + sizeMultiplier;
+            var consignment = await _repo.GetByIdAsync(consignmentId);
+
+            if (consignment == null || consignment.Status == ConsignmentStatusEnum.Completed)
+                throw new Exception("Consignment not found or already completed");
+
+            consignment.Status = ConsignmentStatusEnum.Completed;
+            consignment.CareCompletedDate = DateTime.Now;
+
+            await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
         }
     }
 }

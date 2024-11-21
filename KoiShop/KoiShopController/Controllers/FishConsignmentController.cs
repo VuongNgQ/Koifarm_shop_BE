@@ -197,7 +197,16 @@ namespace KoiShopController.Controllers
             });
         }
 
-
+        [HttpPost("{id}/complete-care")]
+        public async Task<IActionResult> CompleteCConsignment(int id, [FromForm] Invoice invoice)
+        {
+            var response = await _consignmentService.MarkPaymentAsCompletedAsync(id, invoice);
+            if (response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
         [HttpPost("{id}/complete-sale")]
         public async Task<IActionResult> CompleteConsignment(int id, [FromForm] Invoice invoice)
         {
