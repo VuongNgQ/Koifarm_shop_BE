@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    partial class KoiShopContextModelSnapshot : ModelSnapshot
+    [Migration("20241121143600_updateConsignmentEntity")]
+    partial class updateConsignmentEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -222,9 +225,6 @@ namespace DataAccess.Migrations
 
                     b.Property<string>("ConditionDescription")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ConsignmentDurationMonths")
-                        .HasColumnType("int");
 
                     b.Property<int>("ConsignmentStatus")
                         .HasColumnType("int");

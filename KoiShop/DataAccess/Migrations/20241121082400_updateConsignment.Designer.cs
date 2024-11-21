@@ -4,6 +4,7 @@ using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(KoiShopContext))]
-    partial class KoiShopContextModelSnapshot : ModelSnapshot
+    [Migration("20241121082400_updateConsignment")]
+    partial class updateConsignment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -217,14 +220,8 @@ namespace DataAccess.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("FishConsignmentId"));
 
-                    b.Property<decimal?>("CommissionFee")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("ConditionDescription")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ConsignmentDurationMonths")
-                        .HasColumnType("int");
 
                     b.Property<int>("ConsignmentStatus")
                         .HasColumnType("int");
@@ -232,31 +229,25 @@ namespace DataAccess.Migrations
                     b.Property<DateTime?>("CreateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("FinalPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("FishId")
+                    b.Property<int?>("FishId")
                         .HasColumnType("int");
 
                     b.Property<string>("ImageUrls")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<decimal?>("InitialPrice")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("Purpose")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("ServiceFee")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<DateTime?>("ReceiveDate")
+                        .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("StartDate")
+                    b.Property<DateTime?>("TransferDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Type")
@@ -264,9 +255,6 @@ namespace DataAccess.Migrations
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Video")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("FishConsignmentId");
 
@@ -705,8 +693,7 @@ namespace DataAccess.Migrations
                     b.HasOne("DataAccess.Entity.Fish", "Fish")
                         .WithMany("Consignments")
                         .HasForeignKey("FishId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("DataAccess.Entity.User", "User")
                         .WithMany("FishConsignments")
