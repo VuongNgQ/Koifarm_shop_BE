@@ -52,8 +52,11 @@ namespace BusinessObject.Model.RequestDTO
     public enum ListingStatusEnum
     {
         SOLD,
-        WITHDRAWN,   // Rút khỏi danh sách bán
-        EXPIRED      // Hết hạn
+        WITHDRAWN,
+        EXPIRED
     }
-
+    public class Invoice
+    {
+        public IFormFile? InvoiceFile { get; set; }
+    }
 }

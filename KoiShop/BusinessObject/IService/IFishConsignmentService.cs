@@ -2,6 +2,7 @@
 using BusinessObject.Model.ResponseDTO;
 using DataAccess.Entity;
 using DataAccess.Enum;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ namespace BusinessObject.IService
         Task<ServiceResponseFormat<int>> CreateCareConsignmentAsync(CareConsignmentDTO consignmentDto);
         Task<ServiceResponseFormat<int>> CreateSaleConsignmentAsync(SaleConsignmentDTO consignmentDto);
         Task<ServiceResponseFormat<bool>> ApproveConsignmentAsync(int consignmentId, ApproveConsignmentDTO approveDto);
-        Task<ServiceResponseFormat<bool>> CompleteSaleConsignmentAsync(int consignmentId);
+        Task<ServiceResponseFormat<bool>> MarkPaymentAsCompletedAsync(int consignmentId, Invoice invoice);
         Task<ServiceResponseFormat<object>> GetConsignmentByIdAsync(int consignmentId);
         Task<ServiceResponseFormat<List<object>>> GetAllConsignmentsAsync();
         Task<ServiceResponseFormat<List<object>>> GetConsignmentsByUserIdAsync(int userId);

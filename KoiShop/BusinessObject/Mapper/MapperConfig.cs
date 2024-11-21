@@ -114,6 +114,7 @@ namespace BusinessObject.Mapper
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User != null ? src.User.Name : null))
                 .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate.HasValue ? src.CreateDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
                 .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate.HasValue ? src.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
+                .ForMember(dest => dest.EndDate, opt => opt.MapFrom(src => src.EndDate.HasValue ? src.EndDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
                 .ForMember(dest => dest.ConsignmentStatus, opt => opt.MapFrom(src => Enum.GetName(typeof(ConsignmentStatusEnum), src.ConsignmentStatus)))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => Enum.GetName(typeof(ConsignmentType), src.Type)))
                 .ReverseMap();
