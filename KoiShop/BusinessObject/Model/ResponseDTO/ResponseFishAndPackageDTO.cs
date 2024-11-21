@@ -12,6 +12,7 @@ namespace BusinessObject.Model.ResponseDTO
         public int? FishId { get; set; }
         public int? FishPackageId { get; set; }
         public string? Name { get; set; }
+        public string? ImageUrl { get; set; }
         public decimal? Price { get; set; }
         public decimal? MinSize { get; set; }
         public decimal? MaxSize { get; set; }
