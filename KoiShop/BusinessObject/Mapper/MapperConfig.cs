@@ -105,14 +105,15 @@ namespace BusinessObject.Mapper
                 .ReverseMap();
             CreateMap<FishConsignment, FishConsignmentCareResponseDTO>()
                 .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate.HasValue ? src.CreateDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
-                .ForMember(dest => dest.TransferDate, opt => opt.MapFrom(src => src.TransferDate.HasValue ? src.TransferDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
-                .ForMember(dest => dest.ReceiveDate, opt => opt.MapFrom(src => src.ReceiveDate.HasValue ? src.ReceiveDate.Value.ToString("yyyy-MM-ddTHH:mm:ss"): null))
+                .ForMember(dest => dest.TransferDate, opt => opt.MapFrom(src => src.StartDate.HasValue ? src.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
+                .ForMember(dest => dest.ReceiveDate, opt => opt.MapFrom(src => src.EndDate.HasValue ? src.EndDate.Value.ToString("yyyy-MM-ddTHH:mm:ss"): null))
                 .ForMember(dest => dest.ConsignmentStatus, opt => opt.MapFrom(src => Enum.GetName(typeof(ConsignmentStatusEnum), src.ConsignmentStatus)))
                 .ReverseMap();
             CreateMap<FishConsignment, FishConsignmentSaleResponseDTO>()
                 .ForMember(dest => dest.CreateDate, opt => opt.MapFrom(src => src.CreateDate.HasValue ? src.CreateDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
-                .ForMember(dest => dest.TransferDate, opt => opt.MapFrom(src => src.TransferDate.HasValue ? src.TransferDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
+                .ForMember(dest => dest.StartDate, opt => opt.MapFrom(src => src.StartDate.HasValue ? src.StartDate.Value.ToString("yyyy-MM-ddTHH:mm:ss") : null))
                 .ForMember(dest => dest.ConsignmentStatus, opt => opt.MapFrom(src => Enum.GetName(typeof(ConsignmentStatusEnum), src.ConsignmentStatus)))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => Enum.GetName(typeof(ConsignmentType), src.Type)))
                 .ReverseMap();
             CreateMap<Fish, FishInfoDTO>()
                 .ForMember(dest => dest.Gender, opt => opt.MapFrom(src => Enum.GetName(typeof(FishGenderEnum), src.Gender)))

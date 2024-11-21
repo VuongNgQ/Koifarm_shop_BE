@@ -104,18 +104,6 @@ namespace KoiShopController.Controllers
             return Ok(result.Message);
         }
 
-
-        [HttpPut("update")]
-        public async Task<IActionResult> UpdateConsignment([FromBody] FishConsignmentDTO consignmentDto)
-        {
-            var response = await _consignmentService.UpdateConsignmentAsync(consignmentDto);
-            if (!response.Success)
-            {
-                return BadRequest(response);
-            }
-            return Ok(response);
-        }
-
         /// <summary>
         /// Approve consignment request.
         /// </summary>
@@ -126,6 +114,18 @@ namespace KoiShopController.Controllers
         public async Task<IActionResult> ApproveConsignment(int consignmentId, [FromBody] ApproveConsignmentDTO approveDTO)
         {
             var response = await _consignmentService.ApproveConsignmentAsync(consignmentId, approveDTO);
+            if (!response.Success)
+            {
+                return BadRequest(response);
+            }
+            return Ok(response);
+        }
+
+
+        [HttpPut("update")]
+        public async Task<IActionResult> UpdateConsignment([FromBody] FishConsignmentDTO consignmentDto)
+        {
+            var response = await _consignmentService.UpdateConsignmentAsync(consignmentDto);
             if (!response.Success)
             {
                 return BadRequest(response);

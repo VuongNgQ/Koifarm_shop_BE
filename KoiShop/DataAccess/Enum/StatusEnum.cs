@@ -46,9 +46,10 @@ namespace DataAccess.Enum
     {
         PendingApproval,
         Approved,
-        PriceAgreed,
+        OnProcessing,
         Rejected,
-        Completed
+        Completed,
+        Cancelled
     }
     public enum UserStatusEnum
     {

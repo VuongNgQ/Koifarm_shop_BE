@@ -11,18 +11,21 @@ namespace BusinessObject.Model.RequestDTO
     public class CreateConsignmentDTO
     {
         public int UserId { get; set; }
-        public ConsignmentType Type { get; set; }
         public string? ConditionDescription { get; set; }
+        public string? Phone { get; set; }
         public decimal? Price { get; set; }
+        public string? Video { get; set; }
     }
     public class CareConsignmentDTO : CreateConsignmentDTO
     {
         public int FishId { get; set; }
+        public IFormFile? ImageUrl { get; set; }
         public DateTime? TransferDate { get; set; }
         public DateTime? ReceiveDate { get; set; }
     }
     public class SaleConsignmentDTO : CreateConsignmentDTO
     {
+        public ConsignmentType Type { get; set; }
         public FishInfoDTO? FishInfo { get; set; }
     }
     public class FishInfoDTO
@@ -38,6 +41,8 @@ namespace BusinessObject.Model.RequestDTO
     public class ApproveConsignmentDTO
     {
         public decimal AgreedPrice { get; set; }
-        public decimal FishSaleAmount { get; set; }
+        public decimal ServiceFee { get; set; }
+        public decimal CommissionFee { get; set; }
+        public int ConsignmentDurationMonths { get; set; }
     }
 }

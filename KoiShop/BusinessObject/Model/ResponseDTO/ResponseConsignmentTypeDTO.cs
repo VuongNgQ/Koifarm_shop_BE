@@ -14,15 +14,9 @@ namespace BusinessObject.Model.ResponseDTO
         public int UserId { get; set; }
         public int? FishId { get; set; }
         public string? Purpose { get; set; }
-        //public ConsignmentType Type { get; set; }
-        //public decimal? Price { get; set; }
-        //public decimal? DepositAmount { get; set; }
         public DateTime? CreateDate { get; set; }
-        //public DateTime? TransferDate { get; set; }
-        //public DateTime? ReceiveDate { get; set; }
         public string? ConditionDescription { get; set; }
         public string? ConsignmentStatus { get; set; }
-        //public string? ImageUrls { get; set; }
     }
     public class FishConsignmentCareResponseDTO
     {
@@ -33,18 +27,25 @@ namespace BusinessObject.Model.ResponseDTO
         public DateTime? CreateDate { get; set; }
         public DateTime? TransferDate { get; set; }
         public DateTime? ReceiveDate { get; set; }
+        public string? Phone { get; set; }
         public string? Type { get; set; }
         public string? ConsignmentStatus { get; set; }
+        public decimal? ServiceFee { get; set; }
         public string? ImageUrls { get; set; }
     }
     public class FishConsignmentSaleResponseDTO
     {
         public int FishConsignmentId { get; set; }
         public int UserId { get; set; }
-        public decimal? Price { get; set; }
+        public decimal? InitialPrice { get; set; }
+        public decimal? FinalPrice { get; set; }
+        public decimal? ServiceFee { get; set; }
+        public decimal? CommissionFee { get; set; }
         public string? ConditionDescription { get; set; }
         public DateTime? CreateDate { get; set; }
-        public DateTime? TransferDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? Phone { get; set; }
         public FishInfoResponseDTO? FishInfo { get; set; }
         public string? Type { get; set; }
         public string? ConsignmentStatus { get; set; }
@@ -58,5 +59,6 @@ namespace BusinessObject.Model.ResponseDTO
         public string? Status { get; set; }
         public decimal? Size { get; set; }
         public string? ImageUrl { get; set; }
+        public string? Video { get; set; }
     }
 }
