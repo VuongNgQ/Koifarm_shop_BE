@@ -639,6 +639,7 @@ namespace BusinessObject.Service
                     FishId = f.FishId,
                     Name = f.Name,
                     Price = f.Price,
+                    ImageUrl = f.ImageUrl,
                     MinSize = f.Size,
                     MaxSize = f.Size,
                     ProductStatus = f.ProductStatus.ToString(), // Convert Enum to String
@@ -652,6 +653,7 @@ namespace BusinessObject.Service
                 {
                     FishPackageId = p.FishPackageId,
                     Name = p.Name,
+                    ImageUrl = p.ImageUrl,
                     Price = p.TotalPrice,
                     MinSize = p.MinSize,
                     MaxSize = p.MaxSize,
