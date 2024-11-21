@@ -58,7 +58,7 @@ namespace BusinessObject.Service
             }).ToArray();
             Random rnd = new Random();
             var embed_data = new { orderId = orderId};
-            var callbackUrl = "https://7b3b-118-69-182-144.ngrok-free.app/api/Payment/zalopay-callback";
+            var callbackUrl = "https://1dfd-2405-4802-9037-8e30-fcc7-cb14-8560-6ad1.ngrok-free.app/api/Payment/zalopay-callback";
             var app_trans_id = rnd.Next(1000000);
 
             var payment = new Payment
