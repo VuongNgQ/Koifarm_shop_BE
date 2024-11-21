@@ -45,6 +45,7 @@ namespace BusinessObject.Model.ResponseDTO
         public decimal? FinalPrice { get; set; }
         public decimal? ServiceFee { get; set; }
         public decimal? CommissionFee { get; set; }
+        public decimal? Earned { get; set; }
         public string? ConditionDescription { get; set; }
         public DateTime? CreateDate { get; set; }
         public DateTime? StartDate { get; set; }
