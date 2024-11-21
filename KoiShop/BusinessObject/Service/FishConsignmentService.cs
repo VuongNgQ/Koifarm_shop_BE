@@ -328,15 +328,29 @@ namespace BusinessObject.Service
             return response;
         }
 
-        public async Task<ServiceResponseFormat<List<FishConsignmentDTO>>> GetAllConsignmentsAsync()
+        public async Task<ServiceResponseFormat<List<object>>> GetAllConsignmentsAsync()
         {
-            var response = new ServiceResponseFormat<List<FishConsignmentDTO>>();
+            var response = new ServiceResponseFormat<List<object>>();
 
             try
             {
                 var consignments = await _consignmentRepo.GetAllFishConsignmentAsync();
-
-                response.Data = _mapper.Map<List<FishConsignmentDTO>>(consignments);
+                var mappedConsignments = consignments.Select(consignment =>
+                {
+                    if (consignment.Purpose == ConsignmentPurpose.Care)
+                    {
+                        return (object)_mapper.Map<FishConsignmentCareResponseDTO>(consignment);
+                    }
+                    else if (consignment.Purpose == ConsignmentPurpose.Sale)
+                    {
+                        var saleDto = _mapper.Map<FishConsignmentSaleResponseDTO>(consignment);
+                        saleDto.FishInfo = _mapper.Map<FishInfoResponseDTO>(consignment.Fish);
+                        return (object)saleDto;
+                    }
+                    return null;
+                }).Where(dto => dto != null).ToList();
+                response.Data = mappedConsignments;
+                //response.Data = _mapper.Map<List<FishConsignmentDTO>>(consignments);
                 response.Success = true;
                 response.Message = "Consignments retrieved successfully.";
             }
@@ -382,15 +396,29 @@ namespace BusinessObject.Service
             await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
             return new ServiceResponseFormat<FishConsignmentDTO> { Success = true, Message = "Status updated successfully." };
         }
-        public async Task<ServiceResponseFormat<List<FishConsignmentDTO>>> GetConsignmentsByUserIdAsync(int userId)
+        public async Task<ServiceResponseFormat<List<object>>> GetConsignmentsByUserIdAsync(int userId)
         {
-            var response = new ServiceResponseFormat<List<FishConsignmentDTO>>();
+            var response = new ServiceResponseFormat<List<object>>();
 
             try
             {  
                 var consignments = await _consignmentRepo.GetConsignmentsByUserIdAsync(userId);
-
-                response.Data = _mapper.Map<List<FishConsignmentDTO>>(consignments);
+                var mappedConsignments = consignments.Select(consignment =>
+                {
+                    if (consignment.Purpose == ConsignmentPurpose.Care)
+                    {
+                        return (object)_mapper.Map<FishConsignmentCareResponseDTO>(consignment);
+                    }
+                    else if (consignment.Purpose == ConsignmentPurpose.Sale)
+                    {
+                        var saleDto = _mapper.Map<FishConsignmentSaleResponseDTO>(consignment);
+                        saleDto.FishInfo = _mapper.Map<FishInfoResponseDTO>(consignment.Fish);
+                        return (object)saleDto;
+                    }
+                    return null;
+                }).Where(dto => dto != null).ToList();
+                response.Data = mappedConsignments;
+                //response.Data = _mapper.Map<List<FishConsignmentDTO>>(consignments);
                 response.Success = true;
                 response.Message = "Consignments retrieved successfully.";
             }

@@ -22,9 +22,29 @@ namespace BusinessObject.Service
             _mapper = mapper;
         }
 
-        public async Task<Payment?> GetPaymentByIdAsync(int id)
+        public async Task<ServiceResponseFormat<PaymentDTO>> GetPaymentByIdAsync(int id)
         {
-            return await _paymentRepository.GetPaymentByIdAsync(id);
+            var response = new ServiceResponseFormat<PaymentDTO>();
+            try
+            {
+                var payments = await _paymentRepository.GetPaymentByIdAsync(id);
+
+                if (payments == null)
+                {
+                    throw new Exception("Payment not found.");
+                }
+
+                response.Data = _mapper.Map<PaymentDTO>(payments);
+                response.Success = true;
+                response.Message = "Payments successfully retrieved.";
+            }
+            catch (Exception ex)
+            {
+
+                response.Success = false;
+                response.Message = $"Error getting transaction: {ex.Message}";
+            }
+            return response;
         }
 
         public async Task<ServiceResponseFormat<List<PaymentDTO>>> GetPaymentByUserIdAsync(int id)
@@ -52,9 +72,29 @@ namespace BusinessObject.Service
             return response;
         }
 
-        public async Task<IEnumerable<Payment>> GetAllPaymentsAsync()
+        public async Task<ServiceResponseFormat<List<PaymentDTO>>> GetAllPaymentsAsync()
         {
-            return await _paymentRepository.GetAllPaymentsAsync();
+            var response = new ServiceResponseFormat<List<PaymentDTO>>();
+            try
+            {
+                var payments = await _paymentRepository.GetAllPaymentsAsync();
+
+                if (payments == null)
+                {
+                    throw new Exception("Payment not found.");
+                }
+
+                response.Data = _mapper.Map<List<PaymentDTO>>(payments);
+                response.Success = true;
+                response.Message = "Payments successfully retrieved.";
+            }
+            catch (Exception ex)
+            {
+
+                response.Success = false;
+                response.Message = $"Error getting transaction: {ex.Message}";
+            }
+            return response;
         }
 
         public async Task<Payment> CreateDepositPaymentAsync(int userId, int relatedId, decimal amount, string description)
