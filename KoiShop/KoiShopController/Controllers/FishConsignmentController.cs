@@ -199,9 +199,9 @@ namespace KoiShopController.Controllers
 
 
         [HttpPost("{id}/complete-sale")]
-        public async Task<IActionResult> CompleteSaleConsignment(int id)
+        public async Task<IActionResult> CompleteConsignment(int id, [FromForm] Invoice invoice)
         {
-            var response = await _consignmentService.CompleteSaleConsignmentAsync(id);
+            var response = await _consignmentService.MarkPaymentAsCompletedAsync(id, invoice);
             if (response.Success)
             {
                 return BadRequest(response);

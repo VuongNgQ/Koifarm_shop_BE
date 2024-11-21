@@ -6,6 +6,7 @@ using BusinessObject.Utils;
 using DataAccess.Entity;
 using DataAccess.Enum;
 using DataAccess.IRepo;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -177,6 +178,7 @@ namespace BusinessObject.Service
                         consignment.FinalPrice = approveDto.AgreedPrice;
                         consignment.ServiceFee = approveDto.ServiceFee;
                         consignment.CommissionFee = approveDto.CommissionFee;
+                        consignment.ConsignmentDurationMonths = approveDto.ConsignmentDurationMonths;
                         consignment.ConsignmentStatus = ConsignmentStatusEnum.Approved;
                         fish.Price = approveDto.AgreedPrice;
                         await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
@@ -239,7 +241,7 @@ namespace BusinessObject.Service
                     response.Message = "Fish price must be set before listing.";
                     return response;
                 }
-                var currentDate = DateTime.UtcNow;
+                var currentDate = DateTime.Now;
                 consignment.StartDate = currentDate;
                 consignment.EndDate = currentDate.AddMonths(consignment.ConsignmentDurationMonths);
                 consignment.ConsignmentStatus = ConsignmentStatusEnum.OnProcessing;
@@ -323,35 +325,38 @@ namespace BusinessObject.Service
 
             return response;
         }
-
-        public async Task<ServiceResponseFormat<bool>> CompleteSaleConsignmentAsync(int consignmentId)
+        public async Task<ServiceResponseFormat<bool>> MarkPaymentAsCompletedAsync(int consignmentId, Invoice invoice)
         {
             var response = new ServiceResponseFormat<bool>();
-
             try
             {
                 var consignment = await _consignmentRepo.GetFishConsignmentByIdAsync(consignmentId);
-                if (consignment == null || consignment.Purpose != ConsignmentPurpose.Sale)
+                if (consignment == null || consignment.ConsignmentStatus != ConsignmentStatusEnum.Sold)
                 {
                     response.Success = false;
-                    response.Message = "Consignment not found or invalid purpose.";
+                    response.Message = "Consignment not found or not in PendingPayment status.";
                     return response;
                 }
-
+                string invoiceUrl = string.Empty;
+                if (invoice.InvoiceFile != null)
+                {
+                    using (var stream = invoice.InvoiceFile.OpenReadStream())
+                    {
+                        var imageService = new CloudinaryService();
+                        invoiceUrl = await imageService.UploadImageAsync(stream, invoice.InvoiceFile.FileName);
+                    }
+                }
+                consignment.ImageUrls = invoiceUrl;
                 consignment.ConsignmentStatus = ConsignmentStatusEnum.Completed;
+                consignment.EndDate = DateTime.Now;
                 await _consignmentRepo.UpdateFishConsignmentAsync(consignment);
-
-                // Tạo thanh toán cho khách hàng sau khi hoàn tất bán
-                await _paymentService.CreateSalePaymentAsync(consignment.UserId.Value, consignment.FishConsignmentId, consignment.InitialPrice.Value, "Payment for completed sale consignment");
-
                 response.Success = true;
-                response.Data = true;
-                response.Message = "Sale consignment completed and payment processed successfully.";
+                response.Message = "Consignment marked as completed with invoice uploaded.";
             }
             catch (Exception ex)
             {
                 response.Success = false;
-                response.Message = $"Error completing sale consignment: {ex.Message}";
+                response.Message = $"Error completing consignment: {ex.Message}";
             }
 
             return response;

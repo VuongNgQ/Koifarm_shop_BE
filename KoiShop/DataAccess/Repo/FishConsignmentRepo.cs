@@ -55,6 +55,17 @@ namespace DataAccess.Repo
             await _context.SaveChangesAsync();
             return await _context.FishConsignments.FirstOrDefaultAsync(f => f.FishConsignmentId ==consignment.FishConsignmentId);
         }
+        public async Task MarkPaymentAsCompletedAsync(int consignmentId)
+        {
+            var consignment = await GetFishConsignmentByIdAsync(consignmentId);
+            if (consignment == null || consignment.ConsignmentStatus != ConsignmentStatusEnum.Sold)
+            {
+                throw new Exception("Consignment not found or not in PendingPayment status.");
+            }
+            consignment.ConsignmentStatus = ConsignmentStatusEnum.Completed;
+            consignment.EndDate = DateTime.Now;
+            await UpdateFishConsignmentAsync(consignment);
+        }
 
         public async Task<FishConsignment?> UpdateFishConsignmentAsync(FishConsignment consignment)
         {
